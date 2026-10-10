@@ -1,9 +1,14 @@
 .env
+.env.*
+*.env
+*.env.*
 *.pyc
 __pycache__/
 .venv/
 gallery/
-social_spark.db
+social_spark.db*
+*.db-wal
+*.db-shm
 social_spark.log
 # agents-cli deploy state — points at one specific engine in one project
 .adk/
