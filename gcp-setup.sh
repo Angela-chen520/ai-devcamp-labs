@@ -478,7 +478,40 @@ gcloud projects add-iam-policy-binding "$GOOGLE_CLOUD_PROJECT" \
   && echo "Granted roles/cloudtrace.agent to the Gemini Enterprise service agent."
 echo
 
-# === Step 10: (add the next one-time manual GCP step here) ==================
+# === Step 10: BigQuery Agent Analytics (Optimise, Lab 4) =====================
+# The plugin creates the TABLE and its views, but not the DATASET, so create that here.
+# Deployed, the agent writes as its own identity (Agent Identity), so that principalSet
+# needs to write rows (dataEditor) and to start the write session (jobUser). Locally it
+# writes as you, who already can. Also: roles/logging.logWriter, because deployed
+# telemetry writes logs as the same identity (the Cloud Trace role is Step 9's).
+# NOT verified for a deployed agent: the deploy-side grants come from the docs and a
+# community tutorial; the local path (your own credentials) is verified.
+# Prompts and replies land in this dataset. Keep it in the same trust zone as your logs.
+echo "=== Step 10: BigQuery Agent Analytics dataset ==="
+BQ_DATASET="${BQ_ANALYTICS_DATASET:-agent_analytics}"
+BQ_LOCATION="${BQ_ANALYTICS_LOCATION:-US}"
+gcloud services enable bigquery.googleapis.com logging.googleapis.com \
+  --project="$GOOGLE_CLOUD_PROJECT" >/dev/null && echo "Enabled bigquery, logging."
+if bq --project_id="$GOOGLE_CLOUD_PROJECT" show --dataset "$GOOGLE_CLOUD_PROJECT:$BQ_DATASET" >/dev/null 2>&1; then
+  echo "Dataset $BQ_DATASET already exists."
+else
+  bq --project_id="$GOOGLE_CLOUD_PROJECT" mk --dataset --location="$BQ_LOCATION" \
+    --description="BigQuery Agent Analytics events for social_poster" \
+    "$GOOGLE_CLOUD_PROJECT:$BQ_DATASET" && echo "Created dataset $BQ_DATASET ($BQ_LOCATION)."
+fi
+agent_grant "roles/bigquery.dataEditor for deployed agents (Agent Identity)" \
+  gcloud projects add-iam-policy-binding "$GOOGLE_CLOUD_PROJECT" \
+  --member="$AGENT_PRINCIPALS" --role="roles/bigquery.dataEditor" --condition=None
+agent_grant "roles/bigquery.jobUser for deployed agents (Agent Identity)" \
+  gcloud projects add-iam-policy-binding "$GOOGLE_CLOUD_PROJECT" \
+  --member="$AGENT_PRINCIPALS" --role="roles/bigquery.jobUser" --condition=None
+agent_grant "roles/logging.logWriter for deployed agents (Agent Identity)" \
+  gcloud projects add-iam-policy-binding "$GOOGLE_CLOUD_PROJECT" \
+  --member="$AGENT_PRINCIPALS" --role="roles/logging.logWriter" --condition=None
+echo "To turn it on, set BQ_ANALYTICS_DATASET=$BQ_DATASET in backend/social_poster/.env."
+echo
+
+# === Step 11: (add the next one-time manual GCP step here) ==================
 
 if [[ "$PENDING_DEPLOY" == "1" ]]; then
   echo "Done for now. Some grants are waiting for your first deploy (Lab 2, Step 2)."

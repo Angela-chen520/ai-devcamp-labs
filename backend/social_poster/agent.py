@@ -28,6 +28,7 @@ from typing import Any, Optional
 from google.adk.agents import Agent
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+from google.adk.apps.app import App
 from google.adk.models import Gemini
 from google.adk.models.llm_request import LlmRequest
 from google.adk.models.llm_response import LlmResponse
@@ -778,3 +779,46 @@ Posting rules (strict):
     after_tool_callback=_track_stage,
     after_agent_callback=_stage_after_agent,
 )
+
+
+# --- Optimise: the App, and BigQuery Agent Analytics -------------------------------
+# Plugins hang off an App, not off an Agent, so the root agent is wrapped in one.
+# `adk web` / `adk eval` discover `app` before `root_agent`, and backend/main.py builds
+# the AG-UI adapter from it (ADKAgent.from_app) so the plugin sees real traffic too.
+#
+# BigQuery Agent Analytics streams one row per event (LLM request/response, tool call,
+# error, with token counts and latencies) into a table you can query with SQL. It is
+# OFF unless BQ_ANALYTICS_DATASET is set, so Labs 1-3 behave exactly as before.
+# The dataset must exist (gcp-setup.sh creates it); the plugin creates the table.
+# What lands in the table is what the model saw: post-redaction, but still user
+# content. Treat the dataset like the logs in docs/observability.md.
+_BQ_DATASET = os.environ.get("BQ_ANALYTICS_DATASET", "").strip()
+
+
+def _analytics_plugins() -> list:
+    if not _BQ_DATASET:
+        return []
+    from google.adk.plugins.bigquery_agent_analytics_plugin import (
+        BigQueryAgentAnalyticsPlugin,
+        BigQueryLoggerConfig,
+    )
+
+    # PROJECT_ID is the ID; Agent Runtime sets GOOGLE_CLOUD_PROJECT to the NUMBER.
+    project = os.environ.get("PROJECT_ID") or os.environ["GOOGLE_CLOUD_PROJECT"]
+    log.info("BigQuery Agent Analytics on: %s.%s.agent_events", project, _BQ_DATASET)
+    return [
+        BigQueryAgentAnalyticsPlugin(
+            project_id=project,
+            dataset_id=_BQ_DATASET,
+            table_id="agent_events",
+            location=os.environ.get("BQ_ANALYTICS_LOCATION", "US"),
+            config=BigQueryLoggerConfig(
+                create_views=True,  # v_llm_response, v_tool_completed, ... one per event type
+                enable_otel_correlation=True,  # join a row to its Cloud Trace span
+                custom_tags={"agent": "social_poster"},
+            ),
+        )
+    ]
+
+
+app = App(name="social_poster", root_agent=root_agent, plugins=_analytics_plugins())

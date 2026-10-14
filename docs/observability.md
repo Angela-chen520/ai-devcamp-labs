@@ -55,34 +55,45 @@ prompt-response logging (see the ADK observability docs). Keep in mind these
 logs may contain user content — apply the same DLP thinking to log retention
 that Week 3 applies to posts.
 
-## 3. BigQuery Agent Analytics
+## 3. BigQuery Agent Analytics (wired in Lab 4, verified locally)
 
-ADK's `BigQueryAgentAnalyticsPlugin` streams structured events (tool calls,
-tokens, latencies) to a BigQuery dataset. Register it on the `App`:
+The plugin is already registered in `backend/social_poster/agent.py` (on the `App`,
+see `_analytics_plugins()`), and `backend/main.py` builds the AG-UI adapter with
+`ADKAgent.from_app(...)`, because the older `ADKAgent(adk_agent=...)` constructor
+cannot carry plugins. It is off until you set a dataset:
 
-```python
-from google.adk.apps.app import App
-from google.adk.plugins.bigquery_agent_analytics_plugin import (
-    BigQueryAgentAnalyticsPlugin,
-)
-
-app = App(
-    name="social_poster",
-    root_agent=root_agent,
-    plugins=[BigQueryAgentAnalyticsPlugin(
-        project=os.environ["GOOGLE_CLOUD_PROJECT"],
-        dataset="agent_analytics",
-    )],
-)
+```bash
+./gcp-setup.sh                        # Step 10 creates the dataset (US) and the deployed agent's grants
+echo 'BQ_ANALYTICS_DATASET=agent_analytics' >> backend/social_poster/.env
+uv run python evals/smoke_turn.py     # one real turn through the App; closing the runner flushes the batch
+uv run python evals/analytics.py      # the five Lab 4 queries (evals/analytics_queries.sql)
 ```
 
-Then deploy the **BigQuery observability agent from Agent Garden** and ask it
-questions about your telemetry in natural language, e.g.:
+The plugin creates `agent_events` (partitioned by day, clustered by event type, agent
+and user) plus sixteen views, one per event type (`v_llm_response`, `v_tool_completed`,
+`v_llm_error`, ...). The views are where the token and latency columns are already
+flattened, so query those rather than the JSON columns.
 
-- "What's the p95 latency of create_post over the last day?"
-- "How many turns hit the Model Armor refusal path?"
+What we measured on one local turn ("draft a short LinkedIn post"), and what to learn from it:
 
-Two answered questions from that agent = the Week 4 observability demo.
+- **`AgentTool` sub-agents log under their own `session_id`, `invocation_id` and trace id.**
+  A per-session sum silently drops `draft_agent` and `research_agent`. Group by `agent`.
+- **Plain tool calls report 0 ms.** The time is in `LLM_RESPONSE` and in `AGENT_COMPLETED`
+  (agents run as tools), so those are the rows to rank for "slowest".
+- **`draft_agent` made four model calls and re-sent its whole context each time (~2,600 prompt tokens on average)**
+  (`list_skills`, `load_skill` x3, `load_skill_resource`, then the draft): progressive
+  disclosure saves tokens versus loading every skill up front, but each hop still pays
+  for the whole context again.
+- **Most of `draft_agent`'s output side was thinking.** 971 thinking tokens against 198
+  completion tokens on that turn, and thinking is billed as output. That is the cheapest
+  lever to try before swapping models.
+- The rows hold the full prompts and replies. On the AG-UI route the PII boundary layer
+  runs first, so they should hold the redacted text (we did not check this in the rows;
+  `smoke_turn.py` bypasses that layer). Same retention thinking as section 2.
+
+Deployed, the agent writes as its own identity, so it needs `roles/bigquery.dataEditor`
+and `roles/bigquery.jobUser` (Step 10 of `gcp-setup.sh`). **Not verified on a deployed
+engine**; the local path is.
 
 ## 4. What to actually look at first
 
@@ -93,5 +104,7 @@ For this app, the three numbers worth watching in prod:
    filter from Week 3).
 2. **Approval → post conversion** — how many drafts actually get approved. Low
    conversion means drafting quality, not infra.
-3. **Cost per completed post** — ties the Week 4 model mix back to money; this
-   is the number that justifies flash-lite on research/orchestrator.
+3. **Cost per agent** (Q2 in `evals/analytics_queries.sql`, grouped by agent: sub-agents
+   log under their own session, so there is no per-conversation cost column) — ties a
+   model mix back to money. Whether flash-lite is safe for research or the orchestrator
+   is an eval question, and one run is not an answer: see Lab 4, Step 4.

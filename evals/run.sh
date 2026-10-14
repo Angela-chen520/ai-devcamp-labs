@@ -54,6 +54,12 @@ if [[ "$SET" == *governance* ]]; then
   echo "Governance set: Model Armor template=$MODEL_ARMOR_TEMPLATE_ID, Gemini in $GOOGLE_CLOUD_LOCATION"
 fi
 
+# The simulated-user set needs the simulator settings and rubrics that judge a whole
+# conversation, not one expected reply.
+if [[ "$SET" == *simulated* ]]; then
+  CFG="evals/simulation_config.json"
+fi
+
 # 2. Run, and turn "N failed" into a real exit code.
 log="$(mktemp)"
 uv run adk eval backend/social_poster "$SET" \

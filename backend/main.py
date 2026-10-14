@@ -62,7 +62,7 @@ if os.environ.get("GOOGLE_CLOUD_AGENT_ENGINE_ENABLE_TELEMETRY", "").lower() in (
         log.exception("Telemetry export not set up; the agent runs without it")
 
 from backend.social_poster import config, db  # noqa: E402  (needs .env first)
-from backend.social_poster.agent import root_agent  # noqa: E402  (needs .env first)
+from backend.social_poster.agent import app as adk_app  # noqa: E402  (needs .env first)
 from backend.social_poster import guardrails  # noqa: E402
 from backend.pii_middleware import RedactUserMessages  # noqa: E402  (imports guardrails)
 
@@ -118,9 +118,10 @@ else:
     delete_idle_sessions = True  # frees memory; nothing outlives the process anyway
     log.info("In-memory sessions and memory — neither survives a restart")
 
-adk_agent = ADKAgent(
-    adk_agent=root_agent,
-    app_name="social_poster",
+# from_app, not ADKAgent(adk_agent=...): only the App-based constructor carries the
+# App's plugins (BigQuery Agent Analytics, Lab 4) into the Runner.
+adk_agent = ADKAgent.from_app(
+    adk_app,
     user_id="devcamp-user",  # single-user POC; extract from auth in real apps
     session_service=session_service,
     memory_service=memory_service,
@@ -165,8 +166,7 @@ def _get_native_runner():
         from google.adk.sessions import InMemorySessionService
 
         _native_runner = Runner(
-            app_name="social_poster",
-            agent=root_agent,
+            app=adk_app,
             session_service=session_service or InMemorySessionService(),
             memory_service=memory_service or InMemoryMemoryService(),
         )
