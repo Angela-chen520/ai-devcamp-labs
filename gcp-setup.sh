@@ -214,8 +214,12 @@ if gcloud secrets describe "$BUFFER_SECRET_ID" --project="$GOOGLE_CLOUD_PROJECT"
   gcloud secrets add-iam-policy-binding "$BUFFER_SECRET_ID" \
     --project="$GOOGLE_CLOUD_PROJECT" \
     --member="serviceAccount:service-$PROJECT_NUMBER@gcp-sa-aiplatform-re.iam.gserviceaccount.com" \
-    --role="roles/secretmanager.secretAccessor" >/dev/null
-  echo "Granted secretAccessor to the Agent Engine service agent."
+    --role="roles/secretmanager.secretAccessor" >/dev/null 2>&1 || true
+  gcloud secrets add-iam-policy-binding "$BUFFER_SECRET_ID" \
+    --project="$GOOGLE_CLOUD_PROJECT" \
+    --member="principalSet://agents.global.proj-$PROJECT_NUMBER.system.id.goog/attribute.platformContainer/aiplatform/projects/$PROJECT_NUMBER" \
+    --role="roles/secretmanager.secretAccessor" >/dev/null 2>&1 || true
+  echo "Granted secretAccessor to the Agent Engine service agent / Agent Identity."
   echo "Deploy the agent with:  --secrets BUFFER_API_KEY=$BUFFER_SECRET_ID:latest"
 fi
 echo

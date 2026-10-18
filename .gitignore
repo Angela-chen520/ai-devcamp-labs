@@ -5,6 +5,7 @@
 *.pyc
 __pycache__/
 .venv/
+venv/
 gallery/
 social_spark.db*
 *.db-wal
@@ -22,3 +23,4 @@ ai_devcamp_docs/
 .agents/
 .claude/
 deployment_metadata.json
+deployment_metadata.json.lock

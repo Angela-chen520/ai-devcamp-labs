@@ -1,0 +1,1110 @@
+<meta charset="utf-8">
+<title>Lab 2: Scale — Social Spark</title>
+<style>
+  /* ---------- tokens ---------- */
+  :root {
+    --bg: #fafbfc;
+    --bg-panel: #ffffff;
+    --bg-sidebar: #f3f5f8;
+    --bg-sidebar-hover: #e9edf3;
+    --border: #dde1e6;
+    --border-soft: #e8eaee;
+    --text: #1f2430;
+    --text-muted: #5f6672;
+    --text-faint: #8a909b;
+    --accent: #4285F4;
+    --accent-hover: #3367d6;
+    --accent-soft: #e8f0fe;
+    --red: #c5221f;
+    --red-soft: #fce8e6;
+    --yellow: #FBBC05;
+    --yellow-soft: #fef7e0;
+    --green: #137333;
+    --green-soft: #e6f4ea;
+    --code-bg: #12161c;
+    --code-text: #e3e6ea;
+    --code-comment: #7c8a9c;
+    --code-border: #262b33;
+    --shadow: 0 1px 2px rgba(20, 24, 32, 0.06), 0 2px 12px rgba(20, 24, 32, 0.05);
+    --font-display: -apple-system, "Google Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-body: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171c;
+      --bg-panel: #1a1e24;
+      --bg-sidebar: #101317;
+      --bg-sidebar-hover: #1d222a;
+      --border: #2a2f37;
+      --border-soft: #242830;
+      --text: #e7e9ec;
+      --text-muted: #a7adb6;
+      --text-faint: #767c86;
+      --accent: #8ab4f8;
+      --accent-hover: #aecbfa;
+      --accent-soft: rgba(138, 180, 248, 0.14);
+      --red: #f28b82;
+      --red-soft: rgba(242, 139, 130, 0.12);
+      --yellow: #fdd663;
+      --yellow-soft: rgba(253, 214, 99, 0.1);
+      --green: #81c995;
+      --green-soft: rgba(129, 201, 149, 0.12);
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 16px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171c;
+    --bg-panel: #1a1e24;
+    --bg-sidebar: #101317;
+    --bg-sidebar-hover: #1d222a;
+    --border: #2a2f37;
+    --border-soft: #242830;
+    --text: #e7e9ec;
+    --text-muted: #a7adb6;
+    --text-faint: #767c86;
+    --accent: #8ab4f8;
+    --accent-hover: #aecbfa;
+    --accent-soft: rgba(138, 180, 248, 0.14);
+    --red: #f28b82;
+    --red-soft: rgba(242, 139, 130, 0.12);
+    --yellow: #fdd663;
+    --yellow-soft: rgba(253, 214, 99, 0.1);
+    --green: #81c995;
+    --green-soft: rgba(129, 201, 149, 0.12);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 16px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15.5px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--text); margin: 0; }
+  a { color: var(--accent); }
+  p { margin: 0 0 14px; max-width: 100%; }
+  ul, ol { margin: 0 0 14px; padding-left: 1.3em; }
+  li { margin-bottom: 6px; max-width: 100%; }
+  code { font-family: var(--font-mono); font-size: 0.87em; background: var(--accent-soft); color: var(--accent-hover); padding: 0.1em 0.4em; border-radius: 4px; }
+
+  /* ---------- progress bar ---------- */
+  .progress-track {
+    position: fixed; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--border-soft); z-index: 50;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent); width: 0%;
+    transition: width 0.35s ease;
+  }
+
+  /* ---------- shell ---------- */
+  .shell { display: flex; min-height: 100vh; padding-top: 3px; }
+
+  /* ---------- sidebar ---------- */
+  .sidebar {
+    width: 20%; flex: none; background: var(--bg-sidebar);
+    border-right: 1px solid var(--border); padding: 22px 14px 18px;
+    position: sticky; top: 3px; align-self: flex-start; height: calc(100vh - 3px);
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 4px 10px 10px; }
+  .brand-mark {
+    width: 30px; height: 30px; border-radius: 8px; flex: none;
+    background: conic-gradient(from 200deg, var(--accent), var(--green), var(--yellow), var(--red), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+  .brand-text { font-family: var(--font-display); font-weight: 700; font-size: 15.5px; letter-spacing: -0.01em; }
+  .brand-sub { font-size: 12px; color: var(--text-faint); letter-spacing: 0.02em; }
+
+  .step-nav { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .step-nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 8px; cursor: pointer;
+    border-left: 3px solid transparent;
+    color: var(--text-muted); font-size: 12px;
+  }
+  .step-nav-item:hover { background: var(--bg-sidebar-hover); color: var(--text); }
+  .step-nav-item.active { background: var(--accent-soft); color: var(--accent-hover); border-left-color: var(--accent); font-weight: 600; }
+  .step-nav-item.done .step-dot { background: var(--green); color: #fff; border-color: var(--green); }
+  .step-dot {
+    width: 20px; height: 20px; border-radius: 50%; flex: none;
+    border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--text-faint); background: var(--bg-panel);
+  }
+  .step-nav-item.active .step-dot { border-color: var(--accent); color: var(--accent-hover); }
+  .step-label-group { display: flex; flex-direction: column; gap: 1px; min-width: 0;  }
+  .step-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 15px; }
+  .step-dur { font-size: 10px; color: var(--text-faint); }
+  .step-nav-item.optional .step-label::after {
+    content: "optional"; margin-left: 6px; font-size: 9.5px; text-transform: uppercase;
+    letter-spacing: 0.04em; color: var(--yellow); border: 1px solid var(--yellow); border-radius: 4px;
+    padding: 1px 4px; vertical-align: middle;
+  }
+
+  .sidebar-foot {
+    margin-top: auto; padding: 12px 10px; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--text-faint); line-height: 1.5;
+  }
+  .sidebar-foot a { color: var(--text-muted); text-decoration: underline; text-decoration-color: var(--border); }
+
+  /* ---------- main ---------- */
+  .main { flex: 1; min-width: 0; display: flex; justify-content: center; }
+  .content-col { width: 100%; max-width: 55%; padding: 48px 40px 40px; }
+
+  .step-panel { display: none; }
+  .step-panel.active { display: block; animation: fade-in 0.25s ease; }
+  @keyframes fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .eyebrow {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  .eyebrow .pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--accent-soft); color: var(--accent-hover); border-radius: 5px;
+    padding: 2px 8px; font-weight: 700; letter-spacing: 0.02em;
+  }
+  .eyebrow .pill.optional { background: var(--yellow-soft); color: var(--yellow); }
+  .eyebrow .dur { color: var(--text-faint); font-weight: 500; letter-spacing: 0.01em; }
+
+  .step-title { font-size: 28px; font-weight: 700; letter-spacing: -0.015em; margin-bottom: 18px; }
+  .step-panel h3 { font-size: 18.5px; font-weight: 700; margin: 30px 0 12px; letter-spacing: -0.01em; }
+  .step-panel h3:first-of-type { margin-top: 4px; }
+  .step-panel h4 { font-size: 14.5px; font-weight: 700; margin: 20px 0 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; font-family: var(--font-body); }
+
+  .lede { font-size: 16.5px; color: var(--text-muted); margin-bottom: 22px; }
+
+  /* ---------- callouts ---------- */
+  .callout {
+    /* border-left: 3px solid var(--accent); background: var(--accent-soft); */
+    border-radius: 8px 8px 8px 8px; padding: 12px 16px; margin: 16px 0;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout-label {
+    display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; margin-bottom: 5px; color: var(--accent-hover);
+  }
+  .callout.warn { border-left-color: var(--red); background: var(--red-soft); }
+  .callout.warn .callout-label { color: var(--red); }
+  .callout.tip { border-left-color: var(--yellow); background: var(--yellow-soft); }
+  .callout.tip .callout-label { color: var(--yellow); }
+  .callout.check { border-left-color: var(--green); background: var(--green-soft); }
+  .callout.check .callout-label { color: var(--green); }
+  .callout.agent p { font-style: italic; }
+
+  /* ---------- code ---------- */
+  .code-block { position: relative; margin: 14px 0 18px; border-radius: 10px; overflow: hidden; border: 1px solid var(--code-border); box-shadow: var(--shadow); }
+  .code-head {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #1a1f27; padding: 7px 12px; font-size: 11px; color: var(--code-comment);
+    font-family: var(--font-mono); letter-spacing: 0.02em; border-bottom: 1px solid var(--code-border);
+  }
+  .copy-btn {
+    background: transparent; border: 1px solid var(--code-border); color: var(--code-comment);
+    font-family: var(--font-body); font-size: 11px; padding: 3px 9px; border-radius: 5px; cursor: pointer;
+  }
+  .copy-btn:hover { color: var(--code-text); border-color: var(--code-comment); }
+  pre { margin: 0; background: var(--code-bg); padding: 14px 16px; overflow-x: auto; }
+  pre code { background: none; padding: 0; color: var(--code-text); font-size: 12.8px; line-height: 1.62; white-space: pre; }
+  .cm { color: var(--code-comment); }
+
+  /* ---------- tree ---------- */
+  .tree { font-family: var(--font-mono); font-size: 12.8px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; white-space: pre; overflow-x: auto; color: var(--text-muted); }
+
+  /* ---------- table ---------- */
+  .tbl-wrap { overflow-x: auto; margin: 14px 0 20px; border: 1px solid var(--border); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.6px; }
+  th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+  th { background: var(--bg-sidebar); font-weight: 700; color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ---------- checkpoint list ---------- */
+  .checklist { list-style: none; padding: 0; margin: 14px 0 20px; display: flex; flex-direction: column; gap: 8px; }
+  .checklist li { display: flex; gap: 10px; align-items: flex-start; margin: 0; }
+  .checklist li::before { content: "✓"; color: var(--green); font-weight: 700; flex: none; margin-top: 1px; }
+
+  /* ---------- nav footer ---------- */
+  .step-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border);
+  }
+  .nav-btn {
+    font-family: var(--font-body); font-weight: 600; font-size: 14px; cursor: pointer;
+    border-radius: 8px; padding: 10px 18px; border: 1px solid var(--border); background: var(--bg-panel);
+    color: var(--text); display: inline-flex; align-items: center; gap: 6px;
+  }
+  .nav-btn:hover { border-color: var(--accent); color: var(--accent-hover); }
+  .nav-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .nav-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: #fff; }
+  .nav-btn:disabled { opacity: 0.35; cursor: default; }
+  .nav-btn:disabled:hover { border-color: var(--border); color: var(--text); }
+
+  /* ---------- given vs write table chips ---------- */
+  .chip { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; border-radius: 5px; padding: 2px 7px; }
+  .chip.given { background: var(--border-soft); color: var(--text-muted); }
+  .chip.write { background: var(--accent-soft); color: var(--accent-hover); }
+
+  /* ---------- figure / svg diagrams ---------- */
+  figure.diagram { margin: 20px 0 24px; padding: 18px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); }
+  figure.diagram svg { width: 100%; height: auto; display: block; color: var(--text); }
+  figure.diagram figcaption { margin-top: 10px; font-size: 12.5px; color: var(--text-faint); text-align: center; }
+  figure.diagram img { width: 100%; height: auto; display: block; border-radius: 8px; background: #fff; }
+  .accent-fill { fill: var(--accent); }
+  .accent-stroke { stroke: var(--accent); }
+  .green-stroke { stroke: var(--green); }
+  .green-fill { fill: var(--green); }
+  .yellow-stroke { stroke: var(--yellow); }
+  .red-stroke { stroke: var(--red); }
+  .muted-stroke { stroke: var(--text-faint); }
+  .soft-fill { fill: var(--bg-sidebar); }
+  .fill-accent { fill: var(--accent-soft); }
+  .fill-green { fill: var(--green-soft); }
+  .fill-yellow { fill: var(--yellow-soft); }
+  .fill-accent-strong { fill: var(--accent); fill-opacity: 0.16; }
+
+  /* ---------- mock UI ---------- */
+  .mock-stepper { display: flex; gap: 4px; margin: 16px 0 20px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); overflow-x: auto; }
+  .mock-stage { flex: 1; min-width: 84px; text-align: center; font-size: 11px; color: var(--text-faint); }
+  .mock-stage .dot { width: 30px; height: 30px; border-radius: 50%; background: var(--bg-sidebar); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-size: 14px; }
+  .mock-stage.done .dot { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+  .mock-stage.current .dot { background: var(--accent-soft); border-color: var(--accent); }
+  .mock-stage.done, .mock-stage.current { color: var(--text); font-weight: 600; }
+
+  /* ---------- mobile ---------- */
+  .mobile-topnav { display: none; }
+  @media (max-width: 880px) {
+    .sidebar { display: none; }
+    .mobile-topnav {
+      display: flex; gap: 6px; overflow-x: auto; position: sticky; top: 3px; z-index: 40;
+      background: var(--bg-sidebar); border-bottom: 1px solid var(--border); padding: 10px 12px;
+    }
+    .mobile-topnav button {
+      flex: none; font-family: var(--font-body); font-size: 12.5px; padding: 6px 12px; border-radius: 20px;
+      border: 1px solid var(--border); background: var(--bg-panel); color: var(--text-muted); cursor: pointer; white-space: nowrap;
+    }
+    .mobile-topnav button.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+    .content-col { max-width: 100%; padding: 28px 20px 32px; }
+    .step-title { font-size: 23px; }
+  }
+
+  /* ---------- back to docs ---------- */
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-muted); text-decoration: none; padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-panel); margin: 0 6px 12px; }
+  .back-link:hover { color: var(--accent); border-color: var(--accent); }
+  .back-link.mob { display: none; }
+  @media (max-width: 880px) { .back-link.mob { display: inline-flex; margin: 0 0 12px; } }
+  @media print { .back-link { display: none; } }
+
+  /* ---------- theme toggle ---------- */
+  .theme-toggle {
+    position: fixed; top: 14px; right: 14px; z-index: 999;
+    width: 34px; height: 34px; padding: 0; border-radius: 10px;
+    display: grid; place-items: center; cursor: pointer;
+    background: var(--panel, var(--bg-panel, #fff));
+    border: 1px solid var(--border); color: var(--muted, var(--text-muted, #666));
+    font-size: 15px; line-height: 1;
+    box-shadow: 0 1px 3px rgba(0,0,0,.10);
+  }
+  .theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+  .theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media print { .theme-toggle { display: none; } }
+
+  /* ---------- Google palette: blue #4285F4, green #34A853, yellow #FBBC05, red #EA4335 ---------- */
+  :root { --g-blue: #4285F4; --g-green: #34A853; --g-yellow: #FBBC05; --g-red: #EA4335; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --g-blue: #8ab4f8; --g-green: #81c995; --g-yellow: #fdd663; --g-red: #f28b82; }
+  }
+  :root[data-theme="dark"] { --g-blue: #8ab4f8; --g-green: #81c995; --g-yellow: #fdd663; --g-red: #f28b82; }
+  .accent-stroke { stroke: var(--g-blue); }   .accent-fill { fill: var(--g-blue); }
+  .green-stroke  { stroke: var(--g-green); }  .green-fill  { fill: var(--g-green); }
+  .yellow-stroke { stroke: var(--g-yellow); } .yellow-fill { fill: var(--g-yellow); }
+  .red-stroke    { stroke: var(--g-red); }    .red-fill    { fill: var(--g-red); }
+  .fill-red { fill: var(--red-soft); }
+  .dot-blue { fill: var(--g-blue); } .dot-green { fill: var(--g-green); } .dot-yellow { fill: var(--g-yellow); } .dot-red { fill: var(--g-red); }
+  .badge-fill { fill: var(--g-blue); }
+  .brand-mark { background: conic-gradient(from 200deg, var(--g-blue), var(--g-green), var(--g-yellow), var(--g-red), var(--g-blue)); }
+  .callout { border-left-color: var(--g-blue); }
+  .callout.warn { border-left-color: var(--g-red); }
+  .callout.tip { border-left-color: var(--g-yellow); }
+  .callout.tip .callout-label { color: var(--text); }
+  .callout.check { border-left-color: var(--g-green); }
+  .callout.agent { border-left-color: var(--g-blue); background: var(--accent-soft); }
+  .callout.agent .callout-label { color: var(--accent); }
+  .eyebrow .pill.optional { color: var(--text); }
+  .step-nav-item.optional .step-label::after { color: var(--text-muted); border-color: var(--g-yellow); }
+</style>
+
+<script>
+  // Runs before the page paints: reading localStorage here avoids the flash of
+  // the OS theme before the reader's own choice is applied.
+  try {
+    var t = localStorage.getItem("social-spark-theme");
+    if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+  } catch (e) { /* private mode — fall back to the OS preference */ }
+</script>
+
+<button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch between light and dark" title="Switch theme">🌗</button>
+
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="shell">
+  <aside class="sidebar">
+    <a class="back-link" href="index.html">← All docs</a>
+    <div class="brand">
+      <div class="brand-mark">✨</div>
+      <div>
+        <div class="brand-text">Social Spark</div>
+        <div class="brand-sub">GDG DevCamp · Lab 2: Scale</div>
+      </div>
+    </div>
+    <ol class="step-nav" id="stepNav"></ol>
+    <div class="sidebar-foot">
+      Stuck? Ask your buddy group first. Behind from Lab 1? <code>git checkout pillar-build</code> to catch up. The finished checkpoint (<code>pillar-scale</code>) is published the day after the session.
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="content-col">
+
+      <a class="back-link mob" href="index.html">← All docs</a>
+      <nav class="mobile-topnav" id="mobileNav"></nav>
+
+      <!-- ================= OVERVIEW ================= -->
+      <section class="step-panel" data-step="0">
+        <div class="eyebrow"><span class="pill">Overview</span></div>
+        <h1 class="step-title">Run Social Spark for real</h1>
+        <p class="lede">Take the agent you built in Lab 1 off your laptop and onto managed infrastructure, with its own identity, conversations that survive a restart, and a memory of what you like.</p>
+
+        <figure class="diagram">
+          <svg viewBox="0 0 720 400" role="img" aria-label="Scale has four pieces. The web UI calls the agent, which runs in Agent Runtime, a managed container that scales to zero and has its own Agent Identity. The agent reads and writes Agent Sessions, which hold the current conversation. When a post is published, the session is distilled into Agent Memory Bank, which holds what to remember about the user across conversations, and the agent searches it before drafting. Agent Sandbox, for running code the agent writes in isolation, is shown dashed because this lab does not use it.">
+            <defs>
+              <marker id="sc-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+              </marker>
+            </defs>
+
+            <!-- client -->
+            <rect x="8" y="160" width="110" height="64" rx="10" class="muted-stroke soft-fill" stroke-width="1.6"/>
+            <text x="63" y="184" font-size="12" font-weight="700" text-anchor="middle" fill="currentColor">Web UI</text>
+            <text x="63" y="200" font-size="9.5" text-anchor="middle" fill="currentColor" opacity="0.65">Cloud Run</text>
+            <text x="63" y="212" font-size="9.5" text-anchor="middle" fill="currentColor" opacity="0.65">Steps 6–7</text>
+            <line x1="118" y1="192" x2="168" y2="192" stroke="currentColor" stroke-width="1.4" marker-end="url(#sc-arrow)"/>
+            <text x="143" y="150" font-size="9" text-anchor="middle" fill="currentColor" opacity="0.7">/api</text>
+            <text x="143" y="161" font-size="9" text-anchor="middle" fill="currentColor" opacity="0.7">+ token</text>
+
+            <!-- Agent Runtime -->
+            <rect x="170" y="30" width="270" height="330" rx="14" class="accent-stroke fill-accent" stroke-width="2"/>
+            <text x="305" y="56" font-size="14" font-weight="700" text-anchor="middle" fill="currentColor">Agent Runtime</text>
+            <text x="305" y="72" font-size="10" text-anchor="middle" fill="currentColor" opacity="0.65">where it runs · Steps 2–3</text>
+            <rect x="192" y="158" width="226" height="68" rx="10" class="accent-stroke fill-accent-strong" stroke-width="1.2"/>
+            <text x="305" y="184" font-size="13" font-weight="700" text-anchor="middle" fill="currentColor">social_poster</text>
+            <text x="305" y="201" font-size="10" text-anchor="middle" fill="currentColor" opacity="0.7">your container, built from your Dockerfile</text>
+            <text x="305" y="215" font-size="9.5" text-anchor="middle" fill="currentColor" opacity="0.6">runs as its own Agent Identity</text>
+            <text x="305" y="300" font-size="10" text-anchor="middle" fill="currentColor" opacity="0.6">scales to zero when idle:</text>
+            <text x="305" y="315" font-size="10" text-anchor="middle" fill="currentColor" opacity="0.6">nothing in memory survives</text>
+            <text x="305" y="345" font-size="10" font-weight="700" text-anchor="middle" fill="currentColor" opacity="0.8">so state must live outside →</text>
+
+            <!-- Sessions -->
+            <rect x="490" y="30" width="222" height="84" rx="12" class="green-stroke fill-green" stroke-width="2"/>
+            <text x="601" y="56" font-size="13" font-weight="700" text-anchor="middle" fill="currentColor">Agent Sessions</text>
+            <text x="601" y="73" font-size="10" text-anchor="middle" fill="currentColor" opacity="0.7">this conversation · Step 4</text>
+            <text x="601" y="89" font-size="9.5" text-anchor="middle" fill="currentColor" opacity="0.6">messages, draft, pipeline stage</text>
+            <text x="601" y="102" font-size="9.5" text-anchor="middle" fill="currentColor" opacity="0.6">survives a restart</text>
+            <line x1="440" y1="72" x2="488" y2="72" stroke="currentColor" stroke-width="1.3" marker-start="url(#sc-arrow)" marker-end="url(#sc-arrow)"/>
+
+            <!-- session -> memory -->
+            <line x1="601" y1="114" x2="601" y2="168" stroke="currentColor" stroke-width="1.3" marker-end="url(#sc-arrow)"/>
+            <text x="609" y="136" font-size="9.5" fill="currentColor" opacity="0.75">distilled when</text>
+            <text x="609" y="148" font-size="9.5" fill="currentColor" opacity="0.75">a post is published</text>
+
+            <!-- Memory Bank -->
+            <rect x="490" y="170" width="222" height="84" rx="12" class="yellow-stroke fill-yellow" stroke-width="2"/>
+            <text x="601" y="196" font-size="13" font-weight="700" text-anchor="middle" fill="currentColor">Agent Memory Bank</text>
+            <text x="601" y="213" font-size="10" text-anchor="middle" fill="currentColor" opacity="0.7">across conversations · Step 5</text>
+            <text x="601" y="229" font-size="9.5" text-anchor="middle" fill="currentColor" opacity="0.6">your preferences and style,</text>
+            <text x="601" y="242" font-size="9.5" text-anchor="middle" fill="currentColor" opacity="0.6">searched before drafting</text>
+            <line x1="440" y1="212" x2="488" y2="212" stroke="currentColor" stroke-width="1.3" marker-start="url(#sc-arrow)" marker-end="url(#sc-arrow)"/>
+
+            <!-- Sandbox (dashed, not used) -->
+            <rect x="490" y="286" width="222" height="74" rx="12" class="red-stroke fill-red" stroke-dasharray="5 4" stroke-width="2"/>
+            <text x="601" y="310" font-size="13" font-weight="700" text-anchor="middle" fill="currentColor" opacity="0.8">Agent Sandbox</text>
+            <text x="601" y="327" font-size="10" text-anchor="middle" fill="currentColor" opacity="0.65">runs code the agent writes,</text>
+            <text x="601" y="340" font-size="10" text-anchor="middle" fill="currentColor" opacity="0.65">in isolation · not used here</text>
+            <line x1="440" y1="323" x2="488" y2="323" stroke="currentColor" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#sc-arrow)"/>
+
+            <text x="8" y="392" font-size="10.5" fill="currentColor" opacity="0.6">Runtime is the one thing that goes away when idle. Sessions and Memory Bank are why that doesn't matter.</text>
+          </svg>
+          <figcaption>The four parts of Scale. The agent is disposable; conversation state (Sessions) and long-term recall (Memory Bank) are kept outside it.</figcaption>
+        </figure>
+
+        <div class="callout">
+          <span class="callout-label">Theory — this is Google's "Scale" pillar</span>
+          <p>Lab 1 was <strong>Build</strong>: designing the agent. This lab is <strong>Scale</strong>, and Scale is specifically about <em>where an agent runs and what it remembers</em>: <strong>Agent Runtime</strong> (managed hosting built for agents), <strong>Agent Identity</strong> (the agent gets its own principal, not your credentials), <strong>Sessions</strong> (managed conversation state) and <strong>Memory Bank</strong> (what persists <em>across</em> conversations). It is not about what the agent is allowed to do (that's Govern, Lab 3) or whether it's any good, which is Optimise, Lab 4.</p>
+          <p><strong>Agent Sandbox</strong> is the fourth piece of Scale: an isolated place to run code an agent writes for itself. Social Spark never writes code, so we don't use it and haven't tested it here. It's in the picture so you know where it sits when your own agent needs it.</p>
+          <p>The distinction that matters today: your laptop is a single process that you restart at will. Managed infrastructure scales to zero when nobody is using it, which means <strong>anything held in memory is gone, routinely, not exceptionally</strong>. Most of this lab is about that one fact.</p>
+        </div>
+
+        <div class="callout agent">
+          <span class="callout-label">How this lab works</span>
+          <p>Same shape as Lab 1: each step is a <strong>concept</strong>, a <strong>prompt</strong> for your coding agent (or a command to run), and a <strong>checkpoint</strong> that proves it worked. Code blocks are there to read and compare against. One step, <strong>Step 2</strong>, is designed to confuse you the first time; that's deliberate and it's flagged.</p>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-label">Fell behind in Lab 1?</span>
+          <p>You don't need your own finished agent to do this lab. Catch up with the published Build checkpoint: <code>git checkout pillar-build</code>. Everything below works against it unchanged.</p>
+        </div>
+
+        <p>By the end you'll have a deployed agent with its own identity, reachable over the internet, remembering your preferences between conversations, with the web UI from Lab 1 talking to it, and you'll have torn it all down again.</p>
+
+        <div class="step-footer">
+          <button class="nav-btn primary" onclick="goTo(1)">Start: Prerequisites →</button>
+        </div>
+      </section>
+
+      <!-- ================= STEP 1 ================= -->
+      <section class="step-panel" data-step="1">
+        <div class="eyebrow"><span class="pill">Step 1 of 9</span><span class="dur">⏱ 10 min</span></div>
+        <h1 class="step-title">Prerequisites</h1>
+        <p class="lede">Deploying touches more of Google Cloud than local development does. Get the APIs and permissions in place first; they're the most common reason a deploy fails in a way that's hard to read.</p>
+
+        <div class="code-block">
+          <div class="code-head"><span>terminal — from the repo root</span><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+          <pre><code>./gcp-setup.sh</code></pre>
+        </div>
+
+        <p>First set <code>GCS_BUCKET_NAME</code> in <code>backend/social_poster/.env</code>. Bucket names are global, so include your project ID, for example <code>YOUR_PROJECT-social-spark</code>. Your deployed agent keeps published posts there, because a container's own disk is wiped every time it scales to zero.</p>
+
+        <p>The script is idempotent, so it's safe to re-run. It reads <code>GOOGLE_CLOUD_PROJECT</code> and <code>GCS_BUCKET_NAME</code> from that <code>.env</code> and acts as whichever account <code>gcloud</code> is logged in as. For the Scale stage it:</p>
+
+        <ul>
+          <li><strong>Checks your login.</strong> Runs <code>gcloud auth application-default login</code> if you don't have Application Default Credentials yet. It then sets your project as the ADC <em>quota project</em>, so API calls made with your credentials are billed and rate-limited against your project (and the "without a quota project" warning goes away). Set <code>PERSONAL_EMAIL=you@example.com</code> in front of the command to grant the roles below to a different account.</li>
+          <li><strong>Enables the APIs a deploy needs:</strong> Agent Platform (<code>aiplatform</code>), Cloud Build, Artifact Registry and Cloud Run to build and host the container, Secret Manager, and Cloud Resource Manager. Without that last one, the deploy fails with a <code>403 SERVICE_DISABLED</code> buried in a stack trace.</li>
+          <li><strong>Creates your bucket</strong> in <code>us-central1</code> if it doesn't exist yet, private by default.</li>
+          <li><strong>Grants you <code>roles/aiplatform.user</code></strong>, so you can call your deployed agent (see below).</li>
+          <li><strong>Creates <code>social-spark-frontend@YOUR_PROJECT.iam.gserviceaccount.com</code></strong> and grants it the same role. This is the identity the web UI runs as on Cloud Run in Step 7.</li>
+          <li><strong>Stores your Buffer key in Secret Manager</strong> as <code>buffer-api-key</code>, read straight from your <code>.env</code> so it never lands in your shell history. It skips this if <code>BUFFER_API_KEY</code> isn't set.</li>
+          <li><strong>Lets your deployed agent read that secret.</strong> The agent is given only the secret's name, <code>BUFFER_API_KEY_SECRET=buffer-api-key</code>, and fetches the value at runtime as its own Agent Identity. The script grants access to every Agent Identity in the project, because your agent's own identity doesn't exist until its first deploy.</li>
+          <li><strong>Lets your deployed agent write to the bucket</strong>, the same way: <code>roles/storage.objectAdmin</code> for every Agent Identity in the project.</li>
+        </ul>
+
+        <p>There's no service account for the agent itself. In Step 2, <code>--agent-identity</code> gives the deployed agent a principal of its own.</p>
+
+        <div class="callout tip">
+          <span class="callout-label">Why <code>roles/aiplatform.user</code> matters more than it looks</span>
+          <p>If you created your own project you're almost certainly its Owner, which grants this implicitly, so you may never notice it's needed. Anyone working in a project they don't own gets a <code>403</code> the first time they call their deployed agent. It's a classic "works on my machine" at the IAM layer.</p>
+        </div>
+
+        <div class="callout check">
+          <span class="callout-label">Checkpoint</span>
+          <p>The script prints <code>Done.</code> with no errors, and <code>gcloud services list --enabled | grep cloudresourcemanager</code> returns a line. That last API is the one that fails most confusingly if it's missing.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="nav-btn" onclick="goTo(0)">← Back</button>
+          <button class="nav-btn primary" onclick="goTo(2)">Next: Deploy it →</button>
+        </div>
+      </section>
+
+      <!-- ================= STEP 2 ================= -->
+      <section class="step-panel" data-step="2">
+        <div class="eyebrow"><span class="pill">Step 2 of 9</span><span class="dur">⏱ 15 min</span></div>
+        <h1 class="step-title">Deploy to Agent Runtime</h1>
+        <p class="lede">One command. No Dockerfile to write, no packaging code, no container registry to manage.</p>
+
+        <div class="callout">
+          <span class="callout-label">Theory — what Agent Runtime actually is</span>
+          <p>A managed runtime purpose-built for agents. You hand it your project; it builds a container image from the <code>Dockerfile</code> already in the repo and runs it, scaling to zero when idle so an unused agent costs approximately nothing. The important part isn't the hosting; it's <strong>Agent Identity</strong>: with <code>--agent-identity</code> the deployed agent gets its own cryptographic principal, separate from your user account. That principal is what you grant permissions to, and it's what Lab 3's governance policies will attach to. An agent with its own identity is the difference between "a script running as you" and "a service you can reason about".</p>
+        </div>
+
+        <p>The repo root has an <code>agents-cli-manifest.yaml</code>. It's the file <code>agents-cli</code> reads to know <em>where</em> and <em>how</em> your agent runs: the deploy target, the service name and the region. <code>pyproject.toml</code> covers what the agent is built from; the manifest covers where it goes. Keeping them apart means changing where you deploy never touches your dependencies.</p>
+
+        <div class="code-block">
+          <div class="code-head"><span>agents-cli-manifest.yaml — repo root</span><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+          <pre><code>name: 'social-spark-poster'
+agent_directory: 'backend/social_poster'
+region: 'us-central1'
+create_params:
+  root_agent_name: 'social_poster'
+  deployment_target: 'agent_runtime'
+  is_a2a: false</code></pre>
+        </div>
+
+        <p><code>agents-cli info</code> prints what it read from it. Then deploy:</p>
+
+        <div class="code-block">
+          <div class="code-head"><span>terminal — replace YOUR_PROJECT</span><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+          <pre><code>agents-cli deploy --project YOUR_PROJECT \
+  --agent-identity \
+  --update-env-vars "POST_VIA=linkedin,DRY_RUN=true,GCS_BUCKET_NAME=YOUR_BUCKET,PROJECT_ID=YOUR_PROJECT,ORCHESTRATOR_MODEL=gemini-2.5-flash,RESEARCH_MODEL=gemini-2.5-flash-lite,DRAFT_MODEL=gemini-2.5-pro" \
+  --no-confirm-project --no-wait</code></pre>
+        </div>
+
+        <p>What's doing the work, and one setting that's easy to get wrong:</p>
+
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Setting</th><th>Why</th></tr></thead>
+            <tbody>
+              <tr><td><code>deployment_target</code> and <code>name</code> (manifest)</td><td>Where to deploy and what to call it. Every <code>deploy</code>, <code>--status</code> and <code>--list</code> command reads them, so you never pass them as flags.</td></tr>
+              <tr><td><code>region: 'us-central1'</code> (manifest)</td><td>Deliberate, and the reason it lives in a file rather than your memory. Lab 3's Governance Policy engine doesn't exist in <code>global</code> or <code>europe-west2</code>, and a policy can only bind to an agent in the region it was registered in. Deploy elsewhere and you can't do Lab 3 against this agent.</td></tr>
+              <tr><td><code>--agent-identity</code></td><td>Gives the deployed agent its own principal (see the theory above). It's a flag rather than a manifest field, so pass it every time.</td></tr>
+              <tr><td><code>--update-env-vars</code></td><td>The deployed agent's whole configuration. Your local <code>.env</code> is gitignored, so it never reaches the container; only what you pass here does. <code>DRY_RUN=true</code> keeps LinkedIn posting simulated. <code>GCS_BUCKET_NAME</code> moves published posts off the container's disk. <code>PROJECT_ID</code> is your project ID (not the number): Cloud DLP, used by the agent's PII redaction, rejects the project number the container sees. The three <code>*_MODEL</code> values give each agent its own model, matched to its job: a fast orchestrator, a cheap researcher and a strong writer. Because they differ, you can tell the agents apart in logs and traces later.</td></tr>
+              <tr><td><code>--no-wait</code></td><td>Deploys take 5–10 minutes and can outlive a terminal timeout. The deployment carries on server-side regardless.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout tip">
+          <span class="callout-label">Same manifest, other targets</span>
+          <p>The manifest sets a <em>default</em> target, not the only one. <code>agents-cli deploy -d cloud_run</code> builds the same <code>Dockerfile</code> into a Cloud Run service instead (add <code>--dry-run</code> to see the <code>gcloud run deploy</code> it would run). GKE also needs a cluster and its Terraform and Kubernetes files, so it's more than a flag. We stay on Agent Runtime because Agent Identity, Sessions and Memory Bank all come with it.</p>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-label">Deliberate error — this one is on purpose</span>
+          <p>Check on your deploy:</p>
+          <div class="code-block">
+            <div class="code-head"><span>terminal</span><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+            <pre><code>agents-cli deploy --status --project YOUR_PROJECT --no-confirm-project</code></pre>
+          </div>
+          <p>Once it says <code>✅ Deployment successful!</code>, run it again. You'll get <code>No pending deployment operation found</code>, which looks like your agent is gone. It isn't: <code>--status</code> only follows up on your last deploy, and forgets it once it has reported back. To see what's actually deployed, use <code>--list</code>.</p>
+          <p>The lesson: <strong>read what the failing command actually checks before you start undoing work.</strong></p>
+        </div>
+
+        <div class="callout check">
+          <span class="callout-label">Checkpoint</span>
+          <p><code>agents-cli deploy --list --project YOUR_PROJECT --no-confirm-project</code> shows <code>social-spark-poster</code> in <code>us-central1</code>, and the agent appears in the console under Agent Engine with an identity principal against it.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="nav-btn" onclick="goTo(1)">← Back</button>
+          <button class="nav-btn primary" onclick="goTo(3)">Next: Talk to it →</button>
+        </div>
+      </section>
+
+      <!-- ================= STEP 3 ================= -->
+      <section class="step-panel" data-step="3">
+        <div class="eyebrow"><span class="pill">Step 3 of 9</span><span class="dur">⏱ 10 min</span></div>
+        <h1 class="step-title">Talk to the deployed agent</h1>
+        <p class="lede">Your agent is now an HTTPS endpoint. Finding it teaches you something about how Agent Runtime works.</p>
+
+        <div class="callout">
+          <span class="callout-label">Theory — the <code>/api</code> passthrough</span>
+          <p>Agent Runtime exposes your container's own HTTP routes externally, under an <code>/api</code> prefix:</p>
+          <p><code>https://{region}-aiplatform.googleapis.com/reasoningEngines/v1/{resource}/api/{your_route}</code></p>
+          <p>This is more useful than it first appears. Your container runs <code>backend/main.py</code>, the same FastAPI app you ran locally in Lab 1, with the AG-UI endpoint mounted at <code>/api/adk</code>. So the deployed agent speaks <strong>exactly the same protocol your web UI already speaks</strong>, at <code>.../api/api/adk</code> (the first <code>/api</code> is the passthrough, the second is your own route). No adapter, no translation layer. Step 6 depends entirely on this.</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-head"><span>terminal — any folder, after the deploy succeeded</span><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+          <pre><code># works from any folder; set ENGINE_NAME if you deployed with --service-name
+ENGINE_NAME=social-spark-poster
+PROJECT_NUMBER=$(gcloud projects describe "$(gcloud config get-value project 2&gt;/dev/null)" --format='value(projectNumber)')
+TOK=$(gcloud auth print-access-token)
+ENGINE_ID=$(curl -s -H "Authorization: Bearer $TOK" "https://us-central1-aiplatform.googleapis.com/v1/projects/$PROJECT_NUMBER/locations/us-central1/reasoningEngines?pageSize=100" | python3 -c "import json,sys; print(next((e['name'].split('/')[-1] for e in json.load(sys.stdin).get('reasoningEngines',[]) if e.get('displayName')==sys.argv[1]), ''))" "$ENGINE_NAME")
+echo "project $PROJECT_NUMBER, engine $ENGINE_ID"
+BASE="https://us-central1-aiplatform.googleapis.com/reasoningEngines/v1/projects/$PROJECT_NUMBER/locations/us-central1/reasoningEngines/$ENGINE_ID/api"
+
+curl -s -H "Authorization: Bearer $TOK" "$BASE/openapi.json" | head -c 200</code></pre>
+        </div>
+
+        <p>That should come back starting <code>{"openapi":"3.1.0","info":{"title":"social-agent AG-UI backend"…</code>. Read that title carefully: it's <em>your</em> app's title, from <em>your</em> <code>main.py</code>. You're not talking to a generic ADK wrapper; you're talking to the thing you built, running somewhere else.</p>
+
+        <div class="callout tip">
+          <span class="callout-label">Why the bearer token?</span>
+          <p>The passthrough is a Google API endpoint, so every call needs credentials. That's a feature (your agent isn't sitting on the open internet), but it has a consequence you'll hit in Step 6: <strong>a browser can't call this directly</strong>, because there's no safe way for browser JavaScript to hold that token.</p>
+        </div>
+
+        <div class="callout check">
+          <span class="callout-label">Checkpoint</span>
+          <p><code>openapi.json</code> returns your app's title, and <code>POST</code>ing an AG-UI message to <code>$BASE/api/adk</code> streams back <code>RUN_STARTED</code> … <code>RUN_FINISHED</code>.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="nav-btn" onclick="goTo(2)">← Back</button>
+          <button class="nav-btn primary" onclick="goTo(4)">Next: Sessions →</button>
+        </div>
+      </section>
+
+      <!-- ================= STEP 4 ================= -->
+      <section class="step-panel" data-step="4">
+        <div class="eyebrow"><span class="pill">Step 4 of 9</span><span class="dur">⏱ 15 min</span></div>
+        <h1 class="step-title">Sessions that survive</h1>
+        <p class="lede">Your agent currently forgets every conversation the moment the container goes away, and on a deployment that scales to zero, that's constantly.</p>
+
+        <div class="callout">
+          <span class="callout-label">Theory — why the default is a trap</span>
+          <p>ADK's default session service holds conversations <strong>in process memory</strong>. Locally that's invisible: you restart the server when you choose to, and losing a chat feels like your own doing. On managed infrastructure that scales to zero, the container is destroyed whenever nobody's using it, so conversations vanish on a schedule you don't control and never see. <strong>Nothing errors.</strong> It just quietly forgets.</p>
+          <p><strong>Sessions</strong> is the managed alternative: conversation state lives in the Agent Engine, not the container, so it outlives any individual instance.</p>
+        </div>
+
+        <div class="callout agent">
+          <span class="callout-label">Ask your coding agent</span>
+          <p>In <code>backend/main.py</code>, use <code>VertexAiSessionService</code> instead of the default when running on Agent Runtime, and keep the in-memory default when running locally. Detect which by reading the <code>APP_URL</code> environment variable, which Agent Runtime injects and which contains the engine's own resource name; parse the project, location and engine id out of it. Pass the resulting service to <code>ADKAgent</code>.</p>
+        </div>
+
+        <div class="callout tip">
+          <span class="callout-label">Two things your agent probably won't guess</span>
+          <p><strong>Don't use <code>GOOGLE_CLOUD_LOCATION</code> as the engine's region.</strong> Your <code>.env</code> sets it to <code>global</code>, and the deploy sets it to <code>global</code> in the container too: that's the right location for <em>Gemini</em>. But the engine, its sessions and its Memory Bank live in <code>us-central1</code>. A session service built from <code>GOOGLE_CLOUD_LOCATION</code> asks <code>global</code> for an engine that isn't there.</p>
+          <p><strong><code>GOOGLE_CLOUD_PROJECT</code> in the container is the project <em>number</em>, not the ID</strong> (your local <code>.env</code> isn't deployed). Most Google APIs accept either, but some don't: Cloud DLP rejects the number, which is why the deploy command passes <code>PROJECT_ID</code>.</p>
+          <p><code>APP_URL</code>, which Agent Runtime injects, carries the engine's full resource name (project number, region and engine id), so it's the reliable source for the session service. <code>backend/main.py</code> parses it.</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-head"><span>terminal — after redeploying, list the managed sessions</span><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+          <pre><code># reuses PROJECT_NUMBER and ENGINE_ID from Step 3 (in a new terminal, run that block first)
+: "${ENGINE_ID:?run the Step 3 block first}"
+curl -s -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+  "https://us-central1-aiplatform.googleapis.com/v1/projects/$PROJECT_NUMBER/locations/us-central1/reasoningEngines/$ENGINE_ID/sessions?pageSize=100" \
+  | python3 -c "import json,sys; d=json.load(sys.stdin); s=d.get('sessions'); print(d if s is None else '\n'.join(f\"{x['name'].split('/')[-1]}  {x.get('userId','')}  {x.get('updateTime','')[:19]}\" for x in s))"</code></pre>
+        </div>
+
+        <div class="callout check">
+          <span class="callout-label">Checkpoint</span>
+          <p>Send a message, then list sessions: yours is there, with your user id against it. Send a second message on the same <code>threadId</code> from a <em>fresh</em> process and the agent still has the context. The real proof: come back after the engine has scaled to zero and the conversation is still there.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="nav-btn" onclick="goTo(3)">← Back</button>
+          <button class="nav-btn primary" onclick="goTo(5)">Next: Memory Bank →</button>
+        </div>
+      </section>
+
+      <!-- ================= STEP 5 ================= -->
+      <section class="step-panel" data-step="5">
+        <div class="eyebrow"><span class="pill">Step 5 of 9</span><span class="dur">⏱ 20 min</span></div>
+        <h1 class="step-title">Memory Bank</h1>
+        <p class="lede">Sessions remember a conversation. Memory Bank remembers <em>you</em>, across conversations.</p>
+
+        <div class="callout">
+          <span class="callout-label">Theory — sessions vs. memory</span>
+          <p>These are genuinely different things and the names don't help. A <strong>session</strong> is one conversation: the messages, the state, the draft in progress. <strong>Memory</strong> is what survives when that conversation ends and a new one starts: your preferences, your usual topics, how you phrase things.</p>
+          <p>Memory Bank is the managed memory service: it distils facts out of finished conversations on its own, and ADK's <code>load_memory</code> tool searches them. It sits alongside the Lab 1 <code>memory_agent</code>, so you can run both.</p>
+        </div>
+
+        <figure class="diagram">
+          <img src="https://docs.cloud.google.com/static/gemini-enterprise-agent-platform/images/memory-bank.png" alt="Memory Bank conceptual overview. The agent appends and lists events in Sessions; Sessions feed Memory Bank, which generates memories by extracting and merging facts; the agent creates and retrieves memories in Memory Bank, using memories as a tool." loading="lazy">
+          <figcaption>Memory Bank conceptual overview. Diagram: Google Cloud, <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank" target="_blank" rel="noopener">Memory Bank overview</a>, licensed <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.</figcaption>
+        </figure>
+
+        <div class="callout agent">
+          <span class="callout-label">Ask your coding agent</span>
+          <p>Wire <code>VertexAiMemoryBankService</code> into <code>backend/main.py</code> alongside the session service, using the same engine details. Then in <code>backend/social_poster/agent.py</code>, add ADK's <code>load_memory</code> tool to the orchestrator when memory is available, and update its instruction to consult memory before drafting. Add <code>load_memory</code> to the stage map so the pipeline panel shows "consulting memory".</p>
+        </div>
+
+        <div class="callout">
+          <span class="callout-label">Tell it what to remember</span>
+          <p>Out of the box Memory Bank decides for itself what is worth keeping. For a social-post agent that is too vague, so configure it. The bank takes <strong>memory topics</strong>: managed ones (<code>USER_PREFERENCES</code>, <code>EXPLICIT_INSTRUCTIONS</code>, <code>USER_PERSONAL_INFO</code>, <code>KEY_CONVERSATION_DETAILS</code>) and custom ones you describe in a sentence. You can also set the extraction model, a TTL so memories expire, and few-shot examples of what to extract.</p>
+          <p>Here we keep preferences and explicit instructions, add one custom <code>posting_style</code> topic, and expire memories after 90 days. It is a PATCH on the engine, so no redeploy: <code>GOOGLE_CLOUD_PROJECT=YOUR_PROJECT AGENT_ENGINE_ID=ENGINE_ID uv run python backend/memory_bank_config.py apply</code> (and <code>show</code> to read it back). <code>ENGINE_ID</code> is the number at the end of your engine's resource name, from the deploy output or <code>deployment_metadata.json</code>. It only affects memories generated from then on.</p>
+          <p>Try it before you wire anything else: send the bank a short conversation through <code>client.agent_engines.memories.generate(...)</code> and list what it kept. In our test a message about a sign-off, an emoji rule and a question opener came back as one clean style fact.</p>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-label">Memories don't appear on their own</span>
+          <p>Adding a memory service doesn't save anything to it. The app only saves a conversation to memory when it tidies up a session that has been idle for 20 minutes (it checks every 5). A deployed agent usually scales to zero before then, so that never happens: no memories, and no error.</p>
+          <p>So save to memory yourself, at a moment that matters. Here that's publishing: the conversation is finished, and what the user approved is what's worth remembering.</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-head"><span>backend/social_poster/agent.py — note <code>async</code></span><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+          <pre><code>async def _stage_after_agent(callback_context: CallbackContext) -> None:
+    ...
+    if use_memory_bank and callback_context.state.get("pipeline_stage") == "posted":
+        if callback_context.state.get("memory_ingested"):
+            return  # once per conversation, not once per turn
+        await callback_context.add_session_to_memory()
+        callback_context.state["memory_ingested"] = True</code></pre>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-label">Await the save, or it silently does nothing</span>
+          <p><code>add_session_to_memory()</code> is <code>async</code>. If you call it without <code>await</code>, from a normal (non-async) callback, it never actually runs: no error, nothing in the logs, and a <code>try/except</code> won't catch anything. You just get an empty Memory Bank, the same symptom as the idle-timer problem above.</p>
+          <p>Its signature says <code>-&gt; None</code>, which makes this easy to miss. Make the callback <code>async def</code> and <code>await</code> the call.</p>
+        </div>
+
+        <div class="callout check">
+          <span class="callout-label">Checkpoint</span>
+          <p>Tell the agent a preference ("I always sign off with <em>Building in public.</em> and never use more than two hashtags"), then publish a post in that same conversation. List memories on the engine; the preference is there as a distilled fact. Now start a <strong>brand new conversation</strong> and ask for a post on any topic: it should call <code>load_memory</code> and apply the preference without being told.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="nav-btn" onclick="goTo(4)">← Back</button>
+          <button class="nav-btn primary" onclick="goTo(6)">Next: Connect the UI →</button>
+        </div>
+      </section>
+
+      <!-- ================= STEP 6 ================= -->
+      <section class="step-panel" data-step="6">
+        <div class="eyebrow"><span class="pill">Step 6 of 9</span><span class="dur">⏱ 15 min</span></div>
+        <h1 class="step-title">Point the web UI at it</h1>
+        <p class="lede">The frontend from Lab 1, unchanged in every visible way, now driven by an agent running in Google Cloud.</p>
+
+        <div class="callout">
+          <span class="callout-label">Theory — why there's no adapter here</span>
+          <p>This is where Step 3's passthrough pays off. Your deployed container serves the same AG-UI endpoint your UI already talks to, so connecting them is a URL change, not an integration project. There's no protocol bridge to write, no event translation, no re-implementing the approval flow. If that sounds anticlimactic, it should. <strong>Check whether the platform already speaks your protocol before you build an adapter for it.</strong></p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-head"><span>frontend/.env.local</span><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+          <pre><code>ADK_BACKEND_ORIGIN=https://us-central1-aiplatform.googleapis.com/reasoningEngines/v1/projects/PROJECT_NUMBER/locations/us-central1/reasoningEngines/ENGINE_ID/api</code></pre>
+        </div>
+
+        <p>Comment that line out to go back to your local backend. That one variable is the entire difference.</p>
+
+        <div class="callout agent">
+          <span class="callout-label">Ask your coding agent</span>
+          <p>The browser can't call the deployed backend directly; it can't hold the bearer token. Add same-origin Next.js route handlers that proxy to the backend <em>server-side</em> and attach a token from Application Default Credentials: one for AG-UI (<code>/api/adk</code>), one for the post list (<code>/api/posts</code>), and one for generated images (<code>/outputs/[...path]</code>). Add the token only when the target is a Google endpoint, so local development is unaffected. Pass the upstream response body straight through so SSE keeps streaming.</p>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-label">A trap we fell into, so you don't have to</span>
+          <p>Do not point CopilotKit's <code>HttpAgent</code> straight at the deployed backend with a custom <code>fetch</code> that attaches the token. <strong>It works in development and drops the token in a production build</strong>, and the engine answers <code>401 UNAUTHENTICATED</code>. Route AG-UI through your own handler instead.</p>
+          
+        </div>
+
+        <div class="callout check">
+          <span class="callout-label">Checkpoint</span>
+          <p><code>npm run dev</code>, open the app, and run a full post: the pipeline panel lights up <em>Idea → Consulting memory → Researching → Drafting → Approval</em>, the approval dialog appears, and approving completes the post. Identical to Lab 1, but the agent is in <code>us-central1</code>.</p>
+        </div>
+        <div class="callout tip">
+          <span class="callout-label">Start a fresh chat</span>
+          <p>The app reopens your last conversation on every reload (it keeps the thread id in the browser), and signing out doesn't clear it. After a redeploy, or to show Memory Bank recalling you in a <em>new</em> conversation, click <strong>New chat</strong> in the header. The old conversation stays in the console's Sessions tab. An old conversation can otherwise replay a stale approval against the new deployment.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="nav-btn" onclick="goTo(5)">← Back</button>
+          <button class="nav-btn primary" onclick="goTo(7)">Next: Deploy the UI →</button>
+        </div>
+      </section>
+
+      <!-- ================= STEP 7 ================= -->
+      <section class="step-panel" data-step="7">
+        <div class="eyebrow"><span class="pill">Step 7 of 9</span><span class="dur">⏱ 15 min</span></div>
+        <h1 class="step-title">Deploy the frontend too</h1>
+        <p class="lede">A deployed agent with a UI on your laptop is half a product. Put the whole thing in the cloud.</p>
+
+        <div class="callout">
+          <span class="callout-label">Theory — two identities, not one</span>
+          <p>Running on Cloud Run, your frontend can't borrow your <code>gcloud</code> credentials; it needs an identity of its own. That's the service account <code>gcp-setup.sh</code> created, holding <code>roles/aiplatform.user</code> so it may call your agent. Your proxy code doesn't change at all: Application Default Credentials resolves to <em>you</em> locally and to <em>the service account</em> on Cloud Run, and the same code works in both places.</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-head"><span>terminal</span><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+          <pre><code>gcloud run deploy social-spark-frontend --source frontend \
+  --region=us-central1 --project=YOUR_PROJECT \
+  --service-account=social-spark-frontend@YOUR_PROJECT.iam.gserviceaccount.com \
+  --no-allow-unauthenticated \
+  --set-env-vars="ADK_BACKEND_ORIGIN=YOUR_PASSTHROUGH_ORIGIN" \
+  --port=8080 --memory=1Gi --min-instances=0 --max-instances=3</code></pre>
+        </div>
+
+        <p><code>--no-allow-unauthenticated</code> is the important one: the service is private. Nobody who finds the URL can drive your agent, burn your model quota or publish to your accounts. Reach it like this:</p>
+
+        <div class="code-block">
+          <div class="code-head"><span>terminal</span><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+          <pre><code>gcloud run services proxy social-spark-frontend \
+  --region us-central1 --project YOUR_PROJECT --port 8090</code></pre>
+        </div>
+
+        <p>Then open <code>http://localhost:8090</code>. The proxy authenticates as you, so there's no OAuth setup and no public URL. For sharing it with real users, <strong>IAP</strong> is the next step, out of scope today.</p>
+
+        <div class="callout tip">
+          <span class="callout-label">No OAuth client needed</span>
+          <p>The app's Google sign-in is optional by design; it falls back to "Continue as guest". So a deployed build without a client ID works fine, and you don't have to register redirect URIs mid-workshop.</p>
+        </div>
+
+        <div class="callout check">
+          <span class="callout-label">Checkpoint</span>
+          <p>Hitting the Cloud Run URL directly returns <code>403</code>. Through the proxy, the app loads and completes a full post against your deployed agent. Both halves are now in the cloud.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="nav-btn" onclick="goTo(6)">← Back</button>
+          <button class="nav-btn primary" onclick="goTo(8)">Next: Read the logs →</button>
+        </div>
+      </section>
+
+      <!-- ================= STEP 8 ================= -->
+      <section class="step-panel" data-step="8">
+        <div class="eyebrow"><span class="pill">Step 8 of 9</span><span class="dur">⏱ 5 min</span></div>
+        <h1 class="step-title">Read the logs</h1>
+        <p class="lede">Your agent is somewhere else now. Logs are how you know what it's doing, and the first thing you'll see is alarming and fine.</p>
+
+        <div class="code-block">
+          <div class="code-head"><span>terminal</span><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+          <pre><code>gcloud logging read \
+  'resource.type="aiplatform.googleapis.com/ReasoningEngine"' \
+  --project=YOUR_PROJECT --limit=30 --format="value(severity,textPayload)"</code></pre>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-label">This <code>ERROR</code> is fine. Really.</span>
+          <p>You will see a red <code>ERROR</code> with a full traceback ending:</p>
+          <p><code>ValueError: &lt;Token var=&lt;ContextVar name='current_context'…&gt;&gt; was created in a different Context</code></p>
+          <p>…on a request that worked perfectly. It's an OpenTelemetry quirk: ADK wraps streaming responses in a tracing span, and with server-sent events the span closes in a different async task than the one that opened it. It fires during span <em>cleanup</em>, after your work is done, and affects nothing.</p>
+          <p>You won't have seen it locally, because tracing is only switched on when deployed. Left unexplained, it's the kind of thing that eats an hour of a workshop, which is why it's here rather than in a footnote.</p>
+        </div>
+
+        <div class="callout tip">
+          <span class="callout-label">Never <code>raise</code> at import time in a deployed agent</span>
+          <p>Worth internalising now: if your module raises while being imported, the container dies before it can log why, and the platform reports a generic "failed to be updated" with no build output and no logs. An ordinary config mistake becomes indistinguishable from a platform outage. <strong>Log the problem, degrade, and stay up.</strong> You can't debug what won't start.</p>
+        </div>
+
+        <div class="callout check">
+          <span class="callout-label">Checkpoint</span>
+          <p>You can find your agent's own log lines among the platform noise, and you can tell the harmless OTel traceback from a real failure. Lines starting <code>Sending out request, model:</code> show all three models from Step 2 at work: <code>gemini-2.5-flash</code> for the orchestrator, <code>gemini-2.5-flash-lite</code> for research and <code>gemini-2.5-pro</code> for drafting.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="nav-btn" onclick="goTo(7)">← Back</button>
+          <button class="nav-btn primary" onclick="goTo(9)">Next: Tear it down →</button>
+        </div>
+      </section>
+
+      <!-- ================= STEP 9 ================= -->
+      <section class="step-panel" data-step="9">
+        <div class="eyebrow"><span class="pill">Step 9 of 9</span><span class="dur">⏱ 5 min</span></div>
+        <h1 class="step-title">Tear it down</h1>
+        <p class="lede">Do this before you leave. Every session from here on assumes you did.</p>
+
+        <div class="callout">
+          <span class="callout-label">Theory — scale to zero isn't free of obligation</span>
+          <p>An idle Agent Runtime engine costs approximately nothing, which is exactly why it's easy to forget. But "approximately nothing" across four weeks, times everyone in this room, stops being nothing, and a deployed agent holding API keys is a thing you own whether you remember it or not. <strong>Agent Runtime is this camp's weekly teardown item.</strong></p>
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-label">Deleting the engine deletes the memories</span>
+          <p>The Memory Bank you just built belongs to the engine. Delete the engine and Google deletes its memories with it, so next session starts with an empty bank. That is fine for a workshop, and worth knowing before you point a real user at one: memories you care about need a home that outlives the deployment.</p>
+        </div>
+
+        <div class="code-block">
+          <div class="code-head"><span>terminal</span><button class="copy-btn" onclick="copyBlock(this)">Copy</button></div>
+          <pre><code># list what you have
+agents-cli deploy --list --project YOUR_PROJECT
+
+# the frontend
+gcloud run services delete social-spark-frontend \
+  --region us-central1 --project YOUR_PROJECT</code></pre>
+        </div>
+
+        <p>Delete the engine from the Agent Engine section of the console, or with the SDK. Your Secret Manager secret and service accounts can stay; they cost nothing and you'll want them next week.</p>
+
+        <div class="callout check">
+          <span class="callout-label">Checkpoint</span>
+          <p><code>--list</code> shows no engines, and your Cloud Run services list is empty. Screenshot it for your buddy group if you're the sort of person who forgets.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="nav-btn" onclick="goTo(8)">← Back</button>
+          <button class="nav-btn primary" onclick="goTo(10)">Finish: Assignment →</button>
+        </div>
+      </section>
+
+      <!-- ================= WRAP-UP ================= -->
+      <section class="step-panel" data-step="10">
+        <div class="eyebrow"><span class="pill">Wrap-up</span></div>
+        <h1 class="step-title">What you built, and what's next</h1>
+        <p class="lede">You took an agent off your laptop and gave it an identity, durable memory and a home, and then you deleted it, which is also part of the job.</p>
+
+        <div class="callout">
+          <span class="callout-label">The four Scale concepts, in one paragraph</span>
+          <p><strong>Agent Runtime</strong> ran your container without you managing any infrastructure. <strong>Agent Identity</strong> gave the agent its own principal, which is what Lab 3 will attach governance policies to. <strong>Sessions</strong> moved conversation state out of the container so it survives scaling to zero. <strong>Memory Bank</strong> kept what matters <em>between</em> conversations. The through-line: managed infrastructure destroys your process routinely, so anything you care about has to live somewhere that isn't the process.</p>
+        </div>
+
+        <div class="callout agent">
+          <span class="callout-label">Assignment — do this before Lab 3</span>
+          <p>Deploy <strong>your own agent</strong> from Session 1's homework to Agent Runtime, in your own project, with Agent Identity enabled.</p>
+          <p><strong>What done looks like:</strong> an engine resource with an identity principal against it, and one remote turn answered.</p>
+        </div>
+
+        <div class="callout tip">
+          <span class="callout-label">Going further, if you want to</span>
+          <p>Attach a Memory Bank to your own agent and see what it distils from your conversations; it's often not what you'd have written down yourself. Or try <code>--min-instances 1</code> and measure the cold-start difference against the cost.</p>
+        </div>
+
+        <h2>References</h2>
+        <ul>
+          <li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/overview" target="_blank" rel="noopener">Gemini Enterprise Agent Platform — overview</a>, the four pillars</li>
+          <li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/deploy-an-agent" target="_blank" rel="noopener">Deploy an agent to Agent Runtime</a></li>
+          <li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/runtime/agent-identity" target="_blank" rel="noopener">Agent Identity</a></li>
+          <li><a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/sessions" target="_blank" rel="noopener">Sessions overview</a>, <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank" target="_blank" rel="noopener">Memory Bank overview</a> and <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank/setup" target="_blank" rel="noopener">Memory Bank setup</a> (topics, TTL, IAM)</li>
+          <li><a href="https://docs.cloud.google.com/secret-manager/docs/integrate-secret-manager-with-adk" target="_blank" rel="noopener">Secret Manager with ADK</a> — how a deployed agent reads secrets with its own identity</li>
+          <li><a href="https://google.github.io/adk-docs/" target="_blank" rel="noopener">ADK documentation</a></li>
+          <li><a href="https://cloud.google.com/run/docs/securing/ingress" target="_blank" rel="noopener">Cloud Run — restricting ingress</a>, for making the frontend private properly</li>
+          <li><a href="https://medium.com/google-cloud/tutorial-series-gemini-enterprise-agent-platform-part-3-scaling-with-agent-runtime-memory-1fe9fe48d829" target="_blank" rel="noopener">Tutorial Series: Gemini Enterprise Agent Platform — Part 3: Scaling with Agent Runtime &amp; Memory</a> (Romin Irani), the same Scale pillar on a project scaffolded by <code>agents-cli</code>, including what <code>agents-cli-manifest.yaml</code> holds and why it's separate from <code>pyproject.toml</code></li>
+        </ul>
+
+        <div class="callout check">
+          <span class="callout-label">Next session</span>
+          <p><strong>Lab 3: Govern</strong> — who your agent is allowed to be, and what it's allowed to do. It starts from the agent you deployed today, because governance policies bind to the identity you created in Step 2. If you skipped the teardown, do it now; you'll deploy fresh next time.</p>
+        </div>
+
+        <div class="step-footer">
+          <button class="nav-btn" onclick="goTo(9)">← Back</button>
+          <button class="nav-btn primary" onclick="goTo(0)">Back to start ↑</button>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+  const STEPS = [
+    { i: 0, label: "Overview", dur: "", hash: "overview" },
+    { i: 1, label: "Prerequisites", dur: "10m", hash: "step1" },
+    { i: 2, label: "Deploy to Agent Runtime", dur: "15m", hash: "step2" },
+    { i: 3, label: "Talk to the deployed agent", dur: "10m", hash: "step3" },
+    { i: 4, label: "Sessions that survive", dur: "15m", hash: "step4" },
+    { i: 5, label: "Memory Bank", dur: "20m", hash: "step5" },
+    { i: 6, label: "Point the web UI at it", dur: "15m", hash: "step6" },
+    { i: 7, label: "Deploy the frontend", dur: "15m", hash: "step7" },
+    { i: 8, label: "Read the logs", dur: "5m", hash: "step8" },
+    { i: 9, label: "Tear it down", dur: "5m", hash: "step9" },
+    { i: 10, label: "Wrap-up", dur: "", hash: "wrapup" },
+  ];
+  const HASH_TO_STEP = Object.fromEntries(STEPS.map(s => [s.hash, s.i]));
+
+
+  const navEl = document.getElementById("stepNav");
+  const mobileEl = document.getElementById("mobileNav");
+
+  STEPS.forEach(s => {
+    const li = document.createElement("li");
+    li.className = "step-nav-item" + (s.optional ? " optional" : "");
+    li.dataset.step = s.i;
+    li.onclick = () => goTo(s.i);
+    const dotLabel = s.i === 0 ? "•" : (s.i === 10 ? "★" : s.i);
+    li.innerHTML = `<span class="step-dot">${dotLabel}</span>
+      <span class="step-label-group">
+        <span class="step-label">${s.label}</span>
+        ${s.dur ? `<span class="step-dur">${s.dur}</span>` : ""}
+      </span>`;
+    navEl.appendChild(li);
+
+    const btn = document.createElement("button");
+    btn.textContent = s.i === 0 ? "Overview" : (s.i === 10 ? "Wrap-up" : "Step " + s.i);
+    btn.dataset.step = s.i;
+    btn.onclick = () => goTo(s.i);
+    mobileEl.appendChild(btn);
+  });
+
+  let current = 0;
+  const seen = new Set([0]);
+
+  function goTo(n, updateHash) {
+    current = n;
+    seen.add(n);
+    document.querySelectorAll(".step-panel").forEach(p => {
+      p.classList.toggle("active", parseInt(p.dataset.step) === n);
+    });
+    document.querySelectorAll(".step-nav-item").forEach(el => {
+      const s = parseInt(el.dataset.step);
+      el.classList.toggle("active", s === n);
+      el.classList.toggle("done", seen.has(s) && s !== n);
+    });
+    document.querySelectorAll(".mobile-topnav button").forEach(el => {
+      el.classList.toggle("active", parseInt(el.dataset.step) === n);
+    });
+    const pct = Math.round((n / 10) * 100);
+    document.getElementById("progressFill").style.width = pct + "%";
+    window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+    if (updateHash !== false) {
+      const hash = "#" + (STEPS[n] ? STEPS[n].hash : "overview");
+      if (location.hash !== hash) history.pushState({ step: n }, "", hash);
+    }
+  }
+
+  window.addEventListener("popstate", () => {
+    const n = HASH_TO_STEP[location.hash.slice(1)];
+    goTo(n !== undefined ? n : 0, false);
+  });
+
+  function copyBlock(btn) {
+    const code = btn.closest(".code-block").querySelector("code");
+    const text = code.innerText;
+    const done = () => { const old = btn.textContent; btn.textContent = "Copied!"; setTimeout(() => btn.textContent = old, 1400); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => {});
+    }
+  }
+
+  const initialStep = HASH_TO_STEP[location.hash.slice(1)];
+  goTo(initialStep !== undefined ? initialStep : 0, false);
+</script>
+
+<script>
+  // Three states, not two: no stored value means "follow the OS", which holds
+  // until the reader expresses a preference. The toggle then pins the opposite
+  // of whatever is currently showing.
+  (function () {
+    var KEY = "social-spark-theme";
+    var root = document.documentElement;
+    var btn = document.getElementById("themeToggle");
+    function showing() {
+      return root.dataset.theme
+        || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    }
+    function paint() {
+      var s = showing();
+      btn.textContent = s === "dark" ? "☀️" : "🌙";
+      btn.title = s === "dark" ? "Switch to light" : "Switch to dark";
+    }
+    btn.addEventListener("click", function () {
+      var next = showing() === "dark" ? "light" : "dark";
+      root.dataset.theme = next;
+      try { localStorage.setItem(KEY, next); } catch (e) { /* not fatal */ }
+      paint();
+    });
+    matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
+      if (!root.dataset.theme) paint();
+    });
+    paint();
+  })();
+</script>
+
+<style>
+  .copy-btn, .prompt-copy { display: inline-flex; align-items: center; gap: 6px; }
+  .copy-btn svg, .prompt-copy svg { width: 13px; height: 13px; flex: none; }
+  .callout.agent.has-copy .callout-label { display: flex; align-items: center; gap: 10px; }
+  .prompt-copy {
+    margin-left: auto; flex: none; white-space: nowrap; font-family: var(--font-body); font-size: 12px; text-transform: none; letter-spacing: 0;
+    font-weight: 500; font-style: normal; padding: 3px 9px; border-radius: 6px; cursor: pointer; background: var(--bg-panel);
+    color: var(--text-muted); border: 1px solid var(--border);
+  }
+  .prompt-copy:hover { color: var(--text); border-color: var(--text-faint); }
+</style>
+<script>
+  // Copy icons: every code block already has a Copy button; give it an icon, and add
+  // one to each prompt for the coding agent so it can be pasted in one click.
+  (function () {
+    var ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+    function copyText(text, btn) {
+      var label = btn.querySelector("span");
+      var done = function () { var old = label.textContent; label.textContent = "Copied!"; setTimeout(function () { label.textContent = old; }, 1400); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () {});
+      } else {
+        var t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select();
+        try { document.execCommand("copy"); done(); } catch (e) {} document.body.removeChild(t);
+      }
+    }
+    window.copyBlock = function (btn) { copyText(btn.closest(".code-block").querySelector("code").innerText, btn); };
+    document.querySelectorAll(".copy-btn").forEach(function (b) { b.innerHTML = ICON + "<span>Copy</span>"; });
+    document.querySelectorAll(".callout.agent").forEach(function (c) {
+      var label = c.querySelector(".callout-label");
+      if (!label || !/^(Prompt for your coding agent|Ask your coding agent|Tell it what to remember)/.test(label.textContent.trim())) return;
+      var b = document.createElement("button");
+      b.className = "prompt-copy"; b.type = "button"; b.innerHTML = ICON + "<span>Copy prompt</span>";
+      b.addEventListener("click", function () {
+        copyText(Array.prototype.map.call(c.querySelectorAll("p"), function (p) { return p.innerText.trim(); }).join("\n\n"), b);
+      });
+      c.classList.add("has-copy"); label.appendChild(b);
+    });
+  })();
+</script>

@@ -8,7 +8,7 @@ from typing import Any, Optional
 from google.adk.agents import Agent
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.skills import load_skill_from_dir
-from google.adk.tools import google_search
+from google.adk.tools import google_search, load_memory
 from google.adk.tools.agent_tool import AgentTool
 from google.adk.tools.base_tool import BaseTool
 from google.adk.tools.mcp_tool import McpToolset
@@ -38,12 +38,15 @@ skill_toolset = SkillToolset(
     tool_filter=["load_skill", "load_skill_resource", "list_skills"],
 )
 
+ORCHESTRATOR_MODEL = os.environ.get("ORCHESTRATOR_MODEL", "gemini-2.5-flash")
+RESEARCH_MODEL = os.environ.get("RESEARCH_MODEL", "gemini-2.5-flash-lite")
+
 # ---------------------------------------------------------------------------
 # 2. 獨立 Web 搜尋 Agent (避免與一般工具混合呼叫)
 # ---------------------------------------------------------------------------
 search_agent = Agent(
     name="web_researcher",
-    model="gemini-2.5-flash",
+    model=RESEARCH_MODEL,
     description="Researches facts, dates, and context on the web.",
     instruction=(
         "Research the given query and return a concise summary of relevant facts."
@@ -97,10 +100,16 @@ if POST_VIA != "buffer":
     )
     tools.append(linkedin_toolset)
 
+# 掛載 Memory Bank 查詢工具 (當在雲端環境或提供 APP_URL 時)
+use_memory_bank = bool(os.environ.get("APP_URL"))
+if use_memory_bank:
+    tools.insert(0, load_memory)
+
 # ---------------------------------------------------------------------------
 # 4. Pipeline Stage 狀態追蹤回呼函式
 # ---------------------------------------------------------------------------
 _TOOL_STAGES = {
+    "load_memory": "consulting_memory",
     "web_researcher": "researching",
     "load_skill": "drafting",
     "generate_image": "drafting",
@@ -129,9 +138,19 @@ def _track_stage(
     return None
 
 
-def _stage_after_agent(callback_context: CallbackContext) -> None:
-    if callback_context.state.get("pipeline_stage") in ("researching", "drafting"):
+async def _stage_after_agent(callback_context: CallbackContext) -> None:
+    if callback_context.state.get("pipeline_stage") in (
+        "researching",
+        "drafting",
+        "consulting_memory",
+    ):
         callback_context.state["pipeline_stage"] = "awaiting_approval"
+
+    if use_memory_bank and callback_context.state.get("pipeline_stage") == "posted":
+        if callback_context.state.get("memory_ingested"):
+            return  # once per conversation, not once per turn
+        await callback_context.add_session_to_memory()
+        callback_context.state["memory_ingested"] = True
 
 
 # ---------------------------------------------------------------------------
@@ -139,7 +158,7 @@ def _stage_after_agent(callback_context: CallbackContext) -> None:
 # ---------------------------------------------------------------------------
 root_agent = Agent(
     name="social_poster",
-    model="gemini-2.5-flash",
+    model=ORCHESTRATOR_MODEL,
     description="Helps the user turn an idea into a polished social media post.",
     instruction="""You help the user turn an idea into a social media post.
 
@@ -149,12 +168,13 @@ Tool Calling Rules (Strict):
 - Never use Python code to invoke tools. To load a skill, directly invoke the load_skill function tool with skill_name.
 
 Workflow:
-1. If the idea needs facts, dates, or context, research it with the web_researcher tool first.
-2. When drafting, call load_skill for the relevant skills: post-formatter (structure),
-   platform-style (rules for the target platform), and brand-voice (tone).
-3. If the user asks for an image, load and follow the poster-style skill, then call
+1. If available, call load_memory first to consult user preferences, style guidelines, and past instructions before drafting.
+2. If the idea needs facts, dates, or context, research it with the web_researcher tool first.
+3. When drafting, call load_skill for the relevant skills: post-formatter (structure),
+   platform-style (rules for the target platform), and brand-voice (tone). Apply any memories retrieved.
+4. If the user asks for an image, load and follow the poster-style skill, then call
    generate_image with a detailed visual description and tell them where the file was saved.
-4. ALWAYS show the finished draft to the user and ask for their approval before any posting action.
+5. ALWAYS show the finished draft to the user and ask for their approval before any posting action.
    For an immediate post, ask Buffer to publish now rather than schedule.
 
 Posting rules (strict):

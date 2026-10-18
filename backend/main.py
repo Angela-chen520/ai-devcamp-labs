@@ -3,13 +3,17 @@
 Run from the repo root:  uv run uvicorn backend.main:app --port 8000
 """
 
+import os
 import pathlib
+import re
 
 from ag_ui_adk import ADKAgent, add_adk_fastapi_endpoint
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from google.adk.memory import VertexAiMemoryBankService
+from google.adk.sessions import VertexAiSessionService
 
 load_dotenv(pathlib.Path(__file__).parent / "social_poster" / ".env")
 
@@ -25,11 +29,33 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-adk_agent = ADKAgent(
-    adk_agent=root_agent,
-    app_name="social_poster",
-    user_id="devcamp-user",  # single-user POC; extract from auth in real apps
-)
+# Step 4 & 5: When running on Agent Runtime, APP_URL is injected by the platform
+# carrying the engine's full resource name. We parse it to hook into VertexAiSessionService
+# and VertexAiMemoryBankService. When running locally, APP_URL is not set, so it keeps
+# the default in-memory session service.
+app_url = os.environ.get("APP_URL", "")
+match = re.search(r"projects/([^/]+)/locations/([^/]+)/reasoningEngines/([^/]+)", app_url)
+
+adk_agent_kwargs = {
+    "adk_agent": root_agent,
+    "app_name": "social_poster",
+    "user_id": "devcamp-user",  # single-user POC; extract from auth in real apps
+}
+
+if match:
+    project, location, engine_id = match.groups()
+    adk_agent_kwargs["session_service"] = VertexAiSessionService(
+        project=project,
+        location=location,
+        agent_engine_id=engine_id,
+    )
+    adk_agent_kwargs["memory_service"] = VertexAiMemoryBankService(
+        project=project,
+        location=location,
+        agent_engine_id=engine_id,
+    )
+
+adk_agent = ADKAgent(**adk_agent_kwargs)
 
 add_adk_fastapi_endpoint(app, adk_agent, path="/api/adk")
 

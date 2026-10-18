@@ -1,0 +1,7 @@
+name: 'social-spark-poster'
+agent_directory: 'backend/social_poster'
+region: 'us-central1'
+create_params:
+  root_agent_name: 'social_poster'
+  deployment_target: 'agent_runtime'
+  is_a2a: false

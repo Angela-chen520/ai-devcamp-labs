@@ -13,7 +13,7 @@
 import { useEffect, useState } from "react";
 import { useCopilotChatInternal } from "@copilotkit/react-core";
 
-const BACKEND_ORIGIN = process.env.NEXT_PUBLIC_BACKEND_ORIGIN || "http://localhost:8000";
+const BACKEND_ORIGIN = process.env.NEXT_PUBLIC_BACKEND_ORIGIN ?? "";
 
 type PostEntry = {
   id: string;
