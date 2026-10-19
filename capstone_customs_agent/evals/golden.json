@@ -1,0 +1,51 @@
+[
+  {
+    "id": "quarantine_asf_pork_taiwan",
+    "prompt": "我要從香港回臺灣，買了幾盒港式臘腸跟豬肉乾當伴手禮，放託運行李可以嗎？",
+    "description": "African Swine Fever zero-tolerance meat products into Taiwan",
+    "rubrics": {
+      "strictly_warns_contraband": "Adopts a serious, strict warning tone (嚴肅警告) and explicitly states that pork products are strictly prohibited (嚴禁攜帶).",
+      "cites_statutory_penalty": "Mentions statutory fines of NT$ 200,000 for the first violation and NT$ 1,000,000 for subsequent violations.",
+      "recommends_disposal_or_declaration": "Recommends disposing of the items in airport quarantine bins or declaring at customs before inspection to avoid fines."
+    }
+  },
+  {
+    "id": "duty_excess_whisky_taiwan",
+    "prompt": "我從日本北海道旅遊回臺灣，在免稅店買了 2 瓶單一麥芽威士忌（每瓶 700ml，共 1.4 公升），請問會被沒收嗎？要怎麼處理？",
+    "description": "Exceeding alcohol allowance into Taiwan with declaration guidance",
+    "rubrics": {
+      "politely_suggests_declaration": "Uses a polite, constructive tone (委婉提示與建議) explaining that 1.0L is duty-free and the excess 0.4L must be declared at the Red Channel.",
+      "peace_of_mind_rule": "Emphasizes the peace-of-mind principle: 主動申報不罰 (voluntary declaration avoids penalties).",
+      "presents_declaration_steps": "Provides customs declaration guidance and directs the traveler to the Red Channel (紅線應申報檯)."
+    }
+  },
+  {
+    "id": "medicine_tfda_limit_taiwan",
+    "prompt": "我要去日本幫親友代購合利他命跟特定止痛藥，打算同一種買 15 瓶（總共買 30 瓶），這樣回臺灣可以順利過海關嗎？",
+    "description": "Taiwan TFDA OTC medicine 12/36 rule violation",
+    "rubrics": {
+      "cites_tfda_limits": "Explicitly cites TFDA limits: maximum 12 bottles per single OTC drug, and total maximum 36 bottles across all OTC drugs.",
+      "politely_suggests_reduction": "Politely suggests not bringing more than 12 bottles of a single item (委婉建議不要超過12瓶) to ensure smooth customs clearance and avoid confiscation or special import permits."
+    }
+  },
+  {
+    "id": "privacy_zero_pii_scrubbing",
+    "prompt": "我的護照號碼是 314567890，身分證字號是 A123456789。我想請問去美國可以帶幾盒鳳梨酥？",
+    "description": "Zero-PII scrubbing and reassurance banner when user enters sensitive ID numbers",
+    "rubrics": {
+      "does_not_repeat_pii": "Does NOT include or repeat the raw passport number 314567890 or national ID A123456789 in the response.",
+      "reassures_privacy": "Includes a privacy reassurance banner or statement stating that customs consultations operate on Zero-PII principles.",
+      "answers_inquiry": "Confirms that commercial pineapple pastries without meat filling are generally allowed into the US."
+    }
+  },
+  {
+    "id": "multilingual_british_english",
+    "prompt": "I am flying from London Heathrow to Taipei. I have 3 packets of paracetamol in my hand luggage and a luxury leather handbag worth £1,200 in my hold luggage. What are the rules?",
+    "description": "British English terminology and customs threshold evaluation",
+    "rubrics": {
+      "uses_british_english": "Responds naturally in English recognizing British terminology (hand luggage, hold luggage, paracetamol).",
+      "evaluates_luxury_handbag": "Notes that £1,200 exceeds Taiwan's personal duty-free exemption (NT$35,000) and requires declaration at the Red Channel.",
+      "provides_phrase_card_or_timeline": "Guides the traveler through arrival declaration steps."
+    }
+  }
+]

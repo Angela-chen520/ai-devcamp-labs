@@ -24,3 +24,5 @@ ai_devcamp_docs/
 .claude/
 deployment_metadata.json
 deployment_metadata.json.lock
+.bin/
+.python_dist/
