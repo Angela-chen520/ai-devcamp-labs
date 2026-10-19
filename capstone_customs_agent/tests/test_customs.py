@@ -122,3 +122,54 @@ class TestCustomsTools:
         assert "NT$35,000" in tw_limits["general_exemption"]
         assert "非洲豬瘟" in tw_limits["meat_quarantine"]
         assert "電子煙" in tw_limits["vapes_e_cigarettes"]
+
+        # Test expanded 18 countries
+        kr_limits = lookup_country_limits("South Korea")
+        assert "800" in kr_limits["general_exemption"]
+        assert "肉乾" in kr_limits["meat_quarantine"]
+
+        ca_limits = lookup_country_limits("Canada")
+        assert "800" in ca_limits["general_exemption"]
+
+        fr_limits = lookup_country_limits("France")
+        assert "430" in fr_limits["general_exemption"]
+
+        au_limits = lookup_country_limits("Australia")
+        assert "900" in au_limits["general_exemption"]
+        assert "生物檢疫" in au_limits["meat_quarantine"]
+
+    def test_get_destination_weather(self):
+        from capstone_customs_agent.tools import get_destination_weather
+
+        # Test autumn forecast for Japan
+        res_jp = get_destination_weather("Japan", "2026-10-25", "2026-10-30")
+        assert "日本" in res_jp["destination"]
+        assert "°C" in res_jp["temperature_range"]
+        assert len(res_jp["packing_suggestions"]) > 0
+
+        # Test southern hemisphere / Australia
+        res_au = get_destination_weather("Australia", "2026-12-15", "2026-12-25")
+        assert "澳洲" in res_au["destination"]
+        assert "°C" in res_au["temperature_range"]
+
+        # Test default/unknown fallback
+        res_unknown = get_destination_weather("Mars", "2026-10-25", "2026-10-30")
+        assert "臺灣" in res_unknown["destination"]
+        assert "舒適" in res_unknown["weather_condition"]
+
+    def test_multilingual_phrase_cards(self):
+        # Korea
+        card_kr = generate_phrase_card(
+            destination_country="South Korea",
+            traveler_native_language="Traditional Chinese",
+            declared_items_summary="Red Wine 2 bottles",
+        )
+        assert "세관 공무원 귀하" in card_kr["official_language_text"]
+
+        # France
+        card_fr = generate_phrase_card(
+            destination_country="France",
+            traveler_native_language="English",
+            declared_items_summary="Cash €12,000",
+        )
+        assert "agents des douanes" in card_fr["official_language_text"]

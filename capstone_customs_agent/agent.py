@@ -31,7 +31,12 @@ from google.adk.tools.tool_context import ToolContext
 from google.genai import types as genai_types
 
 from . import guardrails
-from .tools import calculate_duty_tax, generate_phrase_card, lookup_country_limits
+from .tools import (
+    calculate_duty_tax,
+    generate_phrase_card,
+    get_destination_weather,
+    lookup_country_limits,
+)
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 SKILLS_DIR = pathlib.Path(__file__).resolve().parent / "skills"
@@ -293,6 +298,7 @@ Your mission is to provide accurate, privacy-first, dynamically tone-calibrated 
         calculate_duty_tax,
         generate_phrase_card,
         lookup_country_limits,
+        get_destination_weather,
     ],
     generate_content_config=guardrails.content_config(),
     before_model_callback=[_clean_user_input_callback],
