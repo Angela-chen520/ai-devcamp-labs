@@ -110,7 +110,21 @@ capstone_customs_agent/
 ./.bin/uv run python capstone_customs_agent/evals/run_evals.py
 ```
 
-### 3. 一鍵啟動互動諮詢 CLI
+### 3. 一鍵啟動旅客專屬視覺化網頁介面 (Recommended)
+```bash
+./run_web.sh
+```
+啟動後於瀏覽器開啟：`http://localhost:8000`
+- 包含出入境航線快速切換、熱門情境快捷點選、三級動態語氣顏色警示卡片與 Zero-PII 隱私安全守護徽章。
+
+### 4. 啟動 Google ADK 原生開發者 Web 控制台
+```bash
+./.bin/uv run adk web capstone_customs_agent
+```
+啟動後於瀏覽器開啟：`http://127.0.0.1:8501`
+- 提供完整的 Google ADK 多代理人執行軌跡追蹤 (Trace Inspector) 與對話視窗。
+
+### 5. 終端機互動 CLI 諮詢介面
 ```bash
 ./run_advisor.sh
 ```
