@@ -1,7 +1,8 @@
 # 全球旅客出入境行李與報關智慧諮詢系統
 ### Global Traveler Smart Customs & Baggage Advisor
 
-> 本專案為 Google AI Devcamp 個人結訓 Capstone 專案，基於 Google ADK (Agent Development Kit) 與 Gemini 2.5 Flash 構建。
+> 本專案為 Google AI Devcamp 個人結訓 Capstone 專案，基於 Google ADK (Agent Development Kit) 與 Gemini 2.5 Flash 構建。  
+> 📖 **完整使用操作手冊與五大功能詳解**：請參閱 [PORTAL_GUIDE.md](PORTAL_GUIDE.md)。
 
 ---
 
@@ -62,10 +63,15 @@
 ```text
 capstone_customs_agent/
 ├── agent.py                 # ADK Multi-Agent 核心定義 (Root Agent + 4 領域專屬 Agent)
+├── web_server.py            # FastAPI 網頁伺服器與 RESTful API
 ├── guardrails.py            # Zero-PII 雙層防護 (在地正則即時清洗 + Cloud DLP + Model Armor)
-├── tools.py                 # 確定性業務工具 (關稅試算、各國限額快查、雙語溝通小卡生成)
+├── tools.py                 # 確定性業務工具 (關稅試算、18國限額、文化禮儀、氣象、雙語小卡)
 ├── cli.py                   # 互動式終端諮詢介面
-├── README.md                # 專案詳細說明與架構手冊
+├── .env.example             # 環境變數設定範本 (支援 Gemini API Key 與 Vertex AI)
+├── README.md                # 專案架構概覽手冊
+├── PORTAL_GUIDE.md          # 完整網頁入口五大分頁圖解操作手冊
+├── static/
+│   └── index.html           # 航空風格 SPA 單頁應用程式 (五大獨立分頁、主題切換、計時器)
 ├── skills/                  # ADK 領域知識技能庫
 │   ├── quarantine-rules/    # 各國檢疫規範、非洲豬瘟、肉品零容忍、裁罰基準
 │   ├── duty-allowance/      # 免稅額、菸酒限額、現金洗錢防制門檻、紅綠線規則
@@ -74,7 +80,7 @@ capstone_customs_agent/
 │   ├── customs-guide/       # 四階段報關教學與雙語海關小卡規範
 │   └── multilingual-support/# 多語系在地化對照表 (en-GB vs en-US 專有名詞對齊)
 ├── tests/
-│   └── test_customs.py      # 單元測試套件 (涵蓋 PII 遮蔽、稅額計算、小卡生成)
+│   └── test_customs.py      # 單元測試套件 (涵蓋 PII 遮蔽、稅額計算、小卡、文化禮儀)
 └── evals/
     ├── golden.json          # 5 大黃金基準評估測試案例
     └── run_evals.py         # LLM-as-a-Judge 自動化評估執行器 (嚴格 Fail-Closed)
@@ -103,7 +109,7 @@ capstone_customs_agent/
 ```bash
 ./.bin/uv run pytest capstone_customs_agent/tests/test_customs.py -v
 ```
-*(已通過 13/13 完整測試項，涵蓋 18 國法規、氣候預報、Zero-PII 遮蔽與多語系溝通小卡)*
+*(已通過 14/14 完整測試項，涵蓋 18 國法規、文化禁忌、氣候預報、Zero-PII 遮蔽與多語系溝通小卡)*
 
 ### 2. 執行黃金評估基準 (LLM-as-a-Judge)
 ```bash

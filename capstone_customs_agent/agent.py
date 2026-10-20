@@ -42,6 +42,13 @@ from .tools import (
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 SKILLS_DIR = pathlib.Path(__file__).resolve().parent / "skills"
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(REPO_ROOT / ".env")
+    load_dotenv(pathlib.Path(__file__).resolve().parent / ".env")
+except ImportError:
+    pass
+
 log = logging.getLogger(__name__)
 
 # --- Model Configuration ------------------------------------------------------
