@@ -306,10 +306,13 @@ async def query_endpoint(req: QueryRequest):
 
 @server.get("/", response_class=HTMLResponse)
 async def serve_index():
-    index_file = STATIC_DIR / "index.html"
-    if not index_file.exists():
-        return HTMLResponse("<h1>Web UI Not Found</h1>", status_code=404)
-    return FileResponse(index_file)
+    root_index = REPO_ROOT / "index.html"
+    static_index = STATIC_DIR / "index.html"
+    if root_index.exists():
+        return FileResponse(root_index)
+    elif static_index.exists():
+        return FileResponse(static_index)
+    return HTMLResponse("<h1>Web UI Not Found</h1>", status_code=404)
 
 
 # Mount static files
