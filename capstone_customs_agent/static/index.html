@@ -220,7 +220,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       
       <!-- Brand & Badges -->
-      <a href="#" class="flex items-center space-x-3 group">
+      <a href="#" onclick="switchPage('home'); return false;" class="flex items-center space-x-3 group">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-blue-500 flex items-center justify-center text-white shadow-md shadow-sky-500/30 group-hover:scale-105 transition-transform">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -238,22 +238,32 @@
       <!-- Quick Actions & Language Selector -->
       <div class="flex items-center space-x-3 sm:space-x-4">
         
-        <!-- Navigation Links -->
-        <nav class="hidden lg:flex items-center space-x-5 text-sm font-medium text-slate-300">
-          <a href="#user-guide" class="hover:text-sky-400 transition-colors" id="nav-link-guide">使用說明</a>
-          <a href="#inspection-section" class="hover:text-sky-400 transition-colors" id="nav-link-check">行李核驗</a>
-          <a href="#travel-etiquette" class="hover:text-sky-400 transition-colors" id="nav-link-etiquette">旅遊禮儀與法規</a>
-          <a href="#customs-guide" class="hover:text-sky-400 transition-colors" id="nav-link-declaration">報關流程指引</a>
-          <a href="#rules-table" class="hover:text-sky-400 transition-colors" id="nav-link-rules">18 國限額速查</a>
+        <!-- Navigation Links (Desktop Tab Buttons) -->
+        <nav class="hidden lg:flex items-center space-x-1.5 text-sm font-medium">
+          <button type="button" onclick="switchPage('home')" id="nav-btn-home" class="nav-tab px-3 py-1.5 rounded-lg transition-all font-bold bg-sky-600 text-white shadow-sm shadow-sky-600/30">
+            <span id="nav-link-guide">首頁使用說明</span>
+          </button>
+          <button type="button" onclick="switchPage('inspection')" id="nav-btn-inspection" class="nav-tab px-3 py-1.5 rounded-lg transition-all font-medium text-slate-300 hover:text-white hover:bg-slate-800">
+            <span id="nav-link-check">行李核驗</span>
+          </button>
+          <button type="button" onclick="switchPage('etiquette')" id="nav-btn-etiquette" class="nav-tab px-3 py-1.5 rounded-lg transition-all font-medium text-slate-300 hover:text-white hover:bg-slate-800">
+            <span id="nav-link-etiquette">旅遊禮儀與法規</span>
+          </button>
+          <button type="button" onclick="switchPage('declaration')" id="nav-btn-declaration" class="nav-tab px-3 py-1.5 rounded-lg transition-all font-medium text-slate-300 hover:text-white hover:bg-slate-800">
+            <span id="nav-link-declaration">報關流程指引</span>
+          </button>
+          <button type="button" onclick="switchPage('rules')" id="nav-btn-rules" class="nav-tab px-3 py-1.5 rounded-lg transition-all font-medium text-slate-300 hover:text-white hover:bg-slate-800">
+            <span id="nav-link-rules">18 國限額速查</span>
+          </button>
         </nav>
 
         <!-- Direct Customs Guide Button (Highlighted) -->
-        <a href="#customs-guide" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-400/40 text-xs sm:text-sm font-semibold transition-all shadow-sm">
+        <button type="button" onclick="switchPage('declaration')" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-400/40 text-xs sm:text-sm font-semibold transition-all shadow-sm">
           <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           <span id="btn-direct-guide">直接看報關指引 📋</span>
-        </a>
+        </button>
 
         <!-- Theme Mode Switcher (Day / Night / System) -->
         <div class="flex items-center space-x-1.5 bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1" title="切換顯示主題：白天 / 夜間 / 隨裝置同步">
@@ -283,6 +293,27 @@
     </div>
   </header>
 
+  <!-- ==================== MOBILE & TABLET SUB-NAVIGATION TAB BAR ==================== -->
+  <div class="lg:hidden bg-slate-900 border-b border-slate-800 px-3 py-2 sticky top-16 z-40 shadow-md">
+    <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar text-xs">
+      <button type="button" onclick="switchPage('home')" id="mobile-nav-home" class="mobile-nav-tab px-2.5 py-1.5 rounded-lg whitespace-nowrap font-bold bg-sky-600 text-white transition-all">
+        🏠 <span id="mobile-link-guide">首頁說明</span>
+      </button>
+      <button type="button" onclick="switchPage('inspection')" id="mobile-nav-inspection" class="mobile-nav-tab px-2.5 py-1.5 rounded-lg whitespace-nowrap font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+        🧳 <span id="mobile-link-check">行李核驗</span>
+      </button>
+      <button type="button" onclick="switchPage('etiquette')" id="mobile-nav-etiquette" class="mobile-nav-tab px-2.5 py-1.5 rounded-lg whitespace-nowrap font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+        🌍 <span id="mobile-link-etiquette">旅遊禮儀</span>
+      </button>
+      <button type="button" onclick="switchPage('declaration')" id="mobile-nav-declaration" class="mobile-nav-tab px-2.5 py-1.5 rounded-lg whitespace-nowrap font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+        📋 <span id="mobile-link-declaration">報關流程</span>
+      </button>
+      <button type="button" onclick="switchPage('rules')" id="mobile-nav-rules" class="mobile-nav-tab px-2.5 py-1.5 rounded-lg whitespace-nowrap font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+        📊 <span id="mobile-link-rules">限額速查</span>
+      </button>
+    </div>
+  </div>
+
   <!-- ==================== ZERO-PII PRIVACY BANNER ==================== -->
   <div class="bg-emerald-900 text-emerald-100 text-xs py-2 px-4 border-b border-emerald-800 flex items-center justify-center space-x-2">
     <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -296,94 +327,241 @@
   <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
   <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
 
-    <!-- ==================== HERO BANNER & 3-STEP USER GUIDE ==================== -->
-    <section id="user-guide" class="bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900 rounded-2xl text-white p-6 sm:p-8 shadow-xl border border-slate-800 relative overflow-hidden">
-      <!-- Background Decorative Grid -->
-      <div class="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]"></div>
-      
-      <div class="relative z-10 space-y-6">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div class="space-y-2 max-w-2xl">
-            <div class="inline-flex items-center space-x-2 bg-sky-500/20 text-sky-300 border border-sky-400/30 px-3 py-1 rounded-full text-xs font-semibold">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span id="hero-badge">AI 智慧邊境守護者 · 旅客必備通關助手</span>
+    <!-- ==================== VIEW 1: 首頁使用說明 (Home & User Guide) ==================== -->
+    <div id="view-home" class="page-view space-y-10">
+
+      <!-- HERO BANNER & 3-STEP USER GUIDE -->
+      <section id="user-guide" class="bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900 rounded-2xl text-white p-6 sm:p-8 shadow-xl border border-slate-800 relative overflow-hidden">
+        <!-- Background Decorative Grid -->
+        <div class="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        
+        <div class="relative z-10 space-y-6">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="space-y-2 max-w-2xl">
+              <div class="inline-flex items-center space-x-2 bg-sky-500/20 text-sky-300 border border-sky-400/30 px-3 py-1 rounded-full text-xs font-semibold">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="hero-badge">AI 智慧邊境守護者 · 旅客必備通關助手</span>
+              </div>
+              <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white" id="hero-title">
+                旅客出入境行李核驗與報關諮詢全攻略
+              </h2>
+              <p class="text-slate-300 text-sm leading-relaxed" id="hero-desc">
+                準備出國旅遊或返國歸國嗎？只需選擇出入境國家與預計攜帶的行李物品，即可獲得 3 級動態語氣法規核算、關稅試算、目的地旅行天氣打包建議與完整報關指引。
+              </p>
             </div>
-            <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white" id="hero-title">
-              旅客出入境行李核驗與報關諮詢全攻略
-            </h2>
-            <p class="text-slate-300 text-sm leading-relaxed" id="hero-desc">
-              準備出國旅遊或返國歸國嗎？只需選擇出入境國家與預計攜帶的行李物品，即可獲得 3 級動態語氣法規核算、關稅試算、目的地旅行天氣打包建議與完整報關指引。
-            </p>
+
+            <!-- Quick Action Box -->
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-xl p-4 sm:p-5 flex flex-col justify-between space-y-3 shrink-0 lg:w-72">
+              <div class="text-xs text-sky-200 font-medium flex items-center space-x-1.5">
+                <span>✈️ 快速進入功能</span>
+              </div>
+              <p class="text-xs text-slate-300">
+                想立即核驗您隨身或託運行李中的物品是否違規超額？
+              </p>
+              <button type="button" onclick="switchPage('inspection')" class="w-full text-center px-4 py-2.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-white text-xs sm:text-sm font-bold shadow-md transition-colors flex items-center justify-center space-x-1.5">
+                <span>立即進行行李核驗 ➔</span>
+              </button>
+            </div>
           </div>
 
-          <!-- Quick Fast-Track Action Box -->
-          <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-xl p-4 sm:p-5 flex flex-col justify-between space-y-3 shrink-0 lg:w-72">
-            <div class="text-xs text-sky-200 font-medium flex items-center space-x-1.5">
-              <span>✈️ 快速跳轉專區</span>
+          <!-- 3-STEP VISUAL ONBOARDING GUIDE -->
+          <div class="pt-4 border-t border-slate-800">
+            <h3 class="text-xs uppercase tracking-wider font-bold text-sky-400 mb-4" id="guide-header-title">
+              三步驟輕鬆上手使用指南 (How It Works)
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              
+              <!-- Step 1 -->
+              <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 flex items-start space-x-3.5 hover:border-sky-500/50 transition-colors">
+                <div class="w-8 h-8 rounded-lg bg-sky-600 text-white font-bold flex items-center justify-center shrink-0 text-sm shadow">
+                  1
+                </div>
+                <div class="space-y-1">
+                  <h4 class="font-bold text-sm text-white" id="step1-title">選擇行程與旅行日期</h4>
+                  <p class="text-xs text-slate-300 leading-relaxed" id="step1-desc">
+                    設定您的出發地與目的地（涵蓋日韓歐美東南亞等 18 國），並填寫出發及回國日期以同步獲取目的地天氣。
+                  </p>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 flex items-start space-x-3.5 hover:border-sky-500/50 transition-colors">
+                <div class="w-8 h-8 rounded-lg bg-sky-600 text-white font-bold flex items-center justify-center shrink-0 text-sm shadow">
+                  2
+                </div>
+                <div class="space-y-1">
+                  <h4 class="font-bold text-sm text-white" id="step2-title">填寫或點選行李物品</h4>
+                  <p class="text-xs text-slate-300 leading-relaxed" id="step2-desc">
+                    輸入預計攜帶之物品及數量，或直接點選常見熱門標籤（名牌包、洋酒、感冒藥、伴手禮等）。
+                  </p>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 flex items-start space-x-3.5 hover:border-sky-500/50 transition-colors">
+                <div class="w-8 h-8 rounded-lg bg-sky-600 text-white font-bold flex items-center justify-center shrink-0 text-sm shadow">
+                  3
+                </div>
+                <div class="space-y-1">
+                  <h4 class="font-bold text-sm text-white" id="step3-title">一鍵智慧核驗與指引</h4>
+                  <p class="text-xs text-slate-300 leading-relaxed" id="step3-desc">
+                    點擊核驗即可取得通關燈號（綠放行 / 黃超額建議 / 紅嚴禁違禁品）、應繳稅額、雙語自主申報小卡與打包建議。
+                  </p>
+                </div>
+              </div>
+
             </div>
-            <p class="text-xs text-slate-300">
-              已有應稅物品或不需查詢，想直接了解機場申報流程？
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 FEATURE GATEWAY CARDS (四大系統功能快速入口) -->
+      <section class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+              系統功能專區總覽與快速入口
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+              點擊上方索引導航，或直接點選下方卡片切換至各項專屬功能：
             </p>
-            <a href="#customs-guide" class="w-full text-center px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs sm:text-sm font-bold shadow-md transition-colors">
-              查看通關與報關指引 ➔
-            </a>
           </div>
         </div>
 
-        <!-- 3-STEP VISUAL ONBOARDING GUIDE -->
-        <div class="pt-4 border-t border-slate-800">
-          <h3 class="text-xs uppercase tracking-wider font-bold text-sky-400 mb-4" id="guide-header-title">
-            三步驟輕鬆上手使用指南 (How It Works)
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            
-            <!-- Step 1 -->
-            <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 flex items-start space-x-3.5 hover:border-sky-500/50 transition-colors">
-              <div class="w-8 h-8 rounded-lg bg-sky-600 text-white font-bold flex items-center justify-center shrink-0 text-sm shadow">
-                1
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Card 1: 行李核驗 -->
+          <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-lg border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-4 hover:border-sky-500 transition-all group">
+            <div class="space-y-3">
+              <div class="w-12 h-12 rounded-xl bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
+                🧳
               </div>
-              <div class="space-y-1">
-                <h4 class="font-bold text-sm text-white" id="step1-title">選擇行程與旅行日期</h4>
-                <p class="text-xs text-slate-300 leading-relaxed" id="step1-desc">
-                  設定您的出發地與目的地（涵蓋日韓歐美東南亞等 18 國），並填寫出發及回國日期以同步獲取目的地天氣。
-                </p>
-              </div>
-            </div>
-
-            <!-- Step 2 -->
-            <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 flex items-start space-x-3.5 hover:border-sky-500/50 transition-colors">
-              <div class="w-8 h-8 rounded-lg bg-sky-600 text-white font-bold flex items-center justify-center shrink-0 text-sm shadow">
-                2
-              </div>
-              <div class="space-y-1">
-                <h4 class="font-bold text-sm text-white" id="step2-title">填寫或點選行李物品</h4>
-                <p class="text-xs text-slate-300 leading-relaxed" id="step2-desc">
-                  輸入預計攜帶之物品及數量，或直接點選常見熱門標籤（名牌包、洋酒、感冒藥、伴手禮等）。
-                </p>
+              <h4 class="text-lg font-bold text-slate-900 dark:text-white">行李申報智慧核驗</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                涵蓋 18 國雙向航線與機場代碼，即時分析動植物防檢疫禁令、菸酒免稅門檻、自用藥品規範及可能關稅試算，並自動生成外國海關溝通專屬的雙語申報小卡。
+              </p>
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">三級動態燈號</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">預估關稅試算</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">旅行天氣預報</span>
               </div>
             </div>
+            <button type="button" onclick="switchPage('inspection')" class="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center space-x-1.5">
+              <span>進入行李核驗頁面</span>
+              <span>➔</span>
+            </button>
+          </div>
 
-            <!-- Step 3 -->
-            <div class="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 flex items-start space-x-3.5 hover:border-sky-500/50 transition-colors">
-              <div class="w-8 h-8 rounded-lg bg-sky-600 text-white font-bold flex items-center justify-center shrink-0 text-sm shadow">
-                3
+          <!-- Card 2: 旅遊禮儀與法規 -->
+          <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-lg border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-4 hover:border-indigo-500 transition-all group">
+            <div class="space-y-3">
+              <div class="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
+                🌍
               </div>
-              <div class="space-y-1">
-                <h4 class="font-bold text-sm text-white" id="step3-title">一鍵智慧核驗與指引</h4>
-                <p class="text-xs text-slate-300 leading-relaxed" id="step3-desc">
-                  點擊核驗即可取得通關燈號（綠放行 / 黃超額建議 / 紅嚴禁違禁品）、應繳稅額、雙語自主申報小卡與打包建議。
-                </p>
+              <h4 class="text-lg font-bold text-slate-900 dark:text-white">入境文化禮儀與法規禁忌</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                出國旅遊必備的各國管理規範！彙整新加坡口香糖/隨地吐痰重罰、日本私道拍照禁令與電車安靜禮儀、泰國尊崇皇室與頭部禁忌、澳洲極嚴檢疫遣返等在地法制。
+              </p>
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">🚨 重罰拘役警告</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">⚠️ 公共管理罰款</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">💡 文化習俗指引</span>
               </div>
             </div>
+            <button type="button" onclick="switchPage('etiquette')" class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center space-x-1.5">
+              <span>查看 18 國文化禮儀</span>
+              <span>➔</span>
+            </button>
+          </div>
 
+          <!-- Card 3: 報關流程指引 -->
+          <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-lg border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-4 hover:border-amber-500 transition-all group">
+            <div class="space-y-3">
+              <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
+                📋
+              </div>
+              <h4 class="text-lg font-bold text-slate-900 dark:text-white">各國機場報關流程指引</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                圖解機場通關四大標準步驟。掌握「紅線應申報」與「綠線免申報」通道核心法則，牢記「主動誠實申報絕無罰鍰」，並附各主要國際機場現場查驗實用對策。
+              </p>
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">安心免罰黃金法則</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">紅綠線通道判別</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">申報單填寫指引</span>
+              </div>
+            </div>
+            <button type="button" onclick="switchPage('declaration')" class="w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center space-x-1.5">
+              <span>查看報關流程教學</span>
+              <span>➔</span>
+            </button>
+          </div>
+
+          <!-- Card 4: 18 國限額速查 -->
+          <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-lg border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-4 hover:border-emerald-500 transition-all group">
+            <div class="space-y-3">
+              <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
+                📊
+              </div>
+              <h4 class="text-lg font-bold text-slate-900 dark:text-white">18 國海關免稅限額速查表</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                完整彙總臺灣、日本、韓國、美加、英歐、澳紐與東南亞等全球 18 個主流目的地的官方免稅金額、酒類、香菸、電子煙/加熱菸管制及現鈔攜帶申報門檻。
+              </p>
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">18 國官方基準</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">即時關鍵字搜尋</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">肉品檢疫與現鈔規範</span>
+              </div>
+            </div>
+            <button type="button" onclick="switchPage('rules')" class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center space-x-1.5">
+              <span>查閱 18 國限額表格</span>
+              <span>➔</span>
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TRAVELER FAQ & ZERO-PII ASSURANCE -->
+      <section class="bg-slate-50 dark:bg-slate-900/60 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 space-y-4">
+        <h4 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+          <span>💡 旅客通關與隱私安全常見須知</span>
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-600 dark:text-slate-300">
+          <div class="bg-white dark:bg-slate-800/80 p-4 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1.5">
+            <div class="font-bold text-slate-900 dark:text-white flex items-center space-x-1.5">
+              <span>🔒 Zero-PII 零個資承諾</span>
+            </div>
+            <p class="leading-relaxed">
+              系統無需您註冊登入，絕不留存旅客姓名、護照號碼或任何個人身分資料。所有查詢資料只在後端記憶體中即時核算，保障最高安全等級。
+            </p>
+          </div>
+          <div class="bg-white dark:bg-slate-800/80 p-4 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1.5">
+            <div class="font-bold text-slate-900 dark:text-white flex items-center space-x-1.5">
+              <span>🚨 誠實申報安心免罰</span>
+            </div>
+            <p class="leading-relaxed">
+              只要對行李內容有疑慮，或可能超出免稅額，請務必主動走「紅線櫃檯」告知海關。主動申報即使無法攜入也僅拋棄處置，絕不會被處以罰鍰。
+            </p>
+          </div>
+          <div class="bg-white dark:bg-slate-800/80 p-4 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1.5">
+            <div class="font-bold text-slate-900 dark:text-white flex items-center space-x-1.5">
+              <span>🐷 非洲豬瘟防檢疫重罰</span>
+            </div>
+            <p class="leading-relaxed">
+              全球多國對肉製品邊境管制極嚴。自疫區攜帶豬肉製品入境未主動申報，臺灣最高處 100 萬罰鍰並遣返，日本處 300 萬日圓罰金或 3 年徒刑。
+            </p>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
+    </div>
+    <!-- ==================== /VIEW 1: 首頁使用說明 ==================== -->
 
-    <!-- ==================== MAIN INSPECTION SECTION (BOARDING PASS CARD) ==================== -->
-    <section id="inspection-section" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <!-- ==================== VIEW 2: 行李智能核驗 (Inspection & Diagnostic Results) ==================== -->
+    <div id="view-inspection" class="page-view space-y-10 hidden">
+
+      <!-- MAIN INSPECTION SECTION (BOARDING PASS CARD) -->
+      <section id="inspection-section" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
       <!-- LEFT 7 COLS: BOARDING PASS FORM CARD -->
       <div class="lg:col-span-7 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden boarding-card">
@@ -646,7 +824,7 @@
           </div>
 
           <div class="pt-1 text-right">
-            <a href="#travel-etiquette" class="text-xs text-sky-600 hover:text-sky-700 font-semibold inline-flex items-center space-x-1">
+            <a href="#" onclick="switchPage('etiquette'); return false;" class="text-xs text-sky-600 hover:text-sky-700 font-semibold inline-flex items-center space-x-1">
               <span>查看 18 國完整旅遊禮儀與法規指南</span>
               <span>➔</span>
             </a>
@@ -708,9 +886,11 @@
       </div>
 
     </section>
+  </div>
+  <!-- ==================== /VIEW 2: 行李智能核驗 ==================== -->
 
-
-    <!-- ==================== DESTINATION CULTURE & TRAVELER CONDUCT GUIDE (入境國文化禮儀與法規禁忌專區) ==================== -->
+  <!-- ==================== VIEW 3: 入境文化禮儀與法規禁忌 (Destination Culture & Etiquette) ==================== -->
+  <div id="view-etiquette" class="page-view space-y-10 hidden">
     <section id="travel-etiquette" class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden space-y-8 p-6 sm:p-8">
       
       <!-- Section Header -->
@@ -801,9 +981,11 @@
       </div>
 
     </section>
+  </div>
+  <!-- ==================== /VIEW 3: 入境文化禮儀與法規禁忌 ==================== -->
 
-
-    <!-- ==================== DEDICATED CUSTOMS DECLARATION GUIDE (報關流程教學專區) ==================== -->
+  <!-- ==================== VIEW 4: 報關流程教學專區 (Customs Declaration Guide) ==================== -->
+  <div id="view-declaration" class="page-view space-y-10 hidden">
     <section id="customs-guide" class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden space-y-8 p-6 sm:p-8">
       
       <!-- Section Header -->
@@ -917,9 +1099,11 @@
       </div>
 
     </section>
+  </div>
+  <!-- ==================== /VIEW 4: 報關流程教學專區 ==================== -->
 
-
-    <!-- ==================== 18-COUNTRY STATUTORY LIMITS TABLE (18 國限額速查表) ==================== -->
+  <!-- ==================== VIEW 5: 18 國海關免稅限額速查表 (Statutory Rules Table) ==================== -->
+  <div id="view-rules" class="page-view space-y-10 hidden">
     <section id="rules-table" class="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 sm:p-8 space-y-6">
       
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
@@ -960,6 +1144,8 @@
       </div>
 
     </section>
+  </div>
+  <!-- ==================== /VIEW 5: 18 國海關免稅限額速查表 ==================== -->
 
   </main>
 
@@ -1196,7 +1382,7 @@
     const I18N = {
       "zh-TW": {
         brandTitle: "全球旅客出入境海關智慧諮詢系統",
-        guideLink: "使用說明",
+        guideLink: "首頁使用說明",
         checkLink: "行李核驗",
         etiquetteLink: "旅遊禮儀與法規",
         declarationLink: "報關流程指引",
@@ -1270,6 +1456,59 @@
         cardHeader: "BOARDING & CUSTOMS PASS / 여행자 세관 통관 카드"
       }
     };
+
+    // ==================== MULTI-PAGE VIEW ROUTING ====================
+    const PAGES = ['home', 'inspection', 'etiquette', 'declaration', 'rules'];
+
+    function switchPage(pageId) {
+      const target = PAGES.includes(pageId) ? pageId : 'home';
+
+      // 1. Toggle visibility of views
+      PAGES.forEach(p => {
+        const viewEl = document.getElementById(`view-${p}`);
+        if (viewEl) {
+          if (p === target) {
+            viewEl.classList.remove('hidden');
+          } else {
+            viewEl.classList.add('hidden');
+          }
+        }
+      });
+
+      // 2. Update desktop nav active styles
+      PAGES.forEach(p => {
+        const btn = document.getElementById(`nav-btn-${p}`);
+        if (btn) {
+          if (p === target) {
+            btn.className = 'nav-tab px-3 py-1.5 rounded-lg transition-all font-bold bg-sky-600 text-white shadow-sm shadow-sky-600/30';
+          } else {
+            btn.className = 'nav-tab px-3 py-1.5 rounded-lg transition-all font-medium text-slate-300 hover:text-white hover:bg-slate-800';
+          }
+        }
+      });
+
+      // 3. Update mobile nav active styles
+      PAGES.forEach(p => {
+        const mBtn = document.getElementById(`mobile-nav-${p}`);
+        if (mBtn) {
+          if (p === target) {
+            mBtn.className = 'mobile-nav-tab px-2.5 py-1.5 rounded-lg whitespace-nowrap font-bold bg-sky-600 text-white transition-all';
+          } else {
+            mBtn.className = 'mobile-nav-tab px-2.5 py-1.5 rounded-lg whitespace-nowrap font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-all';
+          }
+        }
+      });
+
+      // 4. Update window location hash without disruptive jump
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', '#' + target);
+      } else {
+        window.location.hash = target;
+      }
+
+      // 5. Scroll to top smoothly
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     // Initialize Default Dates
     function initDates() {
@@ -1585,6 +1824,14 @@
       }
       document.getElementById('nav-link-declaration').textContent = t.declarationLink;
       document.getElementById('nav-link-rules').textContent = t.rulesLink;
+
+      // Update Mobile Tab Labels
+      if (document.getElementById('mobile-link-guide')) document.getElementById('mobile-link-guide').textContent = t.guideLink;
+      if (document.getElementById('mobile-link-check')) document.getElementById('mobile-link-check').textContent = t.checkLink;
+      if (document.getElementById('mobile-link-etiquette')) document.getElementById('mobile-link-etiquette').textContent = t.etiquetteLink;
+      if (document.getElementById('mobile-link-declaration')) document.getElementById('mobile-link-declaration').textContent = t.declarationLink;
+      if (document.getElementById('mobile-link-rules')) document.getElementById('mobile-link-rules').textContent = t.rulesLink;
+
       document.getElementById('btn-direct-guide').textContent = t.directGuideBtn;
       document.getElementById('hero-badge').textContent = t.heroBadge;
       document.getElementById('hero-title').textContent = t.heroTitle;
@@ -1605,6 +1852,9 @@
       const language = document.getElementById('language-select').value;
 
       if (!items) return;
+
+      // Ensure we are viewing the inspection page
+      switchPage('inspection');
 
       const submitBtn = document.getElementById('btn-submit');
       const submitText = document.getElementById('btn-submit-text');
@@ -1774,6 +2024,22 @@
       updateQuickLimits();
       fetchWeather();
       fetchEtiquette();
+
+      // View routing based on initial URL hash (defaults to 'home')
+      const initialHash = (window.location.hash || '').replace('#', '');
+      if (PAGES.includes(initialHash)) {
+        switchPage(initialHash);
+      } else {
+        switchPage('home');
+      }
+
+      // Hash change listener (browser back/forward button navigation)
+      window.addEventListener('hashchange', () => {
+        const hash = (window.location.hash || '').replace('#', '');
+        if (PAGES.includes(hash)) {
+          switchPage(hash);
+        }
+      });
     });
   </script>
 
