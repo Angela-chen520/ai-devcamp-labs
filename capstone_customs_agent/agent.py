@@ -34,6 +34,7 @@ from . import guardrails
 from .tools import (
     calculate_duty_tax,
     generate_phrase_card,
+    get_destination_culture_etiquette,
     get_destination_weather,
     lookup_country_limits,
 )
@@ -299,6 +300,7 @@ Your mission is to provide accurate, privacy-first, dynamically tone-calibrated 
         generate_phrase_card,
         lookup_country_limits,
         get_destination_weather,
+        get_destination_culture_etiquette,
     ],
     generate_content_config=guardrails.content_config(),
     before_model_callback=[_clean_user_input_callback],

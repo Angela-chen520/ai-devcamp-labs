@@ -5,6 +5,7 @@ from capstone_customs_agent.tools import (
     calculate_duty_tax,
     generate_phrase_card,
     lookup_country_limits,
+    get_destination_culture_etiquette,
 )
 from capstone_customs_agent.guardrails import (
     scrub_pii,
@@ -173,3 +174,39 @@ class TestCustomsTools:
             declared_items_summary="Cash €12,000",
         )
         assert "agents des douanes" in card_fr["official_language_text"]
+
+    def test_destination_culture_etiquette(self):
+        # 1. Singapore: Strict fines, littering, e-cigarettes, chewing gum
+        sg_etiquette = get_destination_culture_etiquette("Singapore")
+        assert "新加坡" in sg_etiquette["country_zh"]
+        assert sg_etiquette["flag"] == "🇸🇬"
+        assert len(sg_etiquette["highlight_warnings"]) >= 3
+        assert len(sg_etiquette["rules"]) >= 4
+        # Check specific penalty/rule presence
+        titles = [r["title"] for r in sg_etiquette["rules"]]
+        assert any("口香糖" in t for t in titles)
+        assert any("垃圾" in t or "吸菸" in t for t in titles)
+
+        # 2. Japan: Photography, smoking, train manners
+        jp_etiquette = get_destination_culture_etiquette("日本 (Japan)")
+        assert "日本" in jp_etiquette["country_zh"]
+        assert jp_etiquette["flag"] == "🇯🇵"
+        jp_titles = [r["title"] for r in jp_etiquette["rules"]]
+        assert any("拍照" in t or "肖像" in t for t in jp_titles)
+        assert any("抽菸" in t or "吸菸" in t for t in jp_titles)
+
+        # 3. Thailand: Royal family defamation (lèse-majesté), sacred heads
+        th_etiquette = get_destination_culture_etiquette("Thailand")
+        assert "泰國" in th_etiquette["country_zh"]
+        assert "皇室" in th_etiquette["overview"] or any("皇室" in w for w in th_etiquette["highlight_warnings"])
+
+        # 4. Australia: Biosecurity, beach safety, wildlife
+        au_etiquette = get_destination_culture_etiquette("澳洲 (Australia)")
+        assert "澳洲" in au_etiquette["country_zh"]
+        au_rules = au_etiquette["rules"]
+        assert any("6,260" in r["penalty"] for r in au_rules)
+
+        # 5. Fallback for unknown country
+        unknown_etiquette = get_destination_culture_etiquette("Atlantis")
+        assert "臺灣" in unknown_etiquette["country_zh"]
+

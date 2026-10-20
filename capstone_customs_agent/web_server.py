@@ -31,6 +31,7 @@ from capstone_customs_agent import guardrails
 from capstone_customs_agent.tools import (
     calculate_duty_tax,
     generate_phrase_card,
+    get_destination_culture_etiquette,
     get_destination_weather,
     lookup_country_limits,
 )
@@ -94,6 +95,7 @@ class QueryResponse(BaseModel):
     weather: Dict[str, Any]
     limits: Dict[str, Any]
     phrase_card: Optional[Dict[str, Any]] = None
+    etiquette: Optional[Dict[str, Any]] = None
 
 
 @server.get("/api/healthz")
@@ -113,6 +115,12 @@ def weather_endpoint(
         departure_date=departure_date or "",
         return_date=return_date or "",
     )
+
+
+@server.get("/api/etiquette")
+def etiquette_endpoint(destination: str):
+    """Returns local cultural etiquette, traveler behavioral laws, and penalty warnings for the destination."""
+    return get_destination_culture_etiquette(destination)
 
 
 @server.get("/api/limits")
@@ -209,7 +217,10 @@ async def query_endpoint(req: QueryRequest):
         declared_items_summary=req.items,
     )
 
-    # 4. Generate or reuse session
+    # 4. Local Cultural Etiquette & Traveler Conduct Laws
+    etiquette_data = get_destination_culture_etiquette(req.destination)
+
+    # 5. Generate or reuse session
     client_sid = req.session_id or f"web-{uuid.uuid4().hex[:8]}"
     if client_sid not in active_sessions:
         adk_sess = await session_service.create_session(
@@ -280,6 +291,7 @@ async def query_endpoint(req: QueryRequest):
         weather=weather_data,
         limits=limits_data,
         phrase_card=phrase_card_data,
+        etiquette=etiquette_data,
     )
 
 

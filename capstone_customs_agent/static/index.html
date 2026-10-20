@@ -15,6 +15,7 @@
 
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
@@ -147,6 +148,69 @@
     .prose-report strong {
       color: #0f172a;
     }
+
+    /* Dark Mode Theme Overrides */
+    html.dark body {
+      background-color: #020617;
+      color: #f1f5f9;
+    }
+    html.dark .boarding-card {
+      background: #0f172a;
+      border-color: #1e293b;
+      color: #f8fafc;
+    }
+    html.dark .boarding-perforation {
+      border-color: #334155;
+    }
+    html.dark .boarding-perforation::before, 
+    html.dark .boarding-perforation::after {
+      background-color: #020617;
+    }
+    html.dark .bg-white {
+      background-color: #0f172a !important;
+      border-color: #1e293b !important;
+      color: #f8fafc;
+    }
+    html.dark .bg-slate-50 {
+      background-color: #1e293b !important;
+      border-color: #334155 !important;
+      color: #f1f5f9;
+    }
+    html.dark .bg-slate-100 {
+      background-color: #1e293b !important;
+      color: #f1f5f9;
+    }
+    html.dark .text-slate-900, html.dark .text-slate-800, html.dark .text-slate-700 {
+      color: #f1f5f9 !important;
+    }
+    html.dark .text-slate-600, html.dark .text-slate-500 {
+      color: #94a3b8 !important;
+    }
+    html.dark .border-slate-100, html.dark .border-slate-200, html.dark .border-slate-300 {
+      border-color: #334155 !important;
+    }
+    html.dark input, html.dark select, html.dark textarea {
+      background-color: #1e293b !important;
+      color: #f8fafc !important;
+      border-color: #475569 !important;
+    }
+    html.dark .prose-report table th {
+      background-color: #1e293b;
+      color: #f8fafc;
+      border-color: #334155;
+    }
+    html.dark .prose-report table td {
+      border-color: #334155;
+      color: #cbd5e1;
+    }
+    html.dark .prose-report strong {
+      color: #f8fafc;
+    }
+    html.dark .prose-report blockquote {
+      background-color: #082f49;
+      color: #7dd3fc;
+      border-color: #0284c7;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans selection:bg-blue-600 selection:text-white">
@@ -178,6 +242,7 @@
         <nav class="hidden lg:flex items-center space-x-5 text-sm font-medium text-slate-300">
           <a href="#user-guide" class="hover:text-sky-400 transition-colors" id="nav-link-guide">使用說明</a>
           <a href="#inspection-section" class="hover:text-sky-400 transition-colors" id="nav-link-check">行李核驗</a>
+          <a href="#travel-etiquette" class="hover:text-sky-400 transition-colors" id="nav-link-etiquette">旅遊禮儀與法規</a>
           <a href="#customs-guide" class="hover:text-sky-400 transition-colors" id="nav-link-declaration">報關流程指引</a>
           <a href="#rules-table" class="hover:text-sky-400 transition-colors" id="nav-link-rules">18 國限額速查</a>
         </nav>
@@ -189,6 +254,16 @@
           </svg>
           <span id="btn-direct-guide">直接看報關指引 📋</span>
         </a>
+
+        <!-- Theme Mode Switcher (Day / Night / System) -->
+        <div class="flex items-center space-x-1.5 bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1" title="切換顯示主題：白天 / 夜間 / 隨裝置同步">
+          <span id="theme-icon" class="text-xs">🌓</span>
+          <select id="theme-select" onchange="changeTheme(this.value)" class="bg-transparent text-xs sm:text-sm text-slate-100 font-medium focus:outline-none cursor-pointer">
+            <option value="system" class="bg-slate-800 text-white">💻 隨裝置同步</option>
+            <option value="light" class="bg-slate-800 text-white">☀️ 白天模式</option>
+            <option value="dark" class="bg-slate-800 text-white">🌙 夜間模式</option>
+          </select>
+        </div>
 
         <!-- Prominent Language Selector -->
         <div class="flex items-center space-x-1.5 bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1">
@@ -543,6 +618,41 @@
           </div>
         </div>
 
+        <!-- Live Destination Culture & Etiquette Preview Card -->
+        <div id="etiquette-preview-card" class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <span class="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+              <span>🏛️ 目的地文化禮儀與法規禁忌</span>
+            </span>
+            <span class="text-xs text-sky-600 font-semibold" id="quick-etiquette-country">🇯🇵 日本</span>
+          </div>
+
+          <!-- Overview & High Risk Notice -->
+          <div class="space-y-2 text-xs">
+            <p class="text-slate-600 leading-relaxed text-[11px]" id="quick-etiquette-overview">
+              日本注重公共寧靜與守序規範。嚴禁邊走邊吸菸、偷拍或公共場合喧嘩，神社參拜請洗手淨心。
+            </p>
+            
+            <div class="bg-rose-50 border border-rose-200 rounded-xl p-3 space-y-1.5" id="quick-etiquette-warnings-box">
+              <span class="text-[11px] font-bold text-rose-800 flex items-center space-x-1">
+                <span>🚨 入境旅客違法重罰禁忌 (避免拘役/重罰)</span>
+              </span>
+              <ul class="text-[11px] text-rose-700 space-y-1 list-disc list-inside leading-relaxed" id="quick-etiquette-warnings-list">
+                <li>嚴禁未經許可拍攝他人（特別是藝伎/女性），違者依迷惑防止條例拘役或重罰</li>
+                <li>指定非吸菸區隨地吸菸開罰 2,000 ~ 20,000 日圓</li>
+                <li>電車內嚴禁通話且手機需設為靜音，維持公共寧靜</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="pt-1 text-right">
+            <a href="#travel-etiquette" class="text-xs text-sky-600 hover:text-sky-700 font-semibold inline-flex items-center space-x-1">
+              <span>查看 18 國完整旅遊禮儀與法規指南</span>
+              <span>➔</span>
+            </a>
+          </div>
+        </div>
+
       </div>
 
     </section>
@@ -595,6 +705,99 @@
           </p>
         </div>
 
+      </div>
+
+    </section>
+
+
+    <!-- ==================== DESTINATION CULTURE & TRAVELER CONDUCT GUIDE (入境國文化禮儀與法規禁忌專區) ==================== -->
+    <section id="travel-etiquette" class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden space-y-8 p-6 sm:p-8">
+      
+      <!-- Section Header -->
+      <div class="space-y-2 border-b border-slate-200 pb-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center space-x-1.5 text-xs font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-full uppercase tracking-wider">
+              <span>🏛️ 入境國在地文化、旅客行為規範與重罰禁忌全覽</span>
+            </div>
+            <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1.5" id="etiquette-section-title">
+              18 國在地文化禮儀與旅客法規提醒
+            </h3>
+            <p class="text-sm text-slate-600 mt-1" id="etiquette-section-desc">
+              出國遊玩入境隨俗。各國對公共秩序、古蹟維護、吸菸、宗教聖地及拍攝均有不同法規，特別注意違規重罰與拘役風險，做個受歡迎的文明旅客！
+            </p>
+          </div>
+
+          <!-- Country Switcher inside Section -->
+          <div class="flex items-center space-x-2 shrink-0">
+            <label for="etiquette-country-select" class="text-xs font-bold text-slate-600">選擇國家：</label>
+            <select id="etiquette-country-select" onchange="renderEtiquetteDetails(this.value)" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs sm:text-sm text-slate-800 font-semibold focus:ring-2 focus:ring-sky-500">
+              <option value="日本 (Japan)" selected>🇯🇵 日本 (Japan)</option>
+              <option value="臺灣 (Taiwan)">🇹🇼 臺灣 (Taiwan)</option>
+              <option value="韓國 (South Korea)">🇰🇷 韓國 (South Korea)</option>
+              <option value="美國 (USA)">🇺🇸 美國 (United States)</option>
+              <option value="加拿大 (Canada)">🇨🇦 加拿大 (Canada)</option>
+              <option value="英國 (UK)">🇬🇧 英國 (United Kingdom)</option>
+              <option value="法國 (France)">🇫🇷 法國 (France)</option>
+              <option value="義大利 (Italy)">🇮🇹 義大利 (Italy)</option>
+              <option value="荷蘭 (Netherlands)">🇳🇱 荷蘭 (Netherlands)</option>
+              <option value="西班牙 (Spain)">🇪🇸 西班牙 (Spain)</option>
+              <option value="希臘 (Greece)">🇬🇷 希臘 (Greece)</option>
+              <option value="澳洲 (Australia)">🇦🇺 澳洲 (Australia)</option>
+              <option value="新加坡 (Singapore)">🇸🇬 新加坡 (Singapore)</option>
+              <option value="泰國 (Thailand)">🇹🇭 泰國 (Thailand)</option>
+              <option value="越南 (Vietnam)">🇻🇳 越南 (Vietnam)</option>
+              <option value="菲律賓 (Philippines)">🇵🇭 菲律賓 (Philippines)</option>
+              <option value="馬來西亞 (Malaysia)">🇲🇾 馬來西亞 (Malaysia)</option>
+              <option value="香港 (Hong Kong)">🇭🇰 香港 (Hong Kong)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Selected Country Hero Card -->
+      <div id="etiquette-country-hero" class="bg-gradient-to-r from-sky-900 via-indigo-950 to-slate-900 rounded-2xl p-6 text-white shadow-lg space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sky-800/60 pb-3">
+          <div class="flex items-center space-x-3">
+            <span class="text-4xl" id="etiquette-hero-flag">🇯🇵</span>
+            <div>
+              <h4 class="text-xl font-extrabold text-white" id="etiquette-hero-country">日本 (Japan)</h4>
+              <p class="text-xs text-sky-200 mt-0.5" id="etiquette-hero-overview">注重安靜秩序、公共守規與彼此尊重。</p>
+            </div>
+          </div>
+          <span class="text-xs bg-sky-500/30 text-sky-200 border border-sky-400/30 px-3 py-1 rounded-full font-mono self-start sm:self-auto">
+            DESTINATION ETIQUETTE
+          </span>
+        </div>
+
+        <!-- 3 Highlight Warnings -->
+        <div class="space-y-2">
+          <span class="text-xs uppercase tracking-wider font-bold text-rose-300 flex items-center space-x-1.5">
+            <span>🚨 旅客最容易誤觸之三大罰款/處分禁忌：</span>
+          </span>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs" id="etiquette-hero-highlights">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Rules Cards Grid (Categorized: 🚨 嚴格法規 / ⚠️ 公共管理 / 💡 文化禮儀) -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center space-x-2">
+            <span>📚 旅客行為守則、禁忌與各項罰則條例詳解</span>
+          </h4>
+          <div class="flex items-center space-x-2 text-[11px] text-slate-500">
+            <span class="flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span><span>重罰拘役</span></span>
+            <span class="flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span><span>罰款規範</span></span>
+            <span class="flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-sky-500"></span><span>在地習慣</span></span>
+          </div>
+        </div>
+
+        <!-- Container for rule cards -->
+        <div id="etiquette-rules-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Dynamically populated cards -->
+        </div>
       </div>
 
     </section>
@@ -995,6 +1198,7 @@
         brandTitle: "全球旅客出入境海關智慧諮詢系統",
         guideLink: "使用說明",
         checkLink: "行李核驗",
+        etiquetteLink: "旅遊禮儀與法規",
         declarationLink: "報關流程指引",
         rulesLink: "18 國限額速查",
         directGuideBtn: "直接看報關指引 📋",
@@ -1009,6 +1213,7 @@
         brandTitle: "Global Traveler Customs & Border Advisor",
         guideLink: "User Guide",
         checkLink: "Baggage Check",
+        etiquetteLink: "Culture & Etiquette",
         declarationLink: "Customs Guide",
         rulesLink: "Corridor Limits",
         directGuideBtn: "Customs Clearance Guide 📋",
@@ -1023,6 +1228,7 @@
         brandTitle: "Global Traveler Customs & Border Advisor",
         guideLink: "User Guide",
         checkLink: "Baggage Check",
+        etiquetteLink: "Culture & Etiquette",
         declarationLink: "Customs Guide",
         rulesLink: "Corridor Limits",
         directGuideBtn: "Customs Clearance Guide 📋",
@@ -1037,6 +1243,7 @@
         brandTitle: "グローバル旅行者 税関・手荷物スマート相談システム",
         guideLink: "利用案内",
         checkLink: "手荷物検査",
+        etiquetteLink: "文化・マナー・罰則",
         declarationLink: "税関申告ガイド",
         rulesLink: "免税基準一覧",
         directGuideBtn: "税関申告手順を見る 📋",
@@ -1051,6 +1258,7 @@
         brandTitle: "글로벌 여행자 세관 및 수하물 스마트 상담 시스템",
         guideLink: "이용 안내",
         checkLink: "수하물 심사",
+        etiquetteLink: "여행 에티켓 및 법규",
         declarationLink: "세관 신고 가이드",
         rulesLink: "18개국 면세 한도",
         directGuideBtn: "세관 신고 안내 바로보기 📋",
@@ -1141,6 +1349,184 @@
       updateRouteDisplay();
       fetchWeather();
       updateQuickLimits();
+      fetchEtiquette();
+    }
+
+    // ==================== THEME MANAGEMENT ====================
+    function getStoredTheme() {
+      return localStorage.getItem('customs_theme_mode') || 'system';
+    }
+
+    function applyTheme(mode) {
+      const root = document.documentElement;
+      let isDark = false;
+
+      if (mode === 'dark') {
+        isDark = true;
+      } else if (mode === 'light') {
+        isDark = false;
+      } else { // 'system'
+        isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      }
+
+      if (isDark) {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+
+      const select = document.getElementById('theme-select');
+      if (select) select.value = mode;
+
+      const icon = document.getElementById('theme-icon');
+      if (icon) {
+        if (mode === 'light') icon.textContent = '☀️';
+        else if (mode === 'dark') icon.textContent = '🌙';
+        else icon.textContent = isDark ? '🌙' : '☀️';
+      }
+    }
+
+    function changeTheme(mode) {
+      localStorage.setItem('customs_theme_mode', mode);
+      applyTheme(mode);
+    }
+
+    function initTheme() {
+      const currentMode = getStoredTheme();
+      applyTheme(currentMode);
+
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if (getStoredTheme() === 'system') {
+            applyTheme('system');
+          }
+        });
+      }
+    }
+
+    // ==================== DESTINATION CULTURE & ETIQUETTE ====================
+    let currentEtiquetteData = null;
+
+    async function fetchEtiquette(dest) {
+      const destination = dest || document.getElementById('select-destination').value;
+      try {
+        const url = `/api/etiquette?destination=${encodeURIComponent(destination)}`;
+        const res = await fetch(url);
+        if (!res.ok) return;
+        const data = await res.json();
+        currentEtiquetteData = data;
+        renderEtiquettePreview(data);
+        renderEtiquetteDetails(data);
+      } catch (err) {
+        console.warn('Etiquette fetch warning:', err);
+      }
+    }
+
+    function renderEtiquettePreview(data) {
+      if (!data) return;
+      const cName = document.getElementById('quick-etiquette-country');
+      const overview = document.getElementById('quick-etiquette-overview');
+      const warningsList = document.getElementById('quick-etiquette-warnings-list');
+
+      if (cName) cName.textContent = `${data.flag || '🏛️'} ${data.country_zh || data.country}`;
+      if (overview) overview.textContent = data.overview;
+      if (warningsList && data.highlight_warnings) {
+        warningsList.innerHTML = '';
+        data.highlight_warnings.forEach(warn => {
+          const li = document.createElement('li');
+          li.textContent = warn;
+          warningsList.appendChild(li);
+        });
+      }
+    }
+
+    async function renderEtiquetteDetails(destOrData) {
+      let data = destOrData;
+      if (typeof destOrData === 'string') {
+        try {
+          const res = await fetch(`/api/etiquette?destination=${encodeURIComponent(destOrData)}`);
+          if (res.ok) {
+            data = await res.json();
+          }
+        } catch (e) {
+          console.warn(e);
+        }
+      }
+      if (!data) return;
+
+      // Sync section select
+      const select = document.getElementById('etiquette-country-select');
+      if (select) {
+        for (let i = 0; i < select.options.length; i++) {
+          if (select.options[i].value.includes(data.country_zh || data.country)) {
+            select.selectedIndex = i;
+            break;
+          }
+        }
+      }
+
+      // Hero Card
+      const heroFlag = document.getElementById('etiquette-hero-flag');
+      const heroCountry = document.getElementById('etiquette-hero-country');
+      const heroOverview = document.getElementById('etiquette-hero-overview');
+      const heroHighlights = document.getElementById('etiquette-hero-highlights');
+
+      if (heroFlag) heroFlag.textContent = data.flag || '🏛️';
+      if (heroCountry) heroCountry.textContent = `${data.country_zh || data.country} (${data.country})`;
+      if (heroOverview) heroOverview.textContent = data.overview;
+
+      if (heroHighlights && data.highlight_warnings) {
+        heroHighlights.innerHTML = '';
+        data.highlight_warnings.forEach(warn => {
+          const div = document.createElement('div');
+          div.className = 'bg-rose-950/70 border border-rose-500/40 rounded-xl p-3 text-rose-100 flex items-start space-x-2';
+          div.innerHTML = `
+            <span class="text-rose-400 font-bold shrink-0 mt-0.5">⚠️</span>
+            <span class="leading-relaxed">${warn}</span>
+          `;
+          heroHighlights.appendChild(div);
+        });
+      }
+
+      // Rules Grid
+      const grid = document.getElementById('etiquette-rules-grid');
+      if (grid && data.rules) {
+        grid.innerHTML = '';
+        data.rules.forEach(rule => {
+          const card = document.createElement('div');
+          
+          let borderClass = 'border-slate-200 dark:border-slate-800';
+          let badgeBg = 'bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-300 border-sky-200 dark:border-sky-800';
+          
+          if (rule.risk_level.includes('🚨') || rule.risk_level.includes('重罰') || rule.risk_level.includes('拘役')) {
+            borderClass = 'border-rose-200 dark:border-rose-900 shadow-sm shadow-rose-100/50 dark:shadow-none';
+            badgeBg = 'bg-rose-50 text-rose-800 dark:bg-rose-950 dark:text-rose-200 border-rose-300 dark:border-rose-800';
+          } else if (rule.risk_level.includes('⚠️') || rule.risk_level.includes('罰款')) {
+            borderClass = 'border-amber-200 dark:border-amber-900';
+            badgeBg = 'bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-200 border-amber-300 dark:border-amber-800';
+          }
+
+          card.className = `bg-white dark:bg-slate-900 rounded-xl p-4 border ${borderClass} space-y-3 flex flex-col justify-between transition-all hover:shadow-md`;
+          
+          card.innerHTML = `
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-base select-none">${rule.icon || '📌'}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeBg}">
+                  ${rule.risk_level}
+                </span>
+              </div>
+              <h5 class="font-bold text-sm text-slate-900 dark:text-white">${rule.title}</h5>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${rule.desc}</p>
+            </div>
+            <div class="pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] font-semibold text-rose-600 dark:text-rose-400 flex items-center space-x-1">
+              <span>⚖️ 處罰條例：</span>
+              <span>${rule.penalty}</span>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      }
     }
 
     // Update Quick Limits Card
@@ -1194,6 +1580,9 @@
       document.getElementById('nav-brand-title').textContent = t.brandTitle;
       document.getElementById('nav-link-guide').textContent = t.guideLink;
       document.getElementById('nav-link-check').textContent = t.checkLink;
+      if (document.getElementById('nav-link-etiquette')) {
+        document.getElementById('nav-link-etiquette').textContent = t.etiquetteLink;
+      }
       document.getElementById('nav-link-declaration').textContent = t.declarationLink;
       document.getElementById('nav-link-rules').textContent = t.rulesLink;
       document.getElementById('btn-direct-guide').textContent = t.directGuideBtn;
@@ -1225,22 +1614,71 @@
       const flashcardSection = document.getElementById('flashcard-section');
       const flashcardContent = document.getElementById('flashcard-content');
 
-      // Loading State
+      // Loading State with Estimated Wait Time & Dynamic Elapsed Seconds
       submitBtn.disabled = true;
       submitText.textContent = I18N[language]?.submitBtnLoading || "AI 核算審驗中...";
       resultsContainer.classList.remove('hidden');
+
       resultBody.innerHTML = `
-        <div class="py-12 flex flex-col items-center justify-center space-y-4 text-center">
-          <div class="w-12 h-12 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
-          <p class="text-sm font-semibold text-slate-700">正在調度檢疫專家、關稅專家與法規智能體核驗您的行李物品...</p>
-          <span class="text-xs text-slate-400">Zero-PII 防護已啟用 · 全球 18 國法規庫即時檢核</span>
+        <div class="py-12 px-4 flex flex-col items-center justify-center space-y-5 text-center">
+          <div class="relative w-16 h-16 flex items-center justify-center">
+            <div class="w-16 h-16 border-4 border-sky-200 dark:border-sky-900 border-t-sky-600 rounded-full animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center font-mono font-bold text-sky-600 dark:text-sky-400 text-xs" id="wait-elapsed-badge">0s</div>
+          </div>
+          <div class="space-y-2 max-w-md w-full">
+            <div class="flex items-center justify-center space-x-2 text-sm font-bold text-slate-800 dark:text-slate-100">
+              <span>⏳ 預計等待時間：約 3~5 秒</span>
+              <span class="text-xs font-semibold text-sky-600 dark:text-sky-400 font-mono" id="wait-timer-text">(已等待 0.0 秒)</span>
+            </div>
+            <!-- Dynamic Progress Bar -->
+            <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+              <div id="wait-progress-bar" class="bg-gradient-to-r from-sky-500 to-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 10%"></div>
+            </div>
+            <p id="wait-status-step" class="text-xs font-medium text-slate-600 dark:text-slate-300 pt-1">
+              正在調度檢疫專家、關稅專家與法規智能體核驗您的行李物品...
+            </p>
+            <span class="text-[11px] text-slate-400 dark:text-slate-500 block">
+              Zero-PII 防護已啟用 · 全球 18 國法規庫即時檢核
+            </span>
+          </div>
         </div>
       `;
+
       stampContainer.innerHTML = '';
       flashcardSection.classList.add('hidden');
 
       // Smooth scroll down to results
       resultsContainer.scrollIntoView({ behavior: 'smooth' });
+
+      // Start elapsed timer interval
+      const startTime = Date.now();
+      const waitInterval = setInterval(() => {
+        const elapsed = (Date.now() - startTime) / 1000;
+        const badge = document.getElementById('wait-elapsed-badge');
+        const timerText = document.getElementById('wait-timer-text');
+        const bar = document.getElementById('wait-progress-bar');
+        const step = document.getElementById('wait-status-step');
+
+        if (badge) badge.textContent = `${Math.floor(elapsed)}s`;
+        if (timerText) timerText.textContent = `(已等待 ${elapsed.toFixed(1)} 秒)`;
+
+        if (bar) {
+          const pct = Math.min(95, Math.floor(15 + (elapsed / 4.0) * 80));
+          bar.style.width = `${pct}%`;
+        }
+
+        if (step) {
+          if (elapsed < 1.3) {
+            step.textContent = "正在調度檢疫專家、關稅專家與法規智能體核驗您的行李物品...";
+          } else if (elapsed < 2.8) {
+            step.textContent = "正在連線目的地海關法規庫核算動植物檢疫與免稅限額...";
+          } else if (elapsed < 4.2) {
+            step.textContent = "正在試算可能應繳關稅並比對在地旅客行為規範與文化禮儀...";
+          } else {
+            step.textContent = "即將完成！正在生成雙語申報小卡與專屬行李評估報告...";
+          }
+        }
+      }, 100);
 
       try {
         const payload = {
@@ -1310,6 +1748,7 @@
           </div>
         `;
       } finally {
+        clearInterval(waitInterval);
         submitBtn.disabled = false;
         submitText.textContent = I18N[language]?.submitBtn || "執行海關行李智慧核驗";
       }
@@ -1328,11 +1767,13 @@
 
     // Page Load Setup
     window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
       initDates();
       renderCountriesTable();
       updateRouteDisplay();
       updateQuickLimits();
       fetchWeather();
+      fetchEtiquette();
     });
   </script>
 
