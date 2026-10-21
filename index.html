@@ -367,13 +367,13 @@
             <!-- Quick Action Box -->
             <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-xl p-4 sm:p-5 flex flex-col justify-between space-y-3 shrink-0 lg:w-72">
               <div class="text-xs text-sky-200 font-medium flex items-center space-x-1.5">
-                <span>✈️ 快速進入功能</span>
+                <span id="quick-action-tag">✈️ 快速進入功能</span>
               </div>
-              <p class="text-xs text-slate-300">
+              <p class="text-xs text-slate-300" id="quick-action-desc">
                 想立即核驗您隨身或託運行李中的物品是否違規超額？
               </p>
               <button type="button" onclick="switchPage('inspection')" class="w-full text-center px-4 py-2.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-white text-xs sm:text-sm font-bold shadow-md transition-colors flex items-center justify-center space-x-1.5">
-                <span>立即進行行李核驗 ➔</span>
+                <span id="quick-action-btn">立即進行行李核驗 ➔</span>
               </button>
             </div>
           </div>
@@ -433,10 +433,10 @@
       <section class="space-y-4">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h3 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight" id="gateway-title">
               系統功能專區總覽與快速入口
             </h3>
-            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400" id="gateway-subtitle">
               點擊上方索引導航，或直接點選下方卡片切換至各項專屬功能：
             </p>
           </div>
@@ -450,17 +450,17 @@
               <div class="w-12 h-12 rounded-xl bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
                 🧳
               </div>
-              <h4 class="text-lg font-bold text-slate-900 dark:text-white">行李申報智慧核驗</h4>
-              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              <h4 class="text-lg font-bold text-slate-900 dark:text-white" id="card1-title">行李申報智慧核驗</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed" id="card1-desc">
                 涵蓋 18 國雙向航線與機場代碼，即時分析動植物防檢疫禁令、菸酒免稅門檻、自用藥品規範及可能關稅試算，並自動生成外國海關溝通專屬的雙語申報小卡。
               </p>
               <div class="flex flex-wrap gap-1.5 pt-1">
-                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">三級動態燈號</span>
-                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">預估關稅試算</span>
-                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">旅行天氣預報</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded" id="card1-tag1">三級動態燈號</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded" id="card1-tag2">預估關稅試算</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded" id="card1-tag3">旅行天氣預報</span>
               </div>
             </div>
-            <button type="button" onclick="switchPage('inspection')" class="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center space-x-1.5">
+            <button type="button" onclick="switchPage('inspection')" class="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center space-x-1.5" id="card1-btn">
               <span>進入行李核驗頁面</span>
               <span>➔</span>
             </button>
@@ -472,19 +472,18 @@
               <div class="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
                 🌍
               </div>
-              <h4 class="text-lg font-bold text-slate-900 dark:text-white">入境文化禮儀與法規禁忌</h4>
-              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              <h4 class="text-lg font-bold text-slate-900 dark:text-white" id="card2-title">入境文化禮儀與法規禁忌</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed" id="card2-desc">
                 出國旅遊必備的各國管理規範！彙整新加坡口香糖/隨地吐痰重罰、日本私道拍照禁令與電車安靜禮儀、泰國尊崇皇室與頭部禁忌、澳洲極嚴檢疫遣返等在地法制。
               </p>
               <div class="flex flex-wrap gap-1.5 pt-1">
-                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">🚨 重罰拘役警告</span>
-                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">⚠️ 公共管理罰款</span>
-                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">💡 文化習俗指引</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded" id="card2-tag1">🚨 重罰拘役警告</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded" id="card2-tag2">⚠️ 公共管理罰款</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded" id="card2-tag3">💡 文化習俗指引</span>
               </div>
             </div>
-            <button type="button" onclick="switchPage('etiquette')" class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center space-x-1.5">
-              <span>查看 18 國文化禮儀</span>
-              <span>➔</span>
+            <button type="button" onclick="switchPage('etiquette')" class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center space-x-1.5" id="card2-btn">
+              <span>查看 18 國文化禮儀 ➔</span>
             </button>
           </div>
 
@@ -494,19 +493,18 @@
               <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
                 📋
               </div>
-              <h4 class="text-lg font-bold text-slate-900 dark:text-white">各國機場報關流程指引</h4>
-              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              <h4 class="text-lg font-bold text-slate-900 dark:text-white" id="card3-title">各國機場報關流程指引</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed" id="card3-desc">
                 圖解機場通關四大標準步驟。掌握「紅線應申報」與「綠線免申報」通道核心法則，牢記「主動誠實申報絕無罰鍰」，並附各主要國際機場現場查驗實用對策。
               </p>
               <div class="flex flex-wrap gap-1.5 pt-1">
-                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">安心免罰黃金法則</span>
-                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">紅綠線通道判別</span>
-                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">申報單填寫指引</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded" id="card3-tag1">安心免罰黃金法則</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded" id="card3-tag2">紅綠線通道判別</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded" id="card3-tag3">申報單填寫指引</span>
               </div>
             </div>
-            <button type="button" onclick="switchPage('declaration')" class="w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center space-x-1.5">
-              <span>查看報關流程教學</span>
-              <span>➔</span>
+            <button type="button" onclick="switchPage('declaration')" class="w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center space-x-1.5" id="card3-btn">
+              <span>查看報關流程教學 ➔</span>
             </button>
           </div>
 
@@ -516,19 +514,18 @@
               <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform">
                 📊
               </div>
-              <h4 class="text-lg font-bold text-slate-900 dark:text-white">18 國海關免稅限額速查表</h4>
-              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              <h4 class="text-lg font-bold text-slate-900 dark:text-white" id="card4-title">18 國海關免稅限額速查表</h4>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed" id="card4-desc">
                 完整彙總臺灣、日本、韓國、美加、英歐、澳紐與東南亞等全球 18 個主流目的地的官方免稅金額、酒類、香菸、電子煙/加熱菸管制及現鈔攜帶申報門檻。
               </p>
               <div class="flex flex-wrap gap-1.5 pt-1">
-                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">18 國官方基準</span>
-                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">即時關鍵字搜尋</span>
-                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">肉品檢疫與現鈔規範</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded" id="card4-tag1">18 國官方基準</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded" id="card4-tag2">即時關鍵字搜尋</span>
+                <span class="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded" id="card4-tag3">肉品檢疫與現鈔規範</span>
               </div>
             </div>
-            <button type="button" onclick="switchPage('rules')" class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center space-x-1.5">
-              <span>查閱 18 國限額表格</span>
-              <span>➔</span>
+            <button type="button" onclick="switchPage('rules')" class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all flex items-center justify-center space-x-1.5" id="card4-btn">
+              <span>查閱 18 國限額表格 ➔</span>
             </button>
           </div>
 
@@ -538,30 +535,30 @@
       <!-- TRAVELER FAQ & ZERO-PII ASSURANCE -->
       <section class="bg-slate-50 dark:bg-slate-900/60 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 space-y-4">
         <h4 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center space-x-2">
-          <span>💡 旅客通關與隱私安全常見須知</span>
+          <span id="faq-title">💡 旅客通關與隱私安全常見須知</span>
         </h4>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-600 dark:text-slate-300">
           <div class="bg-white dark:bg-slate-800/80 p-4 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1.5">
             <div class="font-bold text-slate-900 dark:text-white flex items-center space-x-1.5">
-              <span>🔒 Zero-PII 零個資承諾</span>
+              <span id="faq1-title">🔒 Zero-PII 零個資承諾</span>
             </div>
-            <p class="leading-relaxed">
+            <p class="leading-relaxed" id="faq1-desc">
               系統無需您註冊登入，絕不留存旅客姓名、護照號碼或任何個人身分資料。所有查詢資料只在後端記憶體中即時核算，保障最高安全等級。
             </p>
           </div>
           <div class="bg-white dark:bg-slate-800/80 p-4 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1.5">
             <div class="font-bold text-slate-900 dark:text-white flex items-center space-x-1.5">
-              <span>🚨 誠實申報安心免罰</span>
+              <span id="faq2-title">🚨 誠實申報安心免罰</span>
             </div>
-            <p class="leading-relaxed">
+            <p class="leading-relaxed" id="faq2-desc">
               只要對行李內容有疑慮，或可能超出免稅額，請務必主動走「紅線櫃檯」告知海關。主動申報即使無法攜入也僅拋棄處置，絕不會被處以罰鍰。
             </p>
           </div>
           <div class="bg-white dark:bg-slate-800/80 p-4 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1.5">
             <div class="font-bold text-slate-900 dark:text-white flex items-center space-x-1.5">
-              <span>🐷 非洲豬瘟防檢疫重罰</span>
+              <span id="faq3-title">🐷 非洲豬瘟防檢疫重罰</span>
             </div>
-            <p class="leading-relaxed">
+            <p class="leading-relaxed" id="faq3-desc">
               全球多國對肉製品邊境管制極嚴。自疫區攜帶豬肉製品入境未主動申報，臺灣最高處 100 萬罰鍰並遣返，日本處 300 萬日圓罰金或 3 年徒刑。
             </p>
           </div>
@@ -761,7 +758,7 @@
           <!-- Baggage & Clothing Tips -->
           <div class="space-y-2 mt-4 pt-3 border-t border-sky-800/50">
             <h4 class="text-xs font-bold text-sky-300 uppercase tracking-wider flex items-center space-x-1">
-              <span>🧳 行李打包與穿著必備建議</span>
+              <span id="weather-tips-header">🧳 行李打包與穿著必備建議</span>
             </h4>
             <ul id="weather-tips-list" class="space-y-1.5 text-xs text-slate-200">
               <li class="flex items-start space-x-1.5">
@@ -785,26 +782,26 @@
         <div id="statutory-preview-card" class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-3">
           <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
             <span class="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
-              <span>📌 目的地海關法定免稅限額概覽</span>
+              <span id="statutory-preview-title">📌 目的地海關法定免稅限額概覽</span>
             </span>
             <span class="text-xs text-sky-600 font-semibold" id="quick-limits-country">日本</span>
           </div>
           
           <div class="grid grid-cols-2 gap-2 text-xs">
             <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-              <span class="text-slate-500 block text-[11px]">個人自用免稅額</span>
+              <span class="text-slate-500 block text-[11px]" id="statutory-lbl-exemption">個人自用免稅額</span>
               <strong class="text-slate-900 font-bold mt-0.5 block" id="quick-limit-exemption">200,000 日圓</strong>
             </div>
             <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-              <span class="text-slate-500 block text-[11px]">免稅酒類額度</span>
+              <span class="text-slate-500 block text-[11px]" id="statutory-lbl-alcohol">免稅酒類額度</span>
               <strong class="text-slate-900 font-bold mt-0.5 block" id="quick-limit-alcohol">3 瓶 (~2,280ml)</strong>
             </div>
             <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-              <span class="text-slate-500 block text-[11px]">免稅菸草額度</span>
+              <span class="text-slate-500 block text-[11px]" id="statutory-lbl-tobacco">免稅菸草額度</span>
               <strong class="text-slate-900 font-bold mt-0.5 block" id="quick-limit-tobacco">捲菸 200 支</strong>
             </div>
             <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-              <span class="text-slate-500 block text-[11px]">申報紅線法則</span>
+              <span class="text-slate-500 block text-[11px]" id="statutory-lbl-rule">申報紅線法則</span>
               <strong class="text-amber-700 font-bold mt-0.5 block" id="quick-limit-rule">主動走紅線申報不罰</strong>
             </div>
           </div>
@@ -814,7 +811,7 @@
         <div id="etiquette-preview-card" class="bg-white rounded-2xl p-5 shadow-md border border-slate-200 space-y-3">
           <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
             <span class="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
-              <span>🏛️ 目的地文化禮儀與法規禁忌</span>
+              <span id="culture-preview-title">🏛️ 目的地文化禮儀與法規禁忌</span>
             </span>
             <span class="text-xs text-sky-600 font-semibold" id="quick-etiquette-country">🇯🇵 日本</span>
           </div>
@@ -827,7 +824,7 @@
             
             <div class="bg-rose-50 border border-rose-200 rounded-xl p-3 space-y-1.5" id="quick-etiquette-warnings-box">
               <span class="text-[11px] font-bold text-rose-800 flex items-center space-x-1">
-                <span>🚨 入境旅客違法重罰禁忌 (避免拘役/重罰)</span>
+                <span id="culture-preview-warnings-title">🚨 入境旅客違法重罰禁忌 (避免拘役/重罰)</span>
               </span>
               <ul class="text-[11px] text-rose-700 space-y-1 list-disc list-inside leading-relaxed" id="quick-etiquette-warnings-list">
                 <li>嚴禁未經許可拍攝他人（特別是藝伎/女性），違者依迷惑防止條例拘役或重罰</li>
@@ -838,7 +835,7 @@
           </div>
 
           <div class="pt-1 text-right">
-            <a href="#" onclick="switchPage('etiquette'); return false;" class="text-xs text-sky-600 hover:text-sky-700 font-semibold inline-flex items-center space-x-1">
+            <a href="#" onclick="switchPage('etiquette'); return false;" class="text-xs text-sky-600 hover:text-sky-700 font-semibold inline-flex items-center space-x-1" id="culture-preview-all-link">
               <span>查看 18 國完整旅遊禮儀與法規指南</span>
               <span>➔</span>
             </a>
@@ -910,7 +907,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div class="inline-flex items-center space-x-1.5 text-xs font-bold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-full uppercase tracking-wider">
-              <span>🏛️ 入境國在地文化、旅客行為規範與重罰禁忌全覽</span>
+              <span id="etiquette-section-badge">🏛️ 入境國在地文化、旅客行為規範與重罰禁忌全覽</span>
             </div>
             <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1.5" id="etiquette-section-title">
               18 國在地文化禮儀與旅客法規提醒
@@ -922,7 +919,7 @@
 
           <!-- Country Switcher inside Section -->
           <div class="flex items-center space-x-2 shrink-0">
-            <label for="etiquette-country-select" class="text-xs font-bold text-slate-600">選擇國家：</label>
+            <label for="etiquette-country-select" class="text-xs font-bold text-slate-600" id="etiquette-select-label">選擇國家：</label>
             <select id="etiquette-country-select" onchange="renderEtiquetteDetails(this.value)" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs sm:text-sm text-slate-800 font-semibold focus:ring-2 focus:ring-sky-500">
               <option value="日本 (Japan)" selected>🇯🇵 日本 (Japan)</option>
               <option value="臺灣 (Taiwan)">🇹🇼 臺灣 (Taiwan)</option>
@@ -965,7 +962,7 @@
         <!-- 3 Highlight Warnings -->
         <div class="space-y-2">
           <span class="text-xs uppercase tracking-wider font-bold text-rose-300 flex items-center space-x-1.5">
-            <span>🚨 旅客最容易誤觸之三大罰款/處分禁忌：</span>
+            <span id="etiquette-highlights-title">🚨 旅客最容易誤觸之三大罰款/處分禁忌：</span>
           </span>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs" id="etiquette-hero-highlights">
             <!-- Dynamically populated -->
@@ -977,12 +974,12 @@
       <div class="space-y-4">
         <div class="flex items-center justify-between">
           <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center space-x-2">
-            <span>📚 旅客行為守則、禁忌與各項罰則條例詳解</span>
+            <span id="etiquette-rules-title">📚 旅客行為守則、禁忌與各項罰則條例詳解</span>
           </h4>
           <div class="flex items-center space-x-2 text-[11px] text-slate-500">
-            <span class="flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span><span>重罰拘役</span></span>
-            <span class="flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span><span>罰款規範</span></span>
-            <span class="flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-sky-500"></span><span>在地習慣</span></span>
+            <span class="flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span><span id="legend-penalty">重罰拘役</span></span>
+            <span class="flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span><span id="legend-fine">罰款規範</span></span>
+            <span class="flex items-center space-x-1"><span class="w-2 h-2 rounded-full bg-sky-500"></span><span id="legend-custom">在地習慣</span></span>
           </div>
         </div>
 
@@ -1003,7 +1000,7 @@
       <!-- Section Header -->
       <div class="space-y-2 border-b border-slate-200 pb-5">
         <div class="inline-flex items-center space-x-1.5 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full uppercase tracking-wider">
-          <span>📋 旅客通關與報關全旅程引導手冊</span>
+          <span id="declaration-section-badge">📋 旅客通關與報關全旅程引導手冊</span>
         </div>
         <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight" id="customs-guide-title">
           機場海關通關與主動申報四大步驟全教學
@@ -1030,7 +1027,7 @@
 
       <!-- 4-STAGE CLEARANCE JOURNEY TIMELINE -->
       <div class="space-y-4">
-        <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider">
+        <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider" id="clearance-stages-title">
           四大標準通關流程圖解 (4-Stage Customs Clearance Flow)
         </h4>
 
@@ -1039,8 +1036,8 @@
           <!-- Stage 1 -->
           <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 relative">
             <span class="text-xs font-mono font-bold text-sky-600 bg-sky-100 px-2 py-0.5 rounded">STAGE 01</span>
-            <h5 class="font-bold text-sm text-slate-900">出發前整理憑證</h5>
-            <p class="text-xs text-slate-600 leading-relaxed">
+            <h5 class="font-bold text-sm text-slate-900" id="stage1-title">出發前整理憑證</h5>
+            <p class="text-xs text-slate-600 leading-relaxed" id="stage1-desc">
               在海外採購高價品（名牌包、名錶、電器）請妥善保留正本發票（Invoice）與退稅收據；如有特定慢性病處方藥，請隨身備妥合格醫師英文診斷書或處方箋。
             </p>
           </div>
@@ -1048,8 +1045,8 @@
           <!-- Stage 2 -->
           <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 relative">
             <span class="text-xs font-mono font-bold text-sky-600 bg-sky-100 px-2 py-0.5 rounded">STAGE 02</span>
-            <h5 class="font-bold text-sm text-slate-900">填寫海關申報單</h5>
-            <p class="text-xs text-slate-600 leading-relaxed">
+            <h5 class="font-bold text-sm text-slate-900" id="stage2-title">填寫海關申報單</h5>
+            <p class="text-xs text-slate-600 leading-relaxed" id="stage2-desc">
               航班降落前領取紙本申報單，或透過官方 App 線上填寫（例如日本 Visit Japan Web、美國 MPC 手機快速通關、臺灣海關行動申報），誠實勾選有應稅或攜帶物品。
             </p>
           </div>
@@ -1057,8 +1054,8 @@
           <!-- Stage 3 -->
           <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 relative">
             <span class="text-xs font-mono font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded">STAGE 03</span>
-            <h5 class="font-bold text-sm text-slate-900">機場走紅線通道</h5>
-            <p class="text-xs text-slate-600 leading-relaxed">
+            <h5 class="font-bold text-sm text-slate-900" id="stage3-title">機場走紅線通道</h5>
+            <p class="text-xs text-slate-600 leading-relaxed" id="stage3-desc">
               領取行李後，請直接沿著機場指示走向<strong>【紅線應申報櫃檯（Red Channel）】</strong>。向海關值班同仁出示申報單與物品，海關將快速完成實物查驗與稅款核定。
             </p>
           </div>
@@ -1066,8 +1063,8 @@
           <!-- Stage 4 -->
           <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 relative">
             <span class="text-xs font-mono font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded">STAGE 04</span>
-            <h5 class="font-bold text-sm text-slate-900">現場繳稅蓋章放行</h5>
-            <p class="text-xs text-slate-600 leading-relaxed">
+            <h5 class="font-bold text-sm text-slate-900" id="stage4-title">現場繳稅蓋章放行</h5>
+            <p class="text-xs text-slate-600 leading-relaxed" id="stage4-desc">
               海關列印出繳款單據，現代機場均支援信用卡、Apple Pay 或當地貨幣現金繳納。繳納完成後海關即蓋章放行，取得合法完稅證明，安心展開旅程！
             </p>
           </div>
@@ -1082,14 +1079,14 @@
         <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-5 space-y-3">
           <div class="flex items-center space-x-2 text-emerald-800 font-bold">
             <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-            <span>🟢 綠線免申報通道 (Nothing to Declare)</span>
+            <span id="green-channel-title">🟢 綠線免申報通道 (Nothing to Declare)</span>
           </div>
           <ul class="text-xs text-emerald-900 space-y-1.5 list-disc list-inside leading-relaxed">
-            <li>攜帶物品完稅價值合計未超過個人免稅額（如台灣 NT$35,000 / 日本 20萬日圓 / 美國 $800）。</li>
-            <li>酒類在 1 公升免稅額度內（且滿法定年齡）。</li>
-            <li>捲菸在 200 支（1條）免稅額度內。</li>
-            <li>未攜帶任何違禁品、生鮮蔬果、豬肉肉製品或超額現鈔。</li>
-            <li>直接推行李車通過綠線走道，順暢出關。</li>
+            <li id="green-p1">攜帶物品完稅價值合計未超過個人免稅額（如台灣 NT$35,000 / 日本 20萬日圓 / 美國 $800）。</li>
+            <li id="green-p2">酒類在 1 公升免稅額度內（且滿法定年齡）。</li>
+            <li id="green-p3">捲菸在 200 支（1條）免稅額度內。</li>
+            <li id="green-p4">未攜帶任何違禁品、生鮮蔬果、豬肉肉製品或超額現鈔。</li>
+            <li id="green-p5">直接推行李車通過綠線走道，順暢出關。</li>
           </ul>
         </div>
 
@@ -1097,14 +1094,14 @@
         <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-5 space-y-3">
           <div class="flex items-center space-x-2 text-amber-800 font-bold">
             <span class="w-3 h-3 rounded-full bg-amber-500"></span>
-            <span>🟡 紅線應申報通道 (Goods to Declare)</span>
+            <span id="red-channel-title">🟡 紅線應申報通道 (Goods to Declare)</span>
           </div>
           <ul class="text-xs text-amber-900 space-y-1.5 list-disc list-inside leading-relaxed">
-            <li>物品價值超出免稅額度（如名牌包、名錶、珠寶）。</li>
-            <li>酒類超額自用（如攜帶 2~5 公升，扣除 1L 免稅後其餘繳稅）。</li>
-            <li>攜帶外幣現鈔超過等值 USD $10,000 或大量當地貨幣。</li>
-            <li>攜帶伴手禮含有動植物成分，或不確定是否符合檢疫規定。</li>
-            <li><strong>走紅線申報絕不罰鍰！</strong>即使無法攜入亦屬主動拋棄，不留不良紀錄。</li>
+            <li id="red-p1">物品價值超出免稅額度（如名牌包、名錶、珠寶）。</li>
+            <li id="red-p2">酒類超額自用（如攜帶 2~5 公升，扣除 1L 免稅後其餘繳稅）。</li>
+            <li id="red-p3">攜帶外幣現鈔超過等值 USD $10,000 或大量當地貨幣。</li>
+            <li id="red-p4">攜帶伴手禮含有動植物成分，或不確定是否符合檢疫規定。</li>
+            <li id="red-p5"><strong>走紅線申報絕不罰鍰！</strong>即使無法攜入亦屬主動拋棄，不留不良紀錄。</li>
           </ul>
         </div>
 
@@ -1140,13 +1137,13 @@
         <table class="w-full text-left text-xs border-collapse">
           <thead>
             <tr class="bg-slate-900 text-white font-bold uppercase tracking-wider text-[11px]">
-              <th class="p-3 rounded-l-lg">國家 / 地區</th>
-              <th class="p-3">個人物品免稅額</th>
-              <th class="p-3">免稅酒類額度</th>
-              <th class="p-3">免稅香菸額度</th>
-              <th class="p-3">電子煙 / 加熱菸規定</th>
-              <th class="p-3">動植物檢疫與肉品嚴禁事項</th>
-              <th class="p-3 rounded-r-lg">現鈔申報門檻</th>
+              <th class="p-3 rounded-l-lg" id="th-country">國家 / 地區</th>
+              <th class="p-3" id="th-exemption">個人物品免稅額</th>
+              <th class="p-3" id="th-alcohol">免稅酒類額度</th>
+              <th class="p-3" id="th-tobacco">免稅香菸額度</th>
+              <th class="p-3" id="th-vapes">電子煙 / 加熱菸規定</th>
+              <th class="p-3" id="th-quarantine">動植物檢疫與肉品嚴禁事項</th>
+              <th class="p-3 rounded-r-lg" id="th-cash">現鈔申報門檻</th>
             </tr>
           </thead>
           <tbody id="country-table-body" class="divide-y divide-slate-100 text-slate-700">
@@ -1169,14 +1166,14 @@
           <div class="w-6 h-6 rounded bg-sky-600 flex items-center justify-center text-white font-bold text-xs">
             ✈️
           </div>
-          <span class="font-bold text-slate-200">全球旅客出入境行李與報關智慧諮詢系統</span>
+          <span class="font-bold text-slate-200" id="footer-title">全球旅客出入境行李與報關智慧諮詢系統</span>
           <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400">Capstone Project</span>
         </div>
-        <div class="text-[11px] text-slate-400">
+        <div class="text-[11px] text-slate-400" id="footer-tech">
           Google ADK Multi-Agent 架構 · Gemini 2.5 Flash · 企業級 Zero-PII 安全護欄
         </div>
       </div>
-      <p class="text-[11px] text-slate-500 leading-relaxed">
+      <p class="text-[11px] text-slate-500 leading-relaxed" id="footer-disclaimer">
         免責聲明：本系統依各國海關與邊境保護局現行法規庫提供智慧諮詢與試算。各國海關及檢疫法規可能隨時因應疫情或政策動態調整，旅客出國前請務必確認各國海關官方網站最新公告。通關時請務必配合現場海關人員之指示與實物查驗。
       </p>
     </div>
@@ -1223,18 +1220,61 @@
         if (d.includes('日本') || d.includes('japan')) matchedKey = 'japan';
         else if (d.includes('臺灣') || d.includes('taiwan')) matchedKey = 'taiwan';
         else if (d.includes('韓國') || d.includes('korea')) matchedKey = 'korea';
+        else if (d.includes('加拿大') || d.includes('canada')) matchedKey = 'canada';
+        else if (d.includes('美國') || d.includes('usa')) matchedKey = 'usa';
+        else if (d.includes('英國') || d.includes('uk')) matchedKey = 'uk';
+        else if (d.includes('法國') || d.includes('france')) matchedKey = 'france';
+        else if (d.includes('義大利') || d.includes('italy')) matchedKey = 'italy';
+        else if (d.includes('荷蘭') || d.includes('netherlands')) matchedKey = 'netherlands';
+        else if (d.includes('西班牙') || d.includes('spain')) matchedKey = 'spain';
+        else if (d.includes('希臘') || d.includes('greece')) matchedKey = 'greece';
+        else if (d.includes('澳洲') || d.includes('australia')) matchedKey = 'australia';
+        else if (d.includes('新加坡') || d.includes('singapore')) matchedKey = 'singapore';
+        else if (d.includes('泰國') || d.includes('thailand')) matchedKey = 'thailand';
+        else if (d.includes('越南') || d.includes('vietnam')) matchedKey = 'vietnam';
+        else if (d.includes('菲律賓') || d.includes('philippines')) matchedKey = 'philippines';
+        else if (d.includes('馬來西亞') || d.includes('malaysia')) matchedKey = 'malaysia';
+        else if (d.includes('香港') || d.includes('hong')) matchedKey = 'hong kong';
         else matchedKey = 'japan';
       }
-      const info = OFFLINE_CLIMATE_DB[matchedKey] || OFFLINE_CLIMATE_DB['japan'];
+      const countryObj = OFFLINE_CLIMATE_DB[matchedKey] || OFFLINE_CLIMATE_DB['japan'];
+
+      // Determine season from depDate month (default to autumn for Oct/Nov)
+      let seasonKey = 'autumn';
+      if (depDate && depDate.includes('-')) {
+        const m = parseInt(depDate.split('-')[1], 10);
+        if (m >= 3 && m <= 5) seasonKey = 'spring';
+        else if (m >= 6 && m <= 8) seasonKey = 'summer';
+        else if (m >= 9 && m <= 11) seasonKey = 'autumn';
+        else if (m === 12 || m === 1 || m === 2) seasonKey = 'winter';
+      } else {
+        const curM = new Date().getMonth() + 1;
+        if (curM >= 3 && curM <= 5) seasonKey = 'spring';
+        else if (curM >= 6 && curM <= 8) seasonKey = 'summer';
+        else if (curM >= 9 && curM <= 11) seasonKey = 'autumn';
+        else seasonKey = 'winter';
+      }
+
+      const seasonNames = {
+        'zh-TW': { spring: '春季 (Spring)', summer: '夏季 (Summer)', autumn: '秋季 (Autumn)', winter: '冬季 (Winter)' },
+        'en': { spring: 'Spring', summer: 'Summer', autumn: 'Autumn / Fall', winter: 'Winter' },
+        'ja': { spring: '春 (Spring)', summer: '夏 (Summer)', autumn: '秋 (Autumn)', winter: '冬 (Winter)' },
+        'ko': { spring: '봄 (Spring)', summer: '여름 (Summer)', autumn: '가을 (Autumn)', winter: '겨울 (Winter)' }
+      };
+
+      const sInfo = countryObj[seasonKey] || countryObj['autumn'] || {};
+      const lang = window.currentLang || 'zh-TW';
+      const sName = (seasonNames[lang] || seasonNames['zh-TW'])[seasonKey] || '秋季 (Autumn)';
+
       return {
-        destination: dest || "目的地",
+        destination: countryObj.country_zh || dest || "目的地",
         travel_dates: (depDate && retDate) ? `${depDate} ~ ${retDate}` : "近期出發",
-        season: info.season,
-        temperature_range: info.temperature_range,
-        weather_condition: info.weather_condition,
-        rain_chance: info.rain_chance,
-        icon: info.icon,
-        packing_suggestions: info.packing_suggestions
+        season: sName,
+        temperature_range: sInfo.temp || "15°C ~ 22°C",
+        weather_condition: sInfo.condition || "天氣晴朗舒適",
+        rain_chance: sInfo.rain || "20%",
+        icon: sInfo.icon || "🌤️",
+        packing_suggestions: sInfo.tips || ["建議攜帶薄外套與健走鞋", "注意日夜溫差"]
       };
     }
 
@@ -1695,10 +1735,32 @@
       }
     }
 
+    const COUNTRY_VALUE_TO_CODE = {
+      "臺灣 (Taiwan)": "TW",
+      "日本 (Japan)": "JP",
+      "韓國 (South Korea)": "KR",
+      "美國 (USA)": "US",
+      "加拿大 (Canada)": "CA",
+      "英國 (UK)": "GB",
+      "法國 (France)": "FR",
+      "義大利 (Italy)": "IT",
+      "荷蘭 (Netherlands)": "NL",
+      "西班牙 (Spain)": "ES",
+      "希臘 (Greece)": "GR",
+      "澳洲 (Australia)": "AU",
+      "新加坡 (Singapore)": "SG",
+      "泰國 (Thailand)": "TH",
+      "越南 (Vietnam)": "VN",
+      "菲律賓 (Philippines)": "PH",
+      "馬來西亞 (Malaysia)": "MY",
+      "香港 (Hong Kong)": "HK"
+    };
+
     function updateQuickLimits() {
       const dest = document.getElementById('select-destination').value;
       const list = COUNTRIES_DATA_I18N[currentLang] || COUNTRIES_DATA_I18N['zh-TW'];
-      const countryData = list.find(c => dest.includes(c.code) || dest.includes(c.country.split(' ')[0])) || list[1];
+      const code = COUNTRY_VALUE_TO_CODE[dest];
+      const countryData = (code ? list.find(c => c.code === code) : null) || list.find(c => dest.includes(c.code) || dest.includes(c.country.split(' ')[0])) || list[1];
       document.getElementById('quick-limits-country').textContent = countryData.country;
       document.getElementById('quick-limit-exemption').textContent = countryData.exemption;
       document.getElementById('quick-limit-alcohol').textContent = countryData.alcohol.split('；')[0].split(';')[0];
@@ -1713,7 +1775,7 @@
       document.getElementById('weather-condition').textContent = w.weather_condition;
       document.getElementById('weather-icon').textContent = w.icon;
       document.getElementById('weather-season').textContent = w.season;
-      document.getElementById('weather-rain').textContent = `約 ${w.rain_chance}`;
+      const rainStr = w.rain_chance ? (String(w.rain_chance).includes('%') ? w.rain_chance : `${w.rain_chance}%`) : '20%'; document.getElementById('weather-rain').textContent = (currentLang === 'en' ? 'Approx. ' : (currentLang === 'ko' ? '약 ' : '約 ')) + rainStr;
       document.getElementById('weather-dates-badge').textContent = w.travel_dates || '近期出發';
 
       const tipsList = document.getElementById('weather-tips-list');
