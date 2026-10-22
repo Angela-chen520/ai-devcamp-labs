@@ -25,6 +25,7 @@ class CoursewareEngine:
     """
 
     FAIR_USE_DISCLAIMER = "一切資源作學術研討幫助學習者學習，不提供商業用、或搬運影片用"
+    FAIR_USE_DISCLAIMER_EN = "All resources are provided solely for academic research and educational study to assist learners; commercial use or video piracy/re-uploading is strictly prohibited."
 
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY", "")
@@ -382,80 +383,80 @@ class CoursewareEngine:
         }
 
     def _render_markdown(self, data: Dict[str, Any]) -> str:
-        """Renders comprehensive, publication-quality Markdown courseware."""
+        """Renders comprehensive, publication-quality bilingual Markdown courseware (繁中 / English)."""
         title = data.get("title", "影片研討教材")
         exec_sum = data.get("executive_summary", {})
         highlights = data.get("key_highlights", [])
         ext = data.get("extended_learning", {})
 
         md = []
-        md.append(f"# 📚 {title} — 專題研討教材\n")
-        md.append(f"> ⚖️ **聲明**：{self.FAIR_USE_DISCLAIMER}\n")
+        md.append(f"# 📚 {title} — 專題研討教材 / Specialized Courseware & Research Notes\n")
+        md.append(f"> ⚖️ **學術研討聲明 / Academic Fair Use Notice**：  \n> {self.FAIR_USE_DISCLAIMER}  \n> *{self.FAIR_USE_DISCLAIMER_EN}*\n")
         md.append("---\n")
 
         # Section 1
-        md.append("## 📖 壹、核心摘要 (Executive Summary)\n")
-        md.append(f"- **目標受眾**：{exec_sum.get('target_audience', '學習者')}")
-        md.append(f"- **先備知識**：{exec_sum.get('prerequisites', '無特殊限制')}\n")
-        md.append(f"### 課程總覽\n{exec_sum.get('overview', '')}\n")
-        md.append("### 核心觀點清單")
+        md.append("## 📖 壹、核心摘要 / Executive Summary\n")
+        md.append(f"- 🎯 **目標受眾 / Target Audience**：{exec_sum.get('target_audience', '學習者 / Learners')}")
+        md.append(f"- 🧩 **先備知識 / Prerequisites**：{exec_sum.get('prerequisites', '無特殊限制 / None')}\n")
+        md.append(f"### 課程總覽 / Course Overview\n{exec_sum.get('overview', '')}\n")
+        md.append("### 核心觀點清單 / Core Theses & Key Concepts")
         for th in exec_sum.get("core_theses", []):
             md.append(f"- 💡 {th}")
         md.append("\n---\n")
 
         # Section 2
-        md.append("## 💡 貳、重點精華與時間戳記 (Key Highlights)\n")
+        md.append("## 💡 貳、重點精華與時間戳記 / Key Highlights & Timestamps\n")
         for i, h in enumerate(highlights, 1):
             ts = h.get("timestamp", "00:00")
             md.append(f"### 📍 [{ts}] {h.get('title', '')}")
-            md.append(f"**核心要點**：{h.get('takeaway', '')}\n")
-            md.append(f"**論證脈絡**：{h.get('details', '')}\n")
+            md.append(f"**核心要點 / Key Takeaway**：{h.get('takeaway', '')}\n")
+            md.append(f"**論證脈絡 / Discussion & Details**：{h.get('details', '')}\n")
         md.append("---\n")
 
         # Section 3: Roadmap
         roadmap = ext.get("learning_roadmap", {})
         stages = roadmap.get("stages", [])
-        md.append("## 🗺️ 參、專題系統化學習地圖 (Learning Roadmap)\n")
-        md.append(f"*{roadmap.get('title', '學習路線圖')}*\n")
+        md.append("## 🗺️ 參、專題系統化學習地圖 / Specialized Learning Roadmap\n")
+        md.append(f"*{roadmap.get('title', '學習路線圖 / Study Path Roadmap')}*\n")
         for s in stages:
             md.append(f"### {s.get('stage_name')}")
-            md.append(f"- 🎯 **階段目標**：{s.get('goal')}")
-            md.append(f"- 🔑 **關鍵模組**：{', '.join(s.get('key_topics', []))}")
-            md.append(f"- 🛠️ **建議動手任務**：{s.get('recommended_actions')}")
-            md.append(f"- ⏱️ **建議研習時長**：`{s.get('estimated_time')}`\n")
+            md.append(f"- 🎯 **階段目標 / Stage Goal**：{s.get('goal')}")
+            md.append(f"- 🔑 **關鍵模組 / Key Topics**：{', '.join(s.get('key_topics', []))}")
+            md.append(f"- 🛠️ **建議動手任務 / Hands-on Tasks**：{s.get('recommended_actions')}")
+            md.append(f"- ⏱️ **建議研習時長 / Estimated Time**：`{s.get('estimated_time')}`\n")
         md.append("---\n")
 
         # Section 4: Unexplored Keywords & Guide
         keywords = ext.get("unexplored_keywords", [])
-        md.append("## 🔍 肆、影片關鍵字未解清單與自學資源指引 (Unexplored Keywords Guide)\n")
-        md.append("> 💡 *以下關鍵概念於影片中曾被提及或為必要先備知識，但未提供完整教材。學習者可依據下列指引進行獨立學術探討：*\n")
+        md.append("## 🔍 肆、影片關鍵字未解清單與自學資源指引 / Unexplored Keywords & Self-Study Guide\n")
+        md.append("> 💡 *以下關鍵概念於影片中曾被提及或為必要先備知識，但未提供完整教材。學習者可依據下列指引進行獨立學術探討：*  \n> *The following key concepts were mentioned or serve as required background in the video but lacked comprehensive coverage. Learners are encouraged to conduct independent research following this guide:*\n")
         for idx, kw in enumerate(keywords, 1):
-            md.append(f"### 📌 關鍵字 {idx}：{kw.get('keyword')}")
-            md.append(f"- 🎬 **影片提及脈絡**：{kw.get('context_in_video')}")
-            md.append(f"- ❓ **為什麼需要深入探討**：{kw.get('why_important')}")
-            md.append(f"- 🏛️ **建議權威查找資源**：{kw.get('where_to_search')}")
-            md.append(f"- 🧭 **具體自主學習方法**：{kw.get('how_to_study')}")
-            md.append(f"- 🔎 **精確搜尋關鍵詞建議**：`{kw.get('search_queries')}`\n")
+            md.append(f"### 📌 關鍵字 / Keyword {idx}：{kw.get('keyword')}")
+            md.append(f"- 🎬 **影片提及脈絡 / Context in Video**：{kw.get('context_in_video')}")
+            md.append(f"- ❓ **為什麼需要深入探討 / Why It Matters**：{kw.get('why_important')}")
+            md.append(f"- 🏛️ **建議權威查找資源 / Where to Search**：{kw.get('where_to_search')}")
+            md.append(f"- 🧭 **具體自主學習方法 / How to Study**：{kw.get('how_to_study')}")
+            md.append(f"- 🔎 **精確搜尋關鍵詞建議 / Recommended Search Queries**：`{kw.get('search_queries')}`\n")
         md.append("---\n")
 
         # Section 5: Discussion & Reading & Quiz
-        md.append("## 🚀 伍、延伸學習與自我測驗 (Extended Learning & Self-Quiz)\n")
-        md.append("### 🧠 深度思考與討論題")
+        md.append("## 🚀 伍、延伸學習與自我測驗 / Extended Learning & Self-Assessment Quiz\n")
+        md.append("### 🧠 深度思考與討論題 / Socratic Discussion Questions")
         for q in ext.get("discussion_questions", []):
             md.append(f"1. {q}")
-        md.append("\n### 📚 延伸推薦閱讀")
+        md.append("\n### 📚 延伸推薦閱讀 / Recommended Academic Reading")
         for r in ext.get("recommended_reading", []):
             md.append(f"- 📖 {r}")
-        md.append("\n### 📝 自我評量檢測題庫")
+        md.append("\n### 📝 自我評量檢測題庫 / Self-Assessment Quiz")
         for i, q in enumerate(ext.get("quiz", []), 1):
-            md.append(f"\n#### 第 {i} 題：{q.get('question')}")
+            md.append(f"\n#### 第 {i} 題 / Question {i}：{q.get('question')}")
             for opt in q.get("options", []):
                 md.append(f"- {opt}")
-            md.append(f"\n> **正確解答**：`{q.get('answer')}`")
-            md.append(f"> **觀念解析**：{q.get('explanation')}\n")
+            md.append(f"\n> **正確解答 / Correct Answer**：`{q.get('answer')}`")
+            md.append(f"> **觀念解析 / Detailed Explanation**：{q.get('explanation')}\n")
 
         md.append("\n---\n")
-        md.append(f"*本講義由 VideoLearn AI 智慧教材引擎自動產出。{self.FAIR_USE_DISCLAIMER}*")
+        md.append(f"*本講義由 VideoLearn AI 智慧教材引擎自動產出。{self.FAIR_USE_DISCLAIMER}*  \n*{self.FAIR_USE_DISCLAIMER_EN}*")
         return "\n".join(md)
 
     def _render_canva_script(self, data: Dict[str, Any]) -> List[Dict[str, Any]]:

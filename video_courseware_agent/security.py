@@ -86,6 +86,7 @@ class SecurityGuard:
     """Enterprise-grade security gatekeeper for VideoLearn AI."""
 
     FAIR_USE_DISCLAIMER = "一切資源作學術研討幫助學習者學習，不提供商業用、或搬運影片用"
+    FAIR_USE_DISCLAIMER_EN = "All resources are provided solely for academic research and educational study to assist learners; commercial use or video piracy/re-uploading is strictly prohibited."
 
     @staticmethod
     def validate_url(url: str) -> Tuple[bool, str]:
