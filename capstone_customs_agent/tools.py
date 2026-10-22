@@ -1591,6 +1591,9 @@ def get_destination_culture_etiquette(destination: str) -> Dict[str, Any]:
         else:
             matched_key = "taiwan"
 
-    return DESTINATION_ETIQUETTE_DATA.get(matched_key, DESTINATION_ETIQUETTE_DATA["taiwan"])
+    entry = dict(DESTINATION_ETIQUETTE_DATA.get(matched_key, DESTINATION_ETIQUETTE_DATA["taiwan"]))
+    entry.setdefault("country_name", entry.get("country_zh", ""))
+    entry["key"] = matched_key
+    return entry
 
 

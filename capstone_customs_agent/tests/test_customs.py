@@ -210,3 +210,59 @@ class TestCustomsTools:
         unknown_etiquette = get_destination_culture_etiquette("Atlantis")
         assert "臺灣" in unknown_etiquette["country_zh"]
 
+    def test_all_18_countries_etiquette_and_frontend_sync(self):
+        import json
+        from pathlib import Path
+
+        countries_to_check = [
+            ("台灣", "taiwan", "臺灣"),
+            ("臺灣 (Taiwan)", "taiwan", "臺灣"),
+            ("韓國 (South Korea)", "korea", "韓國"),
+            ("日本 (Japan)", "japan", "日本"),
+            ("美國 (USA)", "usa", "美國"),
+            ("英國 (UK)", "uk", "英國"),
+            ("加拿大 (Canada)", "canada", "加拿大"),
+            ("義大利 (Italy)", "italy", "義大利"),
+            ("荷蘭 (Netherlands)", "netherlands", "荷蘭"),
+            ("西班牙 (Spain)", "spain", "西班牙"),
+            ("希臘 (Greece)", "greece", "希臘"),
+            ("澳洲 (Australia)", "australia", "澳洲"),
+            ("新加坡 (Singapore)", "singapore", "新加坡"),
+            ("泰國 (Thailand)", "thailand", "泰國"),
+            ("越南 (Vietnam)", "vietnam", "越南"),
+            ("菲律賓 (Philippines)", "philippines", "菲律賓"),
+            ("馬來西亞 (Malaysia)", "malaysia", "馬來西亞"),
+            ("香港 (Hong Kong)", "hong kong", "香港"),
+            ("法國 (France)", "france", "法國"),
+        ]
+
+        for query, expected_key, expected_zh in countries_to_check:
+            res = get_destination_culture_etiquette(query)
+            assert res["key"] == expected_key, f"Failed key for {query}: {res.get('key')}"
+            assert expected_zh in res["country_zh"], f"Failed country_zh for {query}: {res.get('country_zh')}"
+            assert expected_zh in res["country_name"], f"Failed country_name for {query}: {res.get('country_name')}"
+            assert res.get("flag"), f"Missing flag for {query}"
+            assert res.get("overview"), f"Missing overview for {query}"
+            assert len(res.get("highlight_warnings", [])) >= 3, f"Missing highlight_warnings for {query}"
+            assert len(res.get("rules", [])) >= 3, f"Missing rules for {query}"
+
+        # Verify static/index.html has all 18 countries in OFFLINE_ETIQUETTE_DB_I18N across all languages
+        static_html_path = Path(__file__).resolve().parent.parent / "static" / "index.html"
+        html_text = static_html_path.read_text(encoding="utf-8")
+        prefix = "    const OFFLINE_ETIQUETTE_DB_I18N = "
+        db_line = next(line for line in html_text.splitlines() if line.startswith(prefix))
+        db_i18n = json.loads(db_line[len(prefix):].rstrip(";"))
+
+        expected_keys = {k for _, k, _ in countries_to_check}
+        for lang in ["zh-TW", "en", "ja", "ko", "en-US", "en-GB", "ja-JP", "ko-KR"]:
+            assert lang in db_i18n, f"Missing language {lang} in OFFLINE_ETIQUETTE_DB_I18N"
+            for k in expected_keys:
+                assert k in db_i18n[lang], f"Missing country '{k}' in OFFLINE_ETIQUETTE_DB_I18N['{lang}']"
+                entry = db_i18n[lang][k]
+                assert entry.get("country_name"), f"Empty country_name for {k} in {lang}"
+                assert entry.get("flag"), f"Empty flag for {k} in {lang}"
+                assert entry.get("overview"), f"Empty overview for {k} in {lang}"
+                assert len(entry.get("highlight_warnings", [])) >= 3, f"Insufficient warnings for {k} in {lang}"
+                assert len(entry.get("rules", [])) >= 2, f"Insufficient rules for {k} in {lang}"
+
+
