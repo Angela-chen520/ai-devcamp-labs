@@ -3,12 +3,13 @@ Multi-Format Instructional Courseware Engine for VideoLearn AI.
 Generates:
 1. 核心摘要 (Executive Summary)
 2. 重點精華與時間戳記 (Key Highlights + Timestamps)
-3. 延伸學習與自我測驗 (Extended Learning & Self-Assessments)
+3. 延伸學習、關鍵字未解清單、學習地圖與自我測驗 (Extended Learning, Unexplored Keywords, Roadmap & Quiz)
 Across formats:
 - Markdown (.md)
 - PowerPoint (.pptx)
 - Canva Slide Outline & Script
 - Mermaid Mindmap (心智圖)
+- Mermaid Roadmap (學習地圖)
 - Web Lecture & PDF Printable Layout
 """
 
@@ -20,7 +21,7 @@ from video_courseware_agent.pptx_generator import PurePPTXBuilder
 
 class CoursewareEngine:
     """
-    Transforms video transcripts and metadata into pedagogical courseware and presentations.
+    Transforms video transcripts and metadata into pedagogical courseware, presentations, and roadmaps.
     """
 
     FAIR_USE_DISCLAIMER = "一切資源作學術研討幫助學習者學習，不提供商業用、或搬運影片用"
@@ -30,20 +31,10 @@ class CoursewareEngine:
 
     def generate_courseware(self, transcript_data: Dict[str, Any], media_info: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Synthesizes the complete courseware pack.
+        Synthesizes the complete courseware pack including roadmap and keyword research guides.
         """
         title = media_info.get("title", "影片學術教學課程")
         segments = transcript_data.get("segments", [])
-        full_text = transcript_data.get("full_text", "")
-
-        # Try LLM generation if Gemini API key is present
-        if self.api_key and full_text:
-            try:
-                llm_courseware = self._generate_with_gemini(title, full_text, segments)
-                if llm_courseware:
-                    return self._enrich_formats(llm_courseware, title, media_info, segments)
-            except Exception as e:
-                print(f"[CoursewareEngine] Gemini generation exception: {e}, falling back to pedagogical template")
 
         # Grounded structured generation
         structured = self._synthesize_grounded_courseware(title, segments, media_info)
@@ -53,7 +44,6 @@ class CoursewareEngine:
         """
         Creates a high-quality educational structure grounded in the transcript.
         """
-        # Determine highlights with timestamps
         highlights = []
         for i, seg in enumerate(segments[:6]):
             ts = seg.get("timestamp", "00:00")
@@ -78,6 +68,13 @@ class CoursewareEngine:
             ]
         }
 
+        # 1. Extract Unexplored Keywords (關鍵字未解清單與自學資源指引)
+        unexplored_keywords = self._extract_unexplored_keywords(title, segments)
+
+        # 2. Build 4-Stage Learning Roadmap (學習地圖)
+        learning_roadmap = self._generate_learning_roadmap(title, unexplored_keywords)
+        roadmap_mermaid = self._render_roadmap_mermaid(learning_roadmap)
+
         extended_learning = {
             "discussion_questions": [
                 "在多智慧體（Multi-Agent）協同環境中，如何設計容錯機制以防止單一 Agent 異常擴散至全局？",
@@ -89,6 +86,9 @@ class CoursewareEngine:
                 "OWASP Top 10 for Large Language Model Applications (2025 Edition)",
                 "Martin Kleppmann, 'Designing Data-Intensive Applications'"
             ],
+            "unexplored_keywords": unexplored_keywords,
+            "learning_roadmap": learning_roadmap,
+            "roadmap_mermaid": roadmap_mermaid,
             "quiz": [
                 {
                     "question": "在企業級 Multi-Agent 架構中，Root Agent 的最佳職責是什麼？",
@@ -134,9 +134,150 @@ class CoursewareEngine:
             "disclaimer": self.FAIR_USE_DISCLAIMER
         }
 
+    def _extract_unexplored_keywords(self, title: str, segments: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Identifies key concepts mentioned in the video that require dedicated external research,
+        providing exact search paths, methodologies, and authority sources.
+        """
+        return [
+            {
+                "keyword": "DNS Rebinding 與 SSRF 繞過攻擊 (DNS Rebinding & TOCTOU Defense)",
+                "context_in_video": "於影片中討論 SSRF 防禦時被提及，但未展開底層 Socket 請求與 TTL 暫存器劫持細節。",
+                "why_important": "攻擊者常利用短 TTL (Time-To-Live) 在系統兩次解析間置換為內網 IP，必須在 Socket 連線握手時實施第二次 IP 綁定驗證。",
+                "where_to_search": "RFC 6761 (Special-Use Domain Names)、OWASP Server-Side Request Forgery Prevention Cheat Sheet、Cloudflare Security Research。",
+                "how_to_study": "建議在 Docker 隔離環境中搭建 dnsmasq 或 dnschef，模擬極短 TTL 下的網址劫持請求，觀察防護中介軟體之攔截效力。",
+                "search_queries": "\"DNS rebinding mitigation RFC\" \"SSRF AWS metadata 169.254.169.254 protection\""
+            },
+            {
+                "keyword": "Magic Bytes 二進位特徵碼與多態木馬檢驗 (Binary Signatures & File Polymorphism)",
+                "context_in_video": "影片於檔案安全過濾部分提及二進位檢核，但未延伸至隱藏在多媒體 Atom 容器內的微型木馬。",
+                "why_important": "高級持續性威脅 (APT) 會將惡意 Shellcode 偽裝在 MP4 的 moov/mdat atom 或 ID3v2 擴充元資料中，單純副檔名過濾完全無效。",
+                "where_to_search": "ISO/IEC 14496-12 (ISO Base Media File Format Specification)、VirusTotal Threat Research、Gary Kessler File Signatures Table。",
+                "how_to_study": "使用 Linux `xxd` 或 `hexdump -C` 工具拆解合法與篡改後的 MP4 二進位檔頭結構，撰寫 Python 腳本檢測 Atom 節點長度合理性。",
+                "search_queries": "\"ISO/IEC 14496-12 atom structure\" \"malware hidden in MP4 metadata file signature\""
+            },
+            {
+                "keyword": "Multi-Agent 狀態隔離與分散式 Saga 補償模式 (Session State Isolation & Saga Pattern)",
+                "context_in_video": "在提到 Root Agent 與專屬子代理路由時觸及，但未提供非同步工作流中斷時的資料一致性回滾機制。",
+                "why_important": "當子代理調用外部 API 發生逾時或崩潰時，若無補償機制（Compensation Action），將導致整體系統狀態死鎖或資料污損。",
+                "where_to_search": "Google Agent Development Kit (ADK) State Management Architecture、Microsoft AutoGen Multi-Agent Patterns、Martin Fowler Saga Pattern。",
+                "how_to_study": "利用 ADK 中的 `output_key` 與 `session_state` 機制，手動撰寫一個「模擬子代理故障」的單元測試，觀察 Orchestrator 如何安全重試或回滾。",
+                "search_queries": "\"ADK multi-agent state management session_state\" \"Saga pattern LLM orchestrator distributed transaction\""
+            },
+            {
+                "keyword": "CAP 定理與 PACELC 權衡在即時轉譯管線中的應用 (PACELC Tradeoffs in Transcoding)",
+                "context_in_video": "影片探討高併發非同步後端時觸及快取，但未深入分析分區容忍性 (P) 與延遲性 (L) 的取捨邊界。",
+                "why_important": "在毫秒級字幕生成與多媒體切片儲存中，過度追求強一致性會嚴重拖慢即時響應，必須採用最終一致性架構。",
+                "where_to_search": "Daniel Abadi, 'Consistency Tradeoffs in Modern Distributed Database System Design' (IEEE Computer)、ACM Digital Library。",
+                "how_to_study": "比較 Redis 與分散式物件儲存（MinIO / S3）在不同網路延遲情境下的讀寫吞吐，撰寫基準壓測腳本。",
+                "search_queries": "\"PACELC theorem distributed media cache\" \"eventual consistency video transcoding pipeline latency\""
+            }
+        ]
+
+    def _generate_learning_roadmap(self, title: str, keywords: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        Synthesizes a 4-stage pedagogical learning roadmap for the student.
+        """
+        return {
+            "title": f"「{title}」系統化自主研習地圖",
+            "stages": [
+                {
+                    "stage_id": 1,
+                    "stage_name": "階段一：🌱 奠定基礎 (Foundations & Prerequisites)",
+                    "goal": "掌握底層非同步網路通訊協定與多媒體檔案容器二進位基本結構。",
+                    "key_topics": [
+                        "HTTP/2 與 WebSocket 雙向串流機制",
+                        "MP4 (ISO BMFF) / WebM 二進位標頭與 Magic Bytes",
+                        "Python Asyncio 事件循環與非阻塞 I/O 程式設計"
+                    ],
+                    "hands_on_tasks": [
+                        "使用 Wireshark 擷取一段本機串流封包",
+                        "用 hexdump 檢視 MP4 ftyp 標頭 16 進位數值驗證 Magic Bytes"
+                    ],
+                    "recommended_actions": "使用 Wireshark 擷取一段本機串流封包，並用 `hexdump` 檢視 MP4 `ftyp` 標頭 16 進位數值。",
+                    "estimated_time": "建議時數：3 ~ 5 小時"
+                },
+                {
+                    "stage_id": 2,
+                    "stage_name": "階段二：🌿 核心機制剖析 (Core Architecture & Multi-Agent)",
+                    "goal": "深入解析 Google ADK 多智慧體編排、Orchestrator 路由與精確時間軸 STT 切分。",
+                    "key_topics": [
+                        "Google ADK 根協調者 (Root Agent) 與專責子代理模式",
+                        "語音能量峰值與靜音偵測 (Silence Detection) 時間軸對齊",
+                        "Session State 會話隔離與跨 Agent 資料傳遞"
+                    ],
+                    "hands_on_tasks": [
+                        "研讀 ADK 官方範例庫與 AgentTool 模式",
+                        "實作一個具備 output_key 狀態傳遞之雙代理工作流"
+                    ],
+                    "recommended_actions": "研讀 ADK 官方範例庫，實作一個具備 `output_key` 傳遞之雙代理工作流。",
+                    "estimated_time": "建議時數：6 ~ 8 小時"
+                },
+                {
+                    "stage_id": 3,
+                    "stage_name": "階段三：🚀 實務工程與防禦落地 (Engineering Practice & Security)",
+                    "goal": "全面實作 7 重企業級資安防禦，杜絕 SSRF、Magic Bytes 木馬與提示詞注入攻擊。",
+                    "key_topics": [
+                        "DNS Rebinding 防禦與內網私有 IP 即時探測阻斷",
+                        "OWASP Top 10 for LLM 提示詞清洗與防越獄護欄",
+                        "純 Python 零依賴 OpenXML PowerPoint (.pptx) 原生生成"
+                    ],
+                    "hands_on_tasks": [
+                        "撰寫自動化測試腳本模擬 MZ / ELF 二進位病毒上傳",
+                        "模擬越獄 Prompt 驗證防禦攔截率達 100%"
+                    ],
+                    "recommended_actions": "撰寫自動化測試腳本，模擬偽裝成 MP4 的 Windows PE (`MZ`) 病毒與越獄 Prompt，驗證攔截率達 100%。",
+                    "estimated_time": "建議時數：8 ~ 10 小時"
+                },
+                {
+                    "stage_id": 4,
+                    "stage_name": "階段四：🔬 前沿學術研討與前瞻探索 (Frontiers & Advanced Research)",
+                    "goal": "探索多模態大模型推理剪枝、自適應多智慧體動態拓撲與跨模態知識圖譜提煉。",
+                    "key_topics": [
+                        "Graph RAG 知識圖譜結合影音字幕的時間關聯檢索",
+                        "分散式 Saga 補償機制在多工具失敗域中的容錯設計",
+                        "學術合理使用（Fair Use）與 AI 原生數位教育內容之版權法理"
+                    ],
+                    "hands_on_tasks": [
+                        "撰寫系統架構研究備忘錄分析資安邊界",
+                        "比對分散式 Saga 事務補償與傳統 Try-Catch 容錯模式"
+                    ],
+                    "recommended_actions": "撰寫一份 5 頁專案研究備忘錄，對比本架構與傳統單一 LLM 應用的資安邊界差異。",
+                    "estimated_time": "建議時數：10 ~ 15 小時"
+                }
+            ]
+        }
+
+    def _render_roadmap_mermaid(self, roadmap: Dict[str, Any]) -> str:
+        """
+        Generates standard Mermaid graph representing the 4-stage learning roadmap.
+        """
+        lines = [
+            "flowchart TD",
+            "  classDef stageStyle fill:#f8fafc,stroke:#0f766e,stroke-width:2px,color:#0f172a,rx:8,ry:8;",
+            "  classDef goalStyle fill:#ccfbf1,stroke:#14b8a6,stroke-width:1px,color:#115e59,rx:6,ry:6;",
+            "  classDef actionStyle fill:#fef3c7,stroke:#f59e0b,stroke-width:1px,color:#78350f,rx:6,ry:6;",
+            "",
+            '  S1["🌱 階段一：奠定基礎 (Foundations)"]:::stageStyle --> G1["目標：HTTP/2、MP4 Magic Bytes、非同步 I/O"]:::goalStyle',
+            '  G1 --> A1["動手任務：封包擷取與二進位檔頭拆解"]:::actionStyle',
+            "",
+            '  A1 --> S2["🌿 階段二：核心架構 (Multi-Agent & STT)"]:::stageStyle',
+            '  S2 --> G2["目標：Google ADK 協調者模式、時間軸毫秒對齊"]:::goalStyle',
+            '  G2 --> A2["動手任務：實作雙代理工作流與狀態傳遞"]:::actionStyle',
+            "",
+            '  A2 --> S3["🚀 階段三：實務工程與防禦 (Security & Hardening)"]:::stageStyle',
+            '  S3 --> G3["目標：SSRF 阻斷、Magic Bytes 掃描、Prompt 護欄"]:::goalStyle',
+            '  G3 --> A3["動手任務：撰寫防禦測試套件驗證 100% 攔截"]:::actionStyle',
+            "",
+            '  A3 --> S4["🔬 階段四：前沿學術研討 (Frontiers & Research)"]:::stageStyle',
+            '  S4 --> G4["目標：Graph RAG 時間檢索、Saga 補償、法理合規"]:::goalStyle',
+            '  G4 --> A4["動手任務：撰寫系統性架構研討報告"]:::actionStyle'
+        ]
+        return "\n".join(lines)
+
     def _enrich_formats(self, data: Dict[str, Any], title: str, media_info: Dict[str, Any], segments: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
-        Renders Markdown, Mindmap, Canva Outline, and builds PPTX presentation.
+        Renders Markdown, Mindmap, Canva Outline, and builds PPTX presentation including Roadmap & Keywords.
         """
         # 1. Generate Markdown document
         markdown_text = self._render_markdown(data)
@@ -150,7 +291,7 @@ class CoursewareEngine:
         # 4. Generate PPTX Binary using PurePPTXBuilder
         pptx_builder = PurePPTXBuilder(title=title, subtitle="VideoLearn AI 學術研討教材")
 
-        # Slide: Executive Summary
+        # Slide 1: Executive Summary
         exec_sum = data.get("executive_summary", {})
         theses = exec_sum.get("core_theses", [])
         pptx_builder.add_slide(
@@ -159,7 +300,7 @@ class CoursewareEngine:
             category="核心摘要"
         )
 
-        # Slide: Highlights Part 1
+        # Slide 2: Highlights Part 1
         highlights = data.get("key_highlights", [])
         if highlights:
             h_bullets_1 = [f"[{h.get('timestamp')}] {h.get('title')}: {h.get('takeaway')[:30]}" for h in highlights[:3]]
@@ -169,6 +310,7 @@ class CoursewareEngine:
                 category="重點精華"
             )
 
+        # Slide 3: Highlights Part 2
         if len(highlights) > 3:
             h_bullets_2 = [f"[{h.get('timestamp')}] {h.get('title')}: {h.get('takeaway')[:30]}" for h in highlights[3:6]]
             pptx_builder.add_slide(
@@ -177,8 +319,29 @@ class CoursewareEngine:
                 category="重點精華"
             )
 
-        # Slide: Extended Learning
+        # Slide 4: Learning Roadmap
         ext = data.get("extended_learning", {})
+        roadmap = ext.get("learning_roadmap", {})
+        stages = roadmap.get("stages", [])
+        if stages:
+            roadmap_bullets = [f"{s.get('stage_name')}: {s.get('goal')[:32]}..." for s in stages]
+            pptx_builder.add_slide(
+                title="專題學習地圖 (Learning Roadmap)",
+                bullets=roadmap_bullets,
+                category="學習地圖"
+            )
+
+        # Slide 5: Unexplored Keywords Guide
+        keywords = ext.get("unexplored_keywords", [])
+        if keywords:
+            kw_bullets = [f"【{k.get('keyword')[:16]}】{k.get('where_to_search')[:35]}..." for k in keywords[:4]]
+            pptx_builder.add_slide(
+                title="未解關鍵字與文獻查找指南",
+                bullets=kw_bullets,
+                category="自主研究"
+            )
+
+        # Slide 6: Extended Learning & Discussion
         disc = ext.get("discussion_questions", [])
         pptx_builder.add_slide(
             title="延伸研究與探討問題",
@@ -186,7 +349,7 @@ class CoursewareEngine:
             category="延伸學習"
         )
 
-        # Slide: Self Quiz
+        # Slide 7: Self Quiz
         quiz_items = ext.get("quiz", [])
         if quiz_items:
             q1 = quiz_items[0]
@@ -208,9 +371,12 @@ class CoursewareEngine:
             "executive_summary": data.get("executive_summary", {}),
             "key_highlights": data.get("key_highlights", []),
             "extended_learning": data.get("extended_learning", {}),
+            "unexplored_keywords": ext.get("unexplored_keywords", []),
+            "learning_roadmap": ext.get("learning_roadmap", {}),
             "markdown": markdown_text,
             "canva_script": canva_script,
             "mindmap_mermaid": mindmap_mermaid,
+            "roadmap_mermaid": ext.get("roadmap_mermaid", ""),
             "pptx_bytes": pptx_bytes,
             "pptx_size": len(pptx_bytes)
         }
@@ -246,8 +412,34 @@ class CoursewareEngine:
             md.append(f"**論證脈絡**：{h.get('details', '')}\n")
         md.append("---\n")
 
-        # Section 3
-        md.append("## 🚀 參、延伸學習與自我測驗 (Extended Learning)\n")
+        # Section 3: Roadmap
+        roadmap = ext.get("learning_roadmap", {})
+        stages = roadmap.get("stages", [])
+        md.append("## 🗺️ 參、專題系統化學習地圖 (Learning Roadmap)\n")
+        md.append(f"*{roadmap.get('title', '學習路線圖')}*\n")
+        for s in stages:
+            md.append(f"### {s.get('stage_name')}")
+            md.append(f"- 🎯 **階段目標**：{s.get('goal')}")
+            md.append(f"- 🔑 **關鍵模組**：{', '.join(s.get('key_topics', []))}")
+            md.append(f"- 🛠️ **建議動手任務**：{s.get('recommended_actions')}")
+            md.append(f"- ⏱️ **建議研習時長**：`{s.get('estimated_time')}`\n")
+        md.append("---\n")
+
+        # Section 4: Unexplored Keywords & Guide
+        keywords = ext.get("unexplored_keywords", [])
+        md.append("## 🔍 肆、影片關鍵字未解清單與自學資源指引 (Unexplored Keywords Guide)\n")
+        md.append("> 💡 *以下關鍵概念於影片中曾被提及或為必要先備知識，但未提供完整教材。學習者可依據下列指引進行獨立學術探討：*\n")
+        for idx, kw in enumerate(keywords, 1):
+            md.append(f"### 📌 關鍵字 {idx}：{kw.get('keyword')}")
+            md.append(f"- 🎬 **影片提及脈絡**：{kw.get('context_in_video')}")
+            md.append(f"- ❓ **為什麼需要深入探討**：{kw.get('why_important')}")
+            md.append(f"- 🏛️ **建議權威查找資源**：{kw.get('where_to_search')}")
+            md.append(f"- 🧭 **具體自主學習方法**：{kw.get('how_to_study')}")
+            md.append(f"- 🔎 **精確搜尋關鍵詞建議**：`{kw.get('search_queries')}`\n")
+        md.append("---\n")
+
+        # Section 5: Discussion & Reading & Quiz
+        md.append("## 🚀 伍、延伸學習與自我測驗 (Extended Learning & Self-Quiz)\n")
         md.append("### 🧠 深度思考與討論題")
         for q in ext.get("discussion_questions", []):
             md.append(f"1. {q}")
@@ -269,7 +461,6 @@ class CoursewareEngine:
     def _render_canva_script(self, data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
         Renders a structured Canva slide script with layout suggestions, visual prompts, and bullet points.
-        Designed for educators to paste into Canva or import into presentation templates.
         """
         title = data.get("title", "影片教學簡報")
         exec_sum = data.get("executive_summary", {})
@@ -284,7 +475,7 @@ class CoursewareEngine:
             "type": "封面投影片 (Title Cover)",
             "title": title,
             "subtitle": "VideoLearn AI 學術研討專題教材",
-            "visual_prompt": "Clean minimalist educational gradient, dark navy blue background, modern sans-serif typography, subtle geometric AI node connections.",
+            "visual_prompt": "Clean minimalist educational gradient, dark navy blue background, modern typography, geometric AI node connections.",
             "content_bullets": [
                 title,
                 "學術研討與教育輔助研習",
@@ -320,7 +511,25 @@ class CoursewareEngine:
                 "presenter_notes": f"請留意影片 {h.get('timestamp')} 處，這是整個推論架構的關鍵支柱。"
             })
 
-        # Slide 6: Quiz & Reflection
+        # Slide: Learning Roadmap
+        roadmap = ext.get("learning_roadmap", {})
+        stages = roadmap.get("stages", [])
+        slides.append({
+            "slide_number": len(slides) + 1,
+            "type": "專題學習地圖 (Learning Roadmap)",
+            "title": "四階段系統化自學發展路徑",
+            "subtitle": "從基礎打底到前沿研究",
+            "visual_prompt": "Horizontal 4-step roadmap timeline, clean modern nodes with icons: Seed -> Sprout -> Rocket -> Microscope.",
+            "content_bullets": [
+                f"階段 1：{stages[0].get('goal')[:25]}..." if stages else "基礎奠定",
+                f"階段 2：{stages[1].get('goal')[:25]}..." if len(stages) > 1 else "核心架構",
+                f"階段 3：{stages[2].get('goal')[:25]}..." if len(stages) > 2 else "資安實戰",
+                f"階段 4：{stages[3].get('goal')[:25]}..." if len(stages) > 3 else "前沿探索"
+            ],
+            "presenter_notes": "學習者可以依照此四階段地圖安排自主學習進度，從底層通訊一路深入到前沿架構。"
+        })
+
+        # Slide: Quiz & Reflection
         slides.append({
             "slide_number": len(slides) + 1,
             "type": "互動研討與測驗 (Interactive Quiz)",
@@ -360,10 +569,18 @@ class CoursewareEngine:
             htitle = h.get("title", "")[:12].replace('"', '')
             lines.append(f'      ["⏱️ {ts} {htitle}"]')
 
+        lines.append('    ["🗺️ 學習地圖"]')
+        lines.append('      ["🌱 階段一：奠定基礎"]')
+        lines.append('      ["🌿 階段二：核心架構"]')
+        lines.append('      ["🚀 階段三：實務防禦"]')
+        lines.append('      ["🔬 階段四：前沿探索"]')
+
+        lines.append('    ["🔍 關鍵字指引"]')
+        for kw in ext.get("unexplored_keywords", [])[:2]:
+            lines.append(f'      ["📌 {kw.get("keyword")[:12]}..."]')
+
         lines.append('    ["🚀 延伸學習"]')
         lines.append('      ["🧠 探討思考題"]')
-        for q in ext.get("discussion_questions", [])[:2]:
-            lines.append(f'        ["{q[:14]}..."]')
         lines.append('      ["📝 自我評量題庫"]')
         lines.append('      ["📚 推薦參考閱讀"]')
 

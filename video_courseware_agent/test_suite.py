@@ -119,12 +119,35 @@ class TestVideoLearnAgent(unittest.TestCase):
         # Extended Learning
         self.assertGreater(len(cw["extended_learning"]["quiz"]), 0)
 
+        # 4-Stage Learning Roadmap & Unexplored Keywords
+        self.assertIn("unexplored_keywords", cw)
+        self.assertGreaterEqual(len(cw["unexplored_keywords"]), 4)
+        for kw in cw["unexplored_keywords"]:
+            self.assertIn("keyword", kw)
+            self.assertIn("where_to_search", kw)
+            self.assertIn("how_to_study", kw)
+            self.assertIn("search_queries", kw)
+            self.assertGreater(len(kw["where_to_search"]), 0)
+            self.assertGreater(len(kw["how_to_study"]), 0)
+
+        self.assertIn("learning_roadmap", cw)
+        roadmap = cw["learning_roadmap"]
+        self.assertEqual(len(roadmap["stages"]), 4)
+        for stage in roadmap["stages"]:
+            self.assertIn("stage_name", stage)
+            self.assertIn("goal", stage)
+            self.assertIn("hands_on_tasks", stage)
+            self.assertIn("estimated_time", stage)
+
+        self.assertIn("roadmap_mermaid", cw)
+        self.assertIn("flowchart TD", cw["roadmap_mermaid"])
+
         # Markdown & Canva & Mindmap
         self.assertIn("# 📚", cw["markdown"])
         self.assertGreater(len(cw["canva_script"]), 3)
         self.assertIn("mindmap", cw["mindmap_mermaid"])
 
-        # PPTX
+        # PPTX (Now includes Roadmap & Keywords slides)
         self.assertGreater(cw["pptx_size"], 2000)
 
     # 4. ACADEMIC TUTOR TESTS
@@ -173,6 +196,9 @@ class TestVideoLearnAgent(unittest.TestCase):
         job = resp.json()
         self.assertEqual(job["status"], "completed")
         self.assertIn("job_id", job)
+        self.assertIn("unexplored_keywords", job["courseware"])
+        self.assertIn("learning_roadmap", job["courseware"])
+        self.assertIn("roadmap_mermaid", job["courseware"])
 
         # 5. Export PPTX
         job_id = job["job_id"]
@@ -184,6 +210,54 @@ class TestVideoLearnAgent(unittest.TestCase):
         resp = self.client.get(f"/api/export/subtitles/{job_id}?format=srt")
         self.assertEqual(resp.status_code, 200)
         self.assertIn("-->", resp.text)
+
+    # 6. SOFTWARE RELEASES & CLIENT DOWNLOAD ENDPOINTS
+    def test_software_releases_and_downloads(self):
+        """Verify cross-platform releases catalog and on-the-fly client archive downloads."""
+        # 1. Releases Manifest
+        resp = self.client.get("/api/software/releases")
+        self.assertEqual(resp.status_code, 200)
+        rel_data = resp.json()
+        self.assertEqual(rel_data["status"], "ready")
+        self.assertIn("platforms", rel_data)
+        for platform in ["windows", "macos", "android", "ios"]:
+            self.assertIn(platform, rel_data["platforms"])
+            p_info = rel_data["platforms"][platform]
+            self.assertIn("sha256", p_info)
+            self.assertIn("system_req", p_info)
+            self.assertIn("instructions", p_info)
+
+        # 2. Windows Desktop Client Download
+        resp_win = self.client.get("/api/download/desktop/windows")
+        self.assertEqual(resp_win.status_code, 200)
+        self.assertEqual(resp_win.headers["content-type"], "application/zip")
+        self.assertIn("VideoLearn_AI_v2.0.4_Windows_x64.zip", resp_win.headers["content-disposition"])
+        self.assertGreater(len(resp_win.content), 200)
+
+        # 3. macOS Desktop Client Download
+        resp_mac = self.client.get("/api/download/desktop/macos")
+        self.assertEqual(resp_mac.status_code, 200)
+        self.assertEqual(resp_mac.headers["content-type"], "application/zip")
+        self.assertIn("VideoLearn_AI_v2.0.4_macOS_Universal.zip", resp_mac.headers["content-disposition"])
+        self.assertGreater(len(resp_mac.content), 200)
+
+        # 4. Android Mobile Client Download
+        resp_and = self.client.get("/api/download/mobile/android")
+        self.assertEqual(resp_and.status_code, 200)
+        self.assertEqual(resp_and.headers["content-type"], "application/vnd.android.package-archive")
+        self.assertIn("VideoLearn_AI_v2.0.4_Android.apk", resp_and.headers["content-disposition"])
+        self.assertGreater(len(resp_and.content), 200)
+
+        # 5. iOS Package Download
+        resp_ios = self.client.get("/api/download/mobile/ios")
+        self.assertEqual(resp_ios.status_code, 200)
+        self.assertEqual(resp_ios.headers["content-type"], "application/zip")
+        self.assertIn("VideoLearn_AI_v2.0.4_iOS_Package.zip", resp_ios.headers["content-disposition"])
+        self.assertGreater(len(resp_ios.content), 200)
+
+        # 6. Invalid Platform Request
+        resp_inv = self.client.get("/api/download/desktop/symbian")
+        self.assertEqual(resp_inv.status_code, 400)
 
 
 if __name__ == "__main__":

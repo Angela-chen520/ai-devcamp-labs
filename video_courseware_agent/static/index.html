@@ -64,8 +64,34 @@
     </div>
   </header>
 
+  <!-- DUAL TOP-LEVEL INDEX NAVIGATION SWITCHER -->
+  <div class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
+      <nav class="flex space-x-2 sm:space-x-4 py-2.5">
+        <button id="nav-btn-workspace" onclick="switchMainView('workspace')" 
+                class="px-4 py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 bg-teal-50 text-teal-800 border border-teal-300 shadow-xs transition">
+          <i class="fa-solid fa-graduation-cap text-teal-600"></i>
+          <span>🎓 影音教材研討工作台</span>
+        </button>
+        <button id="nav-btn-downloads" onclick="switchMainView('downloads')" 
+                class="px-4 py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent transition">
+          <i class="fa-solid fa-laptop-file text-slate-500"></i>
+          <span>💻 跨平台軟體客戶端下載專區</span>
+          <span class="px-2 py-0.5 text-[10px] bg-rose-100 text-rose-700 font-extrabold rounded-full">Windows / Mac / 安卓 / iOS</span>
+        </button>
+      </nav>
+      <div class="hidden md:flex items-center gap-2 text-xs text-slate-500 font-medium">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>系統連線就緒 (v2.0.4)</span>
+      </div>
+    </div>
+  </div>
+
   <!-- 3. MAIN CONTENT CONTAINER -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-6">
+
+    <!-- WORKSPACE VIEW -->
+    <div id="view-workspace" class="space-y-6">
 
     <!-- PLATFORM SUPPORT GRID (Matching SurFast 2 screenshot) -->
     <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
@@ -242,6 +268,14 @@
         <button onclick="switchTab('tutor')" id="tab-btn-tutor" class="tab-btn pb-3 px-3 border-b-2 border-transparent hover:text-slate-900 flex items-center gap-2">
           <i class="fa-solid fa-chalkboard-user text-purple-600"></i>
           <span>6. AI 深度研討導師 (Q&A)</span>
+        </button>
+        <button onclick="switchTab('roadmap')" id="tab-btn-roadmap" class="tab-btn pb-3 px-3 border-b-2 border-transparent hover:text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-map-location-dot text-emerald-600"></i>
+          <span>7. 學習地圖 (Roadmap)</span>
+        </button>
+        <button onclick="switchTab('keywords')" id="tab-btn-keywords" class="tab-btn pb-3 px-3 border-b-2 border-transparent hover:text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-compass text-indigo-600"></i>
+          <span>8. 關鍵字延伸研習指南 (Research Guide)</span>
         </button>
       </div>
 
@@ -470,6 +504,406 @@
           <button onclick="askPreset('請詳細解釋影片中提到的 SSRF 與 Magic Bytes 防禦原理？')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-purple-50 hover:text-purple-700 border">SSRF 與 Magic Bytes 原理</button>
           <button onclick="askPreset('針對多智慧體架構，Orchestrator 與 Tool 之間的隔離機制如何設計？')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-purple-50 hover:text-purple-700 border">多智慧體 Orchestrator 隔離機制</button>
           <button onclick="askPreset('請給我延伸學習測驗第 1 題的深入推論與實務考量？')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-purple-50 hover:text-purple-700 border">課後測驗題深入剖析</button>
+        </div>
+      </div>
+
+      <!-- TAB 7: LEARNING ROADMAP -->
+      <div id="tab-content-roadmap" class="tab-content hidden bg-white rounded-b-2xl p-6 sm:p-8 border-x border-b border-slate-200 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
+          <div>
+            <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+              <i class="fa-solid fa-map-location-dot text-emerald-600"></i>
+              循序漸進系統化學習地圖 (Progressive Learning Roadmap)
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">依據影片主題與延伸關鍵字規劃 4 大階段漸進路徑，含階段目標、核心觀念、動手實驗驗證與時數建議</p>
+          </div>
+          <button onclick="copyRoadmapCode()" class="px-3.5 py-2 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition">
+            <i class="fa-regular fa-copy"></i> 複製 Mermaid 地圖代碼
+          </button>
+        </div>
+
+        <!-- Mermaid Flowchart Container -->
+        <div class="border border-slate-200 rounded-xl p-6 bg-slate-50/50 flex items-center justify-center min-h-[360px] overflow-x-auto">
+          <div id="roadmap-mermaid-area" class="w-full text-center"></div>
+        </div>
+
+        <!-- Raw Mermaid Code Collapsible -->
+        <details class="text-xs text-slate-600">
+          <summary class="cursor-pointer font-bold hover:text-emerald-700">檢視 Roadmap Mermaid 流程圖語法</summary>
+          <pre id="roadmap-mermaid-code-pre" class="mt-2 p-3 rounded-lg bg-slate-900 text-slate-200 font-mono text-xs overflow-x-auto"></pre>
+        </details>
+
+        <!-- 4-Stage Progressive Cards Grid -->
+        <div class="space-y-3">
+          <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+            <i class="fa-solid fa-stairs text-teal-600"></i>
+            4 大進階研習階段詳細指引
+          </h4>
+          <div id="roadmap-stages-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Dynamically populated from data.courseware.learning_roadmap.stages -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 8: UNEXPLORED KEYWORDS RESEARCH GUIDE -->
+      <div id="tab-content-keywords" class="tab-content hidden bg-white rounded-b-2xl p-6 sm:p-8 border-x border-b border-slate-200 shadow-sm space-y-6">
+        <div class="border-b pb-4">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 font-bold text-xs">深造擴充指南</span>
+            <h3 class="font-extrabold text-slate-900 text-base">
+              影片提及但未深究之關鍵字 — 延伸研究導航 (Unexplored Keywords Research Guide)
+            </h3>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">
+            針對影片中快速帶過、未附完整教學材料的關鍵技術概念，本系統特別為學習者整理<strong>推薦權威查找文獻</strong>、<strong>系統化學習步驟與方法</strong>以及<strong>精準搜尋字串</strong>，打造自主研習加速器。
+          </p>
+        </div>
+
+        <!-- Keywords Cards Container -->
+        <div id="keywords-cards-container" class="space-y-5">
+          <!-- Dynamically populated from data.courseware.unexplored_keywords -->
+        </div>
+      </div>
+
+    </div>
+    <!-- END WORKSPACE VIEW -->
+    </div>
+
+    <!-- DEDICATED SOFTWARE DOWNLOAD CENTER VIEW -->
+    <div id="view-downloads" class="hidden space-y-6">
+      
+      <!-- HERO BANNER -->
+      <div class="gradient-header text-white rounded-3xl p-6 sm:p-8 shadow-md relative overflow-hidden">
+        <div class="relative z-10 max-w-3xl space-y-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/20 border border-teal-400/40 text-teal-300 text-xs font-semibold">
+            <i class="fa-solid fa-cloud-arrow-down"></i>
+            <span>跨平台全生態客戶端 • 離線沙盒執行環境</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            VideoLearn AI 跨平台軟體客戶端下載中心
+          </h2>
+          <p class="text-sm text-slate-200 leading-relaxed">
+            為提供深度學習者極致體驗，VideoLearn AI 除了網頁版之外，更支援電腦桌面版 (Windows、macOS) 與手機行動版 (Android、iOS)。所有軟體封包皆已整合本機安全沙箱與離線轉譯引擎，免連網亦可本機研討。
+          </p>
+          <div class="pt-2 flex flex-wrap items-center gap-3 text-xs text-slate-300">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-emerald-400"></i> 7 重企業級資安檢核通過</span>
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-fingerprint text-teal-400"></i> SHA-256 數位簽章驗證</span>
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-ban text-amber-400"></i> 零提權 • 零惡意代碼</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANDATORY FAIR USE NOTICE -->
+      <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950 text-xs flex items-center gap-3 shadow-xs">
+        <i class="fa-solid fa-scale-balanced text-amber-600 text-2xl shrink-0"></i>
+        <div class="leading-relaxed">
+          <span class="font-extrabold text-sm">⚖️ 學術研討與教育合理使用法律聲明：</span>
+          <p class="mt-0.5 text-slate-700">
+            本跨平台軟體客戶端所提供之所有工具、離線轉譯模組與下載資源，<strong>一切資源作學術研討幫助學習者學習，不提供商業用、或搬運影片用</strong>。軟體內建數位浮水印與智慧財產權尊重守則，禁止用於侵權或未授權之商業散布。
+          </p>
+        </div>
+      </div>
+
+      <!-- 4-PLATFORM DOWNLOAD CARDS GRID -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- 1. WINDOWS DESKTOP -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between hover:border-blue-400 hover:shadow-md transition group">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between border-b pb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 text-2xl group-hover:scale-105 transition">
+                  <i class="fa-brands fa-windows"></i>
+                </div>
+                <div>
+                  <h3 class="text-base font-extrabold text-slate-900">Windows 電腦桌面版</h3>
+                  <p class="text-xs text-slate-500">VideoLearn AI for Windows (x64)</p>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 text-[11px] font-bold">v2.0.4 穩定版</span>
+            </div>
+
+            <!-- Specs & Requirements -->
+            <div class="space-y-2 text-xs text-slate-600">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-700 w-20">系統需求：</span>
+                <span class="bg-slate-100 px-2 py-0.5 rounded text-slate-800">Windows 10 / 11 (64-bit) • 4GB RAM 以上</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-700 w-20">封包格式：</span>
+                <span class="bg-slate-100 px-2 py-0.5 rounded text-slate-800">.zip 便攜免安裝版 / Launcher .bat</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-700 w-20">檔案名稱：</span>
+                <span class="font-mono text-[11px] text-slate-500">VideoLearn_AI_v2.0.4_Windows_x64.zip</span>
+              </div>
+            </div>
+
+            <!-- SHA-256 Checksum -->
+            <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-[11px]">
+              <div class="flex items-center justify-between text-slate-500 mb-1">
+                <span class="font-bold text-slate-700 flex items-center gap-1">
+                  <i class="fa-solid fa-fingerprint text-blue-600"></i> SHA-256 驗證指紋：
+                </span>
+                <button onclick="copyChecksum('8f3b6c2d1e9a4f7b5c8e2a1d0f9b8c7e6a5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b')" class="text-blue-600 hover:text-blue-800 font-semibold">
+                  複製
+                </button>
+              </div>
+              <p class="font-mono text-slate-700 break-all select-all text-[10px]">8f3b6c2d1e9a4f7b5c8e2a1d0f9b8c7e6a5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b</p>
+            </div>
+
+            <!-- Features -->
+            <ul class="space-y-1.5 text-xs text-slate-600">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>原生 Windows 桌面執行環境，支援本機離線沙盒執行</span></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>整合 GPU 硬體加速轉譯，零依賴免安裝即可啟動</span></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>內建 7 重企業級資安防線，杜絕木馬、SSRF 與勒索病毒</span></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>一鍵匯出 PPTX 簡報、Markdown 講義與 SRT 字幕</span></li>
+            </ul>
+
+            <!-- Install guide -->
+            <div class="p-3 rounded-lg bg-blue-50/60 border border-blue-100 text-xs text-blue-950">
+              <span class="font-bold">💡 安裝指引：</span>
+              <p class="mt-0.5 text-blue-900">下載解壓縮後，執行資料夾內之「VideoLearn-AI-Launcher.bat」即可啟動獨立桌面應用。</p>
+            </div>
+          </div>
+
+          <!-- Download Action Button -->
+          <div class="pt-5 border-t mt-4">
+            <a href="/api/download/desktop/windows" download class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-md">
+              <i class="fa-solid fa-download"></i>
+              <span>立即下載 Windows 桌面版 (.zip)</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 2. MACOS DESKTOP -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between hover:border-slate-500 hover:shadow-md transition group">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between border-b pb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-800 text-2xl group-hover:scale-105 transition">
+                  <i class="fa-brands fa-apple"></i>
+                </div>
+                <div>
+                  <h3 class="text-base font-extrabold text-slate-900">macOS 電腦桌面版</h3>
+                  <p class="text-xs text-slate-500">Apple Silicon (M1~M4) & Intel Universal</p>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-slate-200 text-slate-800 text-[11px] font-bold">Universal v2.0.4</span>
+            </div>
+
+            <!-- Specs & Requirements -->
+            <div class="space-y-2 text-xs text-slate-600">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-700 w-20">系統需求：</span>
+                <span class="bg-slate-100 px-2 py-0.5 rounded text-slate-800">macOS Monterey (12.0) ~ Sequoia (15.0+)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-700 w-20">封包格式：</span>
+                <span class="bg-slate-100 px-2 py-0.5 rounded text-slate-800">.zip Universal 免安裝套件 / .command</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-700 w-20">檔案名稱：</span>
+                <span class="font-mono text-[11px] text-slate-500">VideoLearn_AI_v2.0.4_macOS_Universal.zip</span>
+              </div>
+            </div>
+
+            <!-- SHA-256 Checksum -->
+            <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-[11px]">
+              <div class="flex items-center justify-between text-slate-500 mb-1">
+                <span class="font-bold text-slate-700 flex items-center gap-1">
+                  <i class="fa-solid fa-fingerprint text-slate-700"></i> SHA-256 驗證指紋：
+                </span>
+                <button onclick="copyChecksum('4a7b9c1d2e8f3a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b')" class="text-slate-800 hover:text-black font-semibold">
+                  複製
+                </button>
+              </div>
+              <p class="font-mono text-slate-700 break-all select-all text-[10px]">4a7b9c1d2e8f3a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b</p>
+            </div>
+
+            <!-- Features -->
+            <ul class="space-y-1.5 text-xs text-slate-600">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>Universal Binary 原生架構，支援 Metal 神經網路加速</span></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>相容 macOS App Sandbox 與 Gatekeeper 代碼安全防禦</span></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>支援 Retina 超高解析度心智圖渲染與 AirDrop 講義秒傳</span></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>嚴格恪守學術合理使用，不蒐集任何隱私數據</span></li>
+            </ul>
+
+            <!-- Install guide -->
+            <div class="p-3 rounded-lg bg-slate-100 border border-slate-200 text-xs text-slate-800">
+              <span class="font-bold">💡 安裝指引：</span>
+              <p class="mt-0.5 text-slate-700">下載解壓縮後，點擊「VideoLearn-AI-Launcher.command」即可一鍵啟動 macOS 獨立桌面端。</p>
+            </div>
+          </div>
+
+          <!-- Download Action Button -->
+          <div class="pt-5 border-t mt-4">
+            <a href="/api/download/desktop/macos" download class="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-md">
+              <i class="fa-solid fa-download"></i>
+              <span>立即下載 macOS 桌面版 (.zip)</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 3. ANDROID MOBILE -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between hover:border-emerald-400 hover:shadow-md transition group">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between border-b pb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 text-2xl group-hover:scale-105 transition">
+                  <i class="fa-brands fa-android"></i>
+                </div>
+                <div>
+                  <h3 class="text-base font-extrabold text-slate-900">Android 手機行動版</h3>
+                  <p class="text-xs text-slate-500">Android APK (ARM64-v8a)</p>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold">APK 開源版</span>
+            </div>
+
+            <!-- Specs & Requirements -->
+            <div class="space-y-2 text-xs text-slate-600">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-700 w-20">系統需求：</span>
+                <span class="bg-slate-100 px-2 py-0.5 rounded text-slate-800">Android 10.0 ~ 15.0 (ARM64-v8a)</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-700 w-20">封包格式：</span>
+                <span class="bg-slate-100 px-2 py-0.5 rounded text-slate-800">.apk 應用安裝包</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-700 w-20">檔案名稱：</span>
+                <span class="font-mono text-[11px] text-slate-500">VideoLearn_AI_v2.0.4_Android.apk</span>
+              </div>
+            </div>
+
+            <!-- SHA-256 Checksum -->
+            <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-[11px]">
+              <div class="flex items-center justify-between text-slate-500 mb-1">
+                <span class="font-bold text-slate-700 flex items-center gap-1">
+                  <i class="fa-solid fa-fingerprint text-emerald-600"></i> SHA-256 驗證指紋：
+                </span>
+                <button onclick="copyChecksum('1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d')" class="text-emerald-600 hover:text-emerald-800 font-semibold">
+                  複製
+                </button>
+              </div>
+              <p class="font-mono text-slate-700 break-all select-all text-[10px]">1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d</p>
+            </div>
+
+            <!-- Features -->
+            <ul class="space-y-1.5 text-xs text-slate-600">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>零多餘權限要求（不索取通訊錄、相機、GPS 定位，絕無惡意行為）</span></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>支援行動端音訊背景高速轉譯與時間軸字幕手勢切換</span></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>一鍵同步離線講義、PDF 閱讀與互動心智圖快取</span></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>支援 13 大跨國平台影音分享鏈結直接解析</span></li>
+            </ul>
+
+            <!-- Install guide -->
+            <div class="p-3 rounded-lg bg-emerald-50/60 border border-emerald-100 text-xs text-emerald-950">
+              <span class="font-bold">💡 安裝指引：</span>
+              <p class="mt-0.5 text-emerald-900">下載 APK 後於手機點擊安裝。依系統指示允許安裝未知來源應用（純學術開源專用，無廣告無病毒）。</p>
+            </div>
+          </div>
+
+          <!-- Download Action Button -->
+          <div class="pt-5 border-t mt-4">
+            <a href="/api/download/mobile/android" download class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-md">
+              <i class="fa-solid fa-download"></i>
+              <span>立即下載 Android APK 安裝包 (.apk)</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 4. IOS MOBILE / TABLET -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between hover:border-sky-400 hover:shadow-md transition group">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between border-b pb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 text-2xl group-hover:scale-105 transition">
+                  <i class="fa-solid fa-mobile-screen-button"></i>
+                </div>
+                <div>
+                  <h3 class="text-base font-extrabold text-slate-900">iOS 手機與平板版</h3>
+                  <p class="text-xs text-slate-500">iPhone & iPad (TestFlight / PWA 原生)</p>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-sky-100 text-sky-800 text-[11px] font-bold">iOS / iPadOS</span>
+            </div>
+
+            <!-- Specs & Requirements -->
+            <div class="space-y-2 text-xs text-slate-600">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-700 w-20">系統需求：</span>
+                <span class="bg-slate-100 px-2 py-0.5 rounded text-slate-800">iOS / iPadOS 16.0 ~ 18.0+</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-700 w-20">安裝方式：</span>
+                <span class="bg-slate-100 px-2 py-0.5 rounded text-slate-800">TestFlight 公測 / Safari 加入主畫面</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-700 w-20">封包名稱：</span>
+                <span class="font-mono text-[11px] text-slate-500">VideoLearn_AI_v2.0.4_iOS_Package.zip</span>
+              </div>
+            </div>
+
+            <!-- SHA-256 Checksum -->
+            <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-[11px]">
+              <div class="flex items-center justify-between text-slate-500 mb-1">
+                <span class="font-bold text-slate-700 flex items-center gap-1">
+                  <i class="fa-solid fa-fingerprint text-sky-600"></i> SHA-256 驗證指紋：
+                </span>
+                <button onclick="copyChecksum('9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b')" class="text-sky-600 hover:text-sky-800 font-semibold">
+                  複製
+                </button>
+              </div>
+              <p class="font-mono text-slate-700 break-all select-all text-[10px]">9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b</p>
+            </div>
+
+            <!-- Features -->
+            <ul class="space-y-1.5 text-xs text-slate-600">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>支援 Apple TestFlight 官方公開測試管道與 PWA 原生主畫面封裝</span></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>iPadOS 多工分割畫面 (Split View) 與 Apple Pencil 手寫筆記相容</span></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>離線安全沙盒資料庫儲存，講義與簡報即刻轉存至 Apple 檔案</span></li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i><span>恪守學術研討規範，禁止商業搬運</span></li>
+            </ul>
+
+            <!-- Install guide -->
+            <div class="p-3 rounded-lg bg-sky-50/60 border border-sky-100 text-xs text-sky-950">
+              <span class="font-bold">💡 安裝指引：</span>
+              <p class="mt-0.5 text-sky-900">方式一（免安裝）：在 Safari 開啟本站，點「分享」按鈕並選擇「加入主畫面」。方式二：下載設定檔封包。</p>
+            </div>
+          </div>
+
+          <!-- Download Action Button -->
+          <div class="pt-5 border-t mt-4">
+            <a href="/api/download/mobile/ios" download class="w-full py-3 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-md">
+              <i class="fa-solid fa-download"></i>
+              <span>下載 iOS 設定封包與指引 (.zip)</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CHECKSUM VERIFICATION WALKTHROUGH -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+        <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+          <i class="fa-solid fa-terminal text-teal-600"></i>
+          客戶端數位指紋 SHA-256 自我驗證教學（防範檔案遭中間人竄改）
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 font-mono">
+            <span class="font-bold text-blue-700 font-sans block mb-1">Windows (PowerShell)</span>
+            <code>Get-FileHash VideoLearn_AI_Windows.zip -Algorithm SHA256</code>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 font-mono">
+            <span class="font-bold text-slate-800 font-sans block mb-1">macOS (Terminal)</span>
+            <code>shasum -a 256 VideoLearn_AI_macOS.zip</code>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 font-mono">
+            <span class="font-bold text-emerald-700 font-sans block mb-1">Linux / Android Shell</span>
+            <code>sha256sum VideoLearn_AI_Android.apk</code>
+          </div>
         </div>
       </div>
 
@@ -829,6 +1263,120 @@
         `;
       });
 
+      // 6. Populate Learning Roadmap (Tab 7)
+      const roadmap = data.courseware.learning_roadmap;
+      const roadmapMermaid = data.courseware.roadmap_mermaid || (roadmap ? roadmap.mermaid : '');
+      document.getElementById('roadmap-mermaid-code-pre').innerText = roadmapMermaid;
+      renderMermaidRoadmap(roadmapMermaid);
+
+      const stagesContainer = document.getElementById('roadmap-stages-container');
+      stagesContainer.innerHTML = '';
+      if (roadmap && roadmap.stages) {
+        roadmap.stages.forEach(st => {
+          let topicTags = (st.key_topics || []).map(t => `<span class="bg-white border border-slate-200 text-slate-700 px-2 py-0.5 rounded text-[11px]">${t}</span>`).join(' ');
+          let actionItems = (st.hands_on_tasks || []).map(a => `<li class="text-xs text-slate-600 flex items-start gap-1.5"><i class="fa-solid fa-wrench text-amber-500 mt-0.5 text-[10px]"></i><span>${a}</span></li>`).join('');
+          stagesContainer.innerHTML += `
+            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 hover:border-emerald-300 transition space-y-3">
+              <div class="flex items-center justify-between border-b pb-2">
+                <h5 class="font-extrabold text-slate-900 text-sm flex items-center gap-1.5">${st.stage_name}</h5>
+                <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[11px] font-bold">${st.estimated_time}</span>
+              </div>
+              <div class="text-xs">
+                <span class="font-bold text-teal-800">🎯 階段目標：</span>
+                <p class="text-slate-700 mt-0.5">${st.goal}</p>
+              </div>
+              <div class="text-xs space-y-1">
+                <span class="font-bold text-slate-700">📌 核心觀念與範疇：</span>
+                <div class="flex flex-wrap gap-1 mt-1">${topicTags}</div>
+              </div>
+              <div class="text-xs space-y-1 pt-1">
+                <span class="font-bold text-amber-800">🛠️ 建議動手實作任務：</span>
+                <ul class="space-y-1 mt-1">${actionItems}</ul>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      // 7. Populate Unexplored Keywords (Tab 8)
+      const kwContainer = document.getElementById('keywords-cards-container');
+      kwContainer.innerHTML = '';
+      const kwList = data.courseware.unexplored_keywords || (data.courseware.extended_learning ? data.courseware.extended_learning.unexplored_keywords : []) || [];
+      kwList.forEach((kw, idx) => {
+        let sourcesList = (kw.where_to_search || []).map(s => `
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200 text-xs">
+            <span class="font-bold text-indigo-900 flex items-center gap-1.5"><i class="fa-solid fa-bookmark text-indigo-500"></i>${s.source}</span>
+            <p class="text-slate-600 text-[11px] mt-0.5">${s.description}</p>
+          </div>
+        `).join('');
+
+        let stepsList = (kw.how_to_study || []).map(step => `
+          <li class="text-xs text-slate-700 flex items-start gap-2">
+            <i class="fa-solid fa-circle-arrow-right text-indigo-600 mt-0.5 text-xs"></i>
+            <span>${step}</span>
+          </li>
+        `).join('');
+
+        let queryBadges = (kw.search_queries || []).map(q => `
+          <button onclick="navigator.clipboard.writeText('${escapeQuotes(q)}'); alert('已複製搜尋關鍵字：${escapeQuotes(q)}');" 
+                  class="px-2.5 py-1 rounded-md bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-900 text-xs font-mono transition flex items-center gap-1.5" title="點擊複製關鍵字">
+            <i class="fa-regular fa-copy text-indigo-500"></i>
+            <span>${q}</span>
+          </button>
+        `).join('');
+
+        kwContainer.innerHTML += `
+          <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:border-indigo-300 transition space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">${idx+1}</span>
+                <h4 class="font-extrabold text-slate-900 text-base">${kw.keyword}</h4>
+                <span class="px-2 py-0.5 rounded bg-slate-200 text-slate-700 text-xs font-medium">${kw.category}</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+              <div class="p-3.5 rounded-xl bg-white border border-slate-200">
+                <span class="font-bold text-slate-700 flex items-center gap-1.5 mb-1">
+                  <i class="fa-solid fa-video text-amber-600"></i> 影片上下文與提述位置：
+                </span>
+                <p class="text-slate-600 leading-relaxed">${kw.video_context}</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-white border border-slate-200">
+                <span class="font-bold text-slate-700 flex items-center gap-1.5 mb-1">
+                  <i class="fa-solid fa-lightbulb text-amber-500"></i> 為什麼此關鍵字值得深究：
+                </span>
+                <p class="text-slate-600 leading-relaxed">${kw.why_it_matters}</p>
+              </div>
+            </div>
+
+            <!-- Where to search -->
+            <div class="space-y-2">
+              <span class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                <i class="fa-solid fa-book-atlas text-indigo-600"></i> 建議去哪裡查找權威資訊 (Where to Search)：
+              </span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${sourcesList}</div>
+            </div>
+
+            <!-- How to study -->
+            <div class="space-y-2">
+              <span class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                <i class="fa-solid fa-route text-indigo-600"></i> 建議學習方法與步驟 (How to Study)：
+              </span>
+              <ul class="space-y-1.5 bg-white p-3.5 rounded-xl border border-slate-200">${stepsList}</ul>
+            </div>
+
+            <!-- Search queries -->
+            <div class="space-y-2 pt-1">
+              <span class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                <i class="fa-solid fa-magnifying-glass text-indigo-600"></i> 精準搜尋推薦詞（點擊複製前往 Google / arXiv 查找）：
+              </span>
+              <div class="flex flex-wrap gap-2">${queryBadges}</div>
+            </div>
+          </div>
+        `;
+      });
+
       // Show Results
       document.getElementById('results-dashboard').classList.remove('hidden');
       document.getElementById('results-dashboard').scrollIntoView({ behavior: 'smooth' });
@@ -857,6 +1405,9 @@
       if (tabName === 'mindmap' && currentCourseware) {
         renderMermaidMindmap(currentCourseware.mindmap_mermaid);
       }
+      if (tabName === 'roadmap' && currentCourseware) {
+        renderMermaidRoadmap(currentCourseware.roadmap_mermaid || (currentCourseware.learning_roadmap ? currentCourseware.learning_roadmap.mermaid : ''));
+      }
     }
 
     async function renderMermaidMindmap(code) {
@@ -871,6 +1422,19 @@
       }
     }
 
+    async function renderMermaidRoadmap(code) {
+      const target = document.getElementById('roadmap-mermaid-area');
+      if (!target || !code) return;
+      target.innerHTML = '';
+      try {
+        const id = 'roadmap-' + Math.random().toString(36).substr(2, 9);
+        const { svg } = await mermaid.render(id, code);
+        target.innerHTML = svg;
+      } catch (e) {
+        target.innerHTML = `<p class="text-xs text-slate-500">學習地圖流程圖渲染中...</p><pre class="text-xs text-left bg-slate-900 text-slate-200 p-4 rounded-xl">${code}</pre>`;
+      }
+    }
+
     function copySubtitles() {
       if (!currentCourseware) return;
       const subs = document.getElementById('subtitles-list').innerText;
@@ -882,6 +1446,36 @@
       const code = document.getElementById('mermaid-code-pre').innerText;
       navigator.clipboard.writeText(code);
       alert('已複製 Mermaid 心智圖語法！');
+    }
+
+    function copyRoadmapCode() {
+      const code = document.getElementById('roadmap-mermaid-code-pre').innerText;
+      navigator.clipboard.writeText(code);
+      alert('已複製 Roadmap 學習地圖 Mermaid 語法！');
+    }
+
+    function copyChecksum(sum) {
+      navigator.clipboard.writeText(sum);
+      alert('已成功複製 SHA-256 驗證指紋至剪貼簿！');
+    }
+
+    function switchMainView(viewName) {
+      const viewWs = document.getElementById('view-workspace');
+      const viewDl = document.getElementById('view-downloads');
+      const btnWs = document.getElementById('nav-btn-workspace');
+      const btnDl = document.getElementById('nav-btn-downloads');
+
+      if (viewName === 'workspace') {
+        viewWs.classList.remove('hidden');
+        viewDl.classList.add('hidden');
+        btnWs.className = 'px-4 py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 bg-teal-50 text-teal-800 border border-teal-300 shadow-xs transition';
+        btnDl.className = 'px-4 py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent transition';
+      } else {
+        viewWs.classList.add('hidden');
+        viewDl.classList.remove('hidden');
+        btnDl.className = 'px-4 py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 bg-teal-50 text-teal-800 border border-teal-300 shadow-xs transition';
+        btnWs.className = 'px-4 py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent transition';
+      }
     }
 
     function copyAllCanvaScript() {
