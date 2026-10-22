@@ -6,6 +6,7 @@ multi-format courseware generation, and interactive AI tutoring.
 
 import os
 import io
+import urllib.parse
 from typing import Dict, Any, List, Optional
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Query
 from fastapi.responses import HTMLResponse, FileResponse, Response, JSONResponse
@@ -180,6 +181,63 @@ async def export_subtitles(job_id: str, format: str = Query("srt", pattern="^(sr
         filepath,
         media_type=media_type,
         filename=f"VideoLearn_Subtitles_{job_id}.{format}"
+    )
+
+
+# ==========================================
+# 影音媒體下載 API (多解析度影片 & 純語音音訊)
+# ==========================================
+
+@app.get("/api/media/options")
+async def get_media_download_options(url: Optional[str] = None):
+    """Returns available video resolutions and audio formats for media downloading."""
+    ingestor = orchestrator.ingestor
+    return ingestor.probe_download_options(url)
+
+
+@app.get("/api/media/download")
+async def download_media(
+    url: str = Query(..., description="影片來源網址"),
+    type: str = Query("video", pattern="^(video|audio)$", description="下載類型：video (影片) 或 audio (純音訊)"),
+    resolution: str = Query("720p", pattern="^(1080p|720p|480p|360p)$", description="影片解析度"),
+    format: str = Query("mp3", pattern="^(mp3|m4a|wav|mp4)$", description="音訊格式或影片格式")
+):
+    """
+    Downloads either multi-resolution video (1080p/720p/480p/360p) or audio-only file (mp3/m4a/wav)
+    with strict cybersecurity validation and academic fair-use headers.
+    """
+    ingestor = orchestrator.ingestor
+    result = ingestor.download_media_artifact(
+        url=url,
+        media_type=type,
+        resolution=resolution,
+        audio_format=format
+    )
+
+    if not result.get("success", False):
+        raise HTTPException(
+            status_code=403 if result.get("security_alert") else 400,
+            detail=result.get("error", "影音媒體下載失敗，請檢查網址或資安限制。")
+        )
+
+    file_path = result["file_path"]
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=500, detail="影音檔案產生過程異常。")
+
+    headers = {
+        "X-Academic-Disclaimer": urllib.parse.quote(SecurityGuard.FAIR_USE_DISCLAIMER),
+        "X-Academic-Disclaimer-EN": SecurityGuard.FAIR_USE_DISCLAIMER_EN,
+        "X-Media-Type": result["media_type"],
+        "X-Media-Format": result["format"]
+    }
+    if result.get("resolution"):
+        headers["X-Media-Resolution"] = result["resolution"]
+
+    return FileResponse(
+        file_path,
+        media_type=result["mime_type"],
+        filename=result["filename"],
+        headers=headers
     )
 
 

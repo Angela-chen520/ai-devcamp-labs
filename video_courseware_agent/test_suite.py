@@ -259,6 +259,73 @@ class TestVideoLearnAgent(unittest.TestCase):
         resp_inv = self.client.get("/api/download/desktop/symbian")
         self.assertEqual(resp_inv.status_code, 400)
 
+    # 7. MULTI-RESOLUTION VIDEO & AUDIO DOWNLOAD TESTS
+    def test_media_download_options_endpoint(self):
+        """Verify media options API provides resolutions, audio formats, and academic disclaimers."""
+        resp = self.client.get("/api/media/options")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data["success"])
+        self.assertIn("video_resolutions", data)
+        self.assertIn("audio_formats", data)
+        
+        # Verify video resolutions
+        res_keys = [r["id"] for r in data["video_resolutions"]]
+        for r in ["1080p", "720p", "480p", "360p"]:
+            self.assertIn(r, res_keys)
+        
+        # Verify audio formats
+        fmt_keys = [f["id"] for f in data["audio_formats"]]
+        for f in ["mp3", "m4a", "wav"]:
+            self.assertIn(f, fmt_keys)
+        
+        # Verify academic notices
+        self.assertIn("academic_notice", data)
+        self.assertIn("一切資源作學術研討幫助學習者學習", data["academic_notice"])
+        self.assertIn("academic_notice_en", data)
+        self.assertIn("All resources are provided solely for academic research", data["academic_notice_en"])
+
+    def test_media_download_artifacts(self):
+        """Verify video multi-resolution and audio-only downloads with fair-use headers."""
+        import urllib.parse
+        sample_url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+        # 1. Video 1080p download
+        resp_vid = self.client.get(f"/api/media/download?url={sample_url}&type=video&resolution=1080p&format=mp4")
+        self.assertEqual(resp_vid.status_code, 200)
+        self.assertEqual(resp_vid.headers["content-type"], "video/mp4")
+        self.assertEqual(resp_vid.headers["x-media-resolution"], "1080p")
+        unquoted_notice = urllib.parse.unquote(resp_vid.headers["x-academic-disclaimer"])
+        self.assertIn("一切資源作學術研討", unquoted_notice)
+        self.assertIn("All resources are provided solely for academic research", resp_vid.headers["x-academic-disclaimer-en"])
+        self.assertGreater(len(resp_vid.content), 32)
+        # Verify ISO BMFF magic bytes (ftyp)
+        self.assertEqual(resp_vid.content[4:8], b"ftyp")
+
+        # 2. Audio MP3 download
+        resp_mp3 = self.client.get(f"/api/media/download?url={sample_url}&type=audio&format=mp3")
+        self.assertEqual(resp_mp3.status_code, 200)
+        self.assertEqual(resp_mp3.headers["content-type"], "audio/mpeg")
+        unquoted_mp3 = urllib.parse.unquote(resp_mp3.headers["x-academic-disclaimer"])
+        self.assertIn("一切資源作學術研討", unquoted_mp3)
+        self.assertGreater(len(resp_mp3.content), 10)
+        # Verify ID3v2 header magic bytes
+        self.assertEqual(resp_mp3.content[:3], b"ID3")
+
+        # 3. Audio WAV download
+        resp_wav = self.client.get(f"/api/media/download?url={sample_url}&type=audio&format=wav")
+        self.assertEqual(resp_wav.status_code, 200)
+        self.assertEqual(resp_wav.headers["content-type"], "audio/wav")
+        unquoted_wav = urllib.parse.unquote(resp_wav.headers["x-academic-disclaimer"])
+        self.assertIn("一切資源作學術研討", unquoted_wav)
+        # Verify RIFF WAVE header magic bytes
+        self.assertEqual(resp_wav.content[:4], b"RIFF")
+        self.assertEqual(resp_wav.content[8:12], b"WAVE")
+
+        # 4. Security guardrail: SSRF attack blocked
+        resp_ssrf = self.client.get("/api/media/download?url=http://127.0.0.1:8000/internal&type=video")
+        self.assertEqual(resp_ssrf.status_code, 403)
+
 
 if __name__ == "__main__":
     unittest.main()
