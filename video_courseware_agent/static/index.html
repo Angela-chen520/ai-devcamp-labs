@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VideoLearn AI — 影片智慧教材生成與資安防護系統</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Mermaid.js for Mindmap rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'loose' });
+  </script>
+  <style>
+    @media print {
+      body { background: white !important; color: black !important; }
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      .tab-content { display: block !important; }
+      #tab-markdown { display: block !important; }
+    }
+    .gradient-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f766e 100%);
+    }
+    .badge-glow {
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+  <!-- 1. ACADEMIC FAIR-USE MANDATORY TOP BANNER -->
+  <div class="bg-amber-500 text-slate-950 font-bold px-4 py-2.5 text-center text-sm shadow-md flex items-center justify-center gap-2">
+    <i class="fa-solid fa-scale-balanced text-lg"></i>
+    <span>⚖️ 學術研討與教育合理使用聲明：本系統一切資源作學術研討幫助學習者學習，不提供商業用、或搬運影片用。</span>
+  </div>
+
+  <!-- 2. NAVBAR -->
+  <header class="gradient-header text-white px-6 py-5 shadow-lg">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-teal-500/20 border border-teal-400/40 flex items-center justify-center text-teal-300 text-2xl shadow-inner">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-extrabold tracking-tight flex items-center gap-2">
+            VideoLearn AI
+            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-900/80 text-teal-300 border border-teal-500/50">v2.0 雙重防禦版</span>
+          </h1>
+          <p class="text-xs text-slate-300">多平台影音智慧轉譯 • 精確時間軸字幕 • 多元教材產出 (MD/PDF/PPTX/Canva/心智圖) • 深度研討導師</p>
+        </div>
+      </div>
+
+      <!-- Security Status Badge Button -->
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSecurityModal()" class="px-3.5 py-2 rounded-lg bg-emerald-950/60 border border-emerald-500/50 text-emerald-300 text-xs font-semibold hover:bg-emerald-900/60 transition flex items-center gap-2 badge-glow">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>7重企業級資安防線全時防護中</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 3. MAIN CONTENT CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-6">
+
+    <!-- PLATFORM SUPPORT GRID (Matching SurFast 2 screenshot) -->
+    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+        <div class="flex items-center gap-2 text-slate-700 font-bold text-sm">
+          <i class="fa-solid fa-globe text-teal-600"></i>
+          <span>已啟動安全轉譯之 13 大跨國影音平台（符合學術合理研討規範）：</span>
+        </div>
+        <span class="text-xs text-slate-500">自動過濾惡意短網址與釣魚重導向</span>
+      </div>
+      <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-12 gap-2 text-center text-xs">
+        <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center gap-1 hover:border-red-300 transition"><i class="fa-brands fa-youtube text-red-600 text-lg"></i><span class="font-medium text-slate-600">YouTube</span></div>
+        <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center gap-1 hover:border-black transition"><i class="fa-brands fa-tiktok text-black text-lg"></i><span class="font-medium text-slate-600">TikTok</span></div>
+        <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center gap-1 hover:border-blue-300 transition"><i class="fa-brands fa-facebook text-blue-600 text-lg"></i><span class="font-medium text-slate-600">Facebook</span></div>
+        <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center gap-1 hover:border-slate-400 transition"><i class="fa-brands fa-x-twitter text-slate-900 text-lg"></i><span class="font-medium text-slate-600">X / Twitter</span></div>
+        <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center gap-1 hover:border-pink-300 transition"><i class="fa-brands fa-instagram text-pink-600 text-lg"></i><span class="font-medium text-slate-600">Instagram</span></div>
+        <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center gap-1 hover:border-purple-300 transition"><i class="fa-brands fa-twitch text-purple-600 text-lg"></i><span class="font-medium text-slate-600">Twitch</span></div>
+        <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center gap-1 hover:border-sky-300 transition"><i class="fa-solid fa-tv text-sky-500 text-lg"></i><span class="font-medium text-slate-600">Bilibili</span></div>
+        <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center gap-1 hover:border-cyan-300 transition"><i class="fa-brands fa-vimeo text-cyan-600 text-lg"></i><span class="font-medium text-slate-600">Vimeo</span></div>
+        <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center gap-1 hover:border-orange-300 transition"><i class="fa-brands fa-soundcloud text-orange-500 text-lg"></i><span class="font-medium text-slate-600">SoundCloud</span></div>
+        <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center gap-1 hover:border-orange-400 transition"><i class="fa-brands fa-reddit text-orange-600 text-lg"></i><span class="font-medium text-slate-600">Reddit</span></div>
+        <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center gap-1 hover:border-blue-400 transition"><i class="fa-brands fa-linkedin text-blue-700 text-lg"></i><span class="font-medium text-slate-600">LinkedIn</span></div>
+        <div class="p-2 rounded-lg bg-slate-50 border border-slate-200 flex flex-col items-center gap-1 hover:border-red-400 transition"><i class="fa-brands fa-pinterest text-red-600 text-lg"></i><span class="font-medium text-slate-600">Pinterest</span></div>
+      </div>
+    </div>
+
+    <!-- INPUT & CONTROL CARD -->
+    <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm space-y-5">
+      <div class="flex items-center justify-between border-b pb-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-bolt text-amber-500"></i>
+            影音研討來源解析
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">輸入影片網址或直接選擇下方學術精選示範主題，即刻生成多維度教材</p>
+        </div>
+        <!-- Mode switcher -->
+        <div class="flex gap-2">
+          <button id="mode-url-btn" onclick="switchInputMode('url')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-600 text-white shadow-sm">網址解析</button>
+          <button id="mode-file-btn" onclick="switchInputMode('file')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200">本機上傳 (Magic Bytes 掃描)</button>
+        </div>
+      </div>
+
+      <!-- URL INPUT FORM -->
+      <div id="url-input-section" class="space-y-4">
+        <div class="flex flex-col md:flex-row gap-3">
+          <div class="relative flex-1">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-link"></i>
+            </div>
+            <input type="text" id="video-url-input" placeholder="請貼上影片網址（例：https://www.youtube.com/watch?v=... 或 Vimeo、TikTok、Bilibili）" 
+                   class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm">
+          </div>
+          <button onclick="startAnalysis()" id="analyze-btn" class="px-6 py-3 rounded-xl bg-gradient-to-r from-teal-600 to-teal-700 text-white font-bold text-sm hover:from-teal-700 hover:to-teal-800 transition shadow-md flex items-center justify-center gap-2 whitespace-nowrap">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>啟動研討教材分析</span>
+          </button>
+        </div>
+
+        <!-- Quick Sample Badges -->
+        <div class="flex flex-wrap items-center gap-2 pt-1 text-xs text-slate-600">
+          <span class="font-bold text-slate-700">💡 快速示範主題：</span>
+          <button onclick="loadSample('Google ADK 多智慧體架構與企業級資安防禦實務', 'https://www.youtube.com/watch?v=sample_adk_architecture')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-teal-50 hover:text-teal-700 border border-slate-200 transition">
+            1. Google ADK 多智慧體與資安防護
+          </button>
+          <button onclick="loadSample('分散式系統架構演進與高併發非同步設計', 'https://vimeo.com/sample_distributed_systems')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-teal-50 hover:text-teal-700 border border-slate-200 transition">
+            2. 分散式系統與非同步設計
+          </button>
+          <button onclick="loadSample('現代機器學習模型：Transformer 與自注意力機制', 'https://www.bilibili.com/video/sample_transformer_attention')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-teal-50 hover:text-teal-700 border border-slate-200 transition">
+            3. Transformer 自注意力機制
+          </button>
+        </div>
+      </div>
+
+      <!-- FILE UPLOAD FORM (Hidden by default) -->
+      <div id="file-input-section" class="hidden space-y-4">
+        <div class="border-2 border-dashed border-slate-300 hover:border-teal-500 rounded-xl p-8 text-center bg-slate-50/50 transition">
+          <i class="fa-solid fa-cloud-arrow-up text-4xl text-teal-600 mb-3"></i>
+          <p class="text-sm font-semibold text-slate-700">拖曳音訊/影片檔案至此處，或點擊選擇本機檔案</p>
+          <p class="text-xs text-slate-400 mt-1">支援 MP4, M4A, MP3, WAV, WebM（單檔限制 150MB，內建惡意代碼 Magic Bytes 深度檢驗）</p>
+          <input type="file" id="media-file-input" accept="video/mp4,audio/mp4,audio/mpeg,audio/wav,audio/x-m4a,video/webm" class="mt-4 text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer">
+        </div>
+        <button onclick="startFileUpload()" id="upload-btn" class="w-full py-3 rounded-xl bg-teal-600 text-white font-bold text-sm hover:bg-teal-700 transition shadow-md flex items-center justify-center gap-2">
+          <i class="fa-solid fa-shield-virus"></i>
+          <span>進行資安驗證並開始轉譯教材</span>
+        </button>
+      </div>
+
+      <!-- PROCESSING PROGRESS / SECURITY SCREENING STATUS (Hidden initially) -->
+      <div id="processing-box" class="hidden rounded-xl bg-slate-900 text-white p-5 space-y-3">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-bold flex items-center gap-2 text-teal-300">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+            <span id="progress-text">正在進行資安篩檢與多媒體串流轉譯...</span>
+          </span>
+          <span id="progress-pct" class="font-mono text-slate-400">20%</span>
+        </div>
+        <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+          <div id="progress-bar" class="bg-gradient-to-r from-teal-400 to-emerald-400 h-2 transition-all duration-300" style="width: 20%"></div>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 pt-2 text-[11px] text-slate-400">
+          <div id="step-sec" class="flex items-center gap-1.5"><i class="fa-solid fa-check text-emerald-400"></i><span>1. SSRF/注入防禦</span></div>
+          <div id="step-magic" class="flex items-center gap-1.5"><i class="fa-solid fa-check text-emerald-400"></i><span>2. 二進位防毒掃描</span></div>
+          <div id="step-stt" class="flex items-center gap-1.5"><i class="fa-solid fa-spinner fa-spin text-teal-300"></i><span>3. 語音時間軸切分</span></div>
+          <div id="step-cw" class="flex items-center gap-1.5 text-slate-600"><i class="fa-regular fa-circle"></i><span>4. 多格式教材構建</span></div>
+        </div>
+      </div>
+
+      <!-- ERROR / BLOCKED ALERT -->
+      <div id="error-alert" class="hidden p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm flex items-start gap-3">
+        <i class="fa-solid fa-triangle-exclamation text-red-500 text-lg mt-0.5"></i>
+        <div>
+          <h4 class="font-bold">資安防禦或轉譯攔截提醒</h4>
+          <p id="error-message" class="text-xs mt-1">錯誤詳情</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. RESULTS DASHBOARD (Hidden until processed) -->
+    <div id="results-dashboard" class="hidden space-y-6">
+      
+      <!-- Video Information Header Bar -->
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span id="result-platform" class="px-2.5 py-0.5 rounded-md bg-teal-100 text-teal-800 font-bold text-xs">YouTube</span>
+            <span class="text-xs text-slate-400">•</span>
+            <span id="result-duration" class="text-xs text-slate-500"><i class="fa-regular fa-clock mr-1"></i>08:30</span>
+            <span class="text-xs text-slate-400">•</span>
+            <span class="text-xs text-emerald-600 font-medium"><i class="fa-solid fa-shield mr-1"></i>資安稽核通過</span>
+          </div>
+          <h2 id="result-title" class="text-xl font-extrabold text-slate-900">影片教材標題</h2>
+        </div>
+
+        <!-- Quick Export Action Buttons -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="window.print()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1.5">
+            <i class="fa-solid fa-print"></i>
+            <span>列印 / 存為 PDF</span>
+          </button>
+          <a id="btn-download-pptx" href="#" class="px-3.5 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-file-powerpoint"></i>
+            <span>下載 PPTX 簡報</span>
+          </a>
+          <a id="btn-download-md" href="#" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+            <i class="fa-brands fa-markdown"></i>
+            <span>下載 Markdown</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- MULTI-FORMAT TABS NAVIGATION -->
+      <div class="border-b border-slate-200 bg-white rounded-t-2xl px-4 pt-3 flex flex-wrap gap-2 text-sm font-bold text-slate-600">
+        <button onclick="switchTab('markdown')" id="tab-btn-markdown" class="tab-btn pb-3 px-3 border-b-2 border-teal-600 text-teal-700 flex items-center gap-2">
+          <i class="fa-solid fa-book-open"></i>
+          <span>1. 結構化講義 (摘要/重點/延伸)</span>
+        </button>
+        <button onclick="switchTab('subtitles')" id="tab-btn-subtitles" class="tab-btn pb-3 px-3 border-b-2 border-transparent hover:text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-closed-captioning"></i>
+          <span>2. 精確時間軸字幕 (SRT/VTT)</span>
+        </button>
+        <button onclick="switchTab('mindmap')" id="tab-btn-mindmap" class="tab-btn pb-3 px-3 border-b-2 border-transparent hover:text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-diagram-project"></i>
+          <span>3. 互動心智圖 (Mindmap)</span>
+        </button>
+        <button onclick="switchTab('pptx')" id="tab-btn-pptx" class="tab-btn pb-3 px-3 border-b-2 border-transparent hover:text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-file-powerpoint text-orange-600"></i>
+          <span>4. PowerPoint (PPTX) 大綱</span>
+        </button>
+        <button onclick="switchTab('canva')" id="tab-btn-canva" class="tab-btn pb-3 px-3 border-b-2 border-transparent hover:text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-palette text-sky-500"></i>
+          <span>5. Canva 簡報結構腳本</span>
+        </button>
+        <button onclick="switchTab('tutor')" id="tab-btn-tutor" class="tab-btn pb-3 px-3 border-b-2 border-transparent hover:text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-chalkboard-user text-purple-600"></i>
+          <span>6. AI 深度研討導師 (Q&A)</span>
+        </button>
+      </div>
+
+      <!-- TAB 1: STRUCTURED COURSEWARE (MARKDOWN & WEB READING) -->
+      <div id="tab-content-markdown" class="tab-content bg-white rounded-b-2xl p-6 sm:p-8 border-x border-b border-slate-200 shadow-sm space-y-8">
+        
+        <!-- Academic Fair Use Box -->
+        <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-3">
+          <i class="fa-solid fa-scale-balanced text-amber-600 text-xl"></i>
+          <div>
+            <span class="font-bold">學術研討與教育合理使用聲明：</span>
+            <span>一切資源作學術研討幫助學習者學習，不提供商業用、或搬運影片用。</span>
+          </div>
+        </div>
+
+        <!-- Section 1: Executive Summary -->
+        <section class="space-y-4">
+          <div class="flex items-center gap-2 text-teal-800 border-b pb-2">
+            <i class="fa-solid fa-bookmark text-lg"></i>
+            <h3 class="text-lg font-bold">壹、核心摘要 (Executive Summary)</h3>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <span class="font-bold text-slate-700">🎯 目標受眾：</span>
+              <p id="cw-audience" class="text-slate-600 mt-1">資訊相關領域學生、AI 系統架構師、自學者</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <span class="font-bold text-slate-700">🧩 先備知識要求：</span>
+              <p id="cw-prereq" class="text-slate-600 mt-1">基本程式設計與網路架構概念</p>
+            </div>
+          </div>
+          <div class="p-4 rounded-xl bg-teal-50/50 border border-teal-100 text-slate-700 text-sm leading-relaxed">
+            <h4 class="font-bold text-teal-900 mb-1">課程總覽</h4>
+            <p id="cw-overview">本單元透過系統化視角...</p>
+          </div>
+          <div class="space-y-2">
+            <h4 class="font-bold text-slate-800 text-sm">核心觀點總覽 (Core Theses)</h4>
+            <ul id="cw-theses" class="space-y-2 text-sm text-slate-700">
+              <!-- Dynamically populated -->
+            </ul>
+          </div>
+        </section>
+
+        <!-- Section 2: Key Highlights with Timestamps -->
+        <section class="space-y-4">
+          <div class="flex items-center gap-2 text-teal-800 border-b pb-2">
+            <i class="fa-solid fa-lightbulb text-lg"></i>
+            <h3 class="text-lg font-bold">貳、重點精華與時間戳記 (Key Highlights)</h3>
+          </div>
+          <div id="cw-highlights-list" class="space-y-3">
+            <!-- Dynamically populated highlight cards with timestamps -->
+          </div>
+        </section>
+
+        <!-- Section 3: Extended Learning & Quiz -->
+        <section class="space-y-4">
+          <div class="flex items-center gap-2 text-teal-800 border-b pb-2">
+            <i class="fa-solid fa-rocket text-lg"></i>
+            <h3 class="text-lg font-bold">參、延伸學習與自我測驗 (Extended Learning)</h3>
+          </div>
+          <!-- Discussion Questions -->
+          <div class="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-comments text-teal-600"></i>
+              深度思考與專題討論題
+            </h4>
+            <ul id="cw-discussion-list" class="space-y-2 text-sm text-slate-700 list-disc pl-5">
+              <!-- Dynamically populated -->
+            </ul>
+          </div>
+          <!-- Recommended Reading -->
+          <div class="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-book text-teal-600"></i>
+              延伸推薦閱讀與文獻
+            </h4>
+            <ul id="cw-reading-list" class="space-y-2 text-sm text-slate-700">
+              <!-- Dynamically populated -->
+            </ul>
+          </div>
+          <!-- Self Quiz -->
+          <div class="p-5 rounded-xl bg-teal-50/60 border border-teal-200 space-y-4">
+            <h4 class="font-bold text-teal-950 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-clipboard-check text-teal-700"></i>
+              課後自我評量檢測題庫 (附詳細解答解析)
+            </h4>
+            <div id="cw-quiz-list" class="space-y-4">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- TAB 2: ACCURATE TIMECODED SUBTITLES (SRT / VTT) -->
+      <div id="tab-content-subtitles" class="tab-content hidden bg-white rounded-b-2xl p-6 border-x border-b border-slate-200 shadow-sm space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
+          <div>
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+              <i class="fa-solid fa-closed-captioning text-teal-600"></i>
+              精確時間軸字幕軌道 (Speech-to-Text with Millisecond Alignment)
+            </h3>
+            <p class="text-xs text-slate-500">毫秒級時間軸切割，點擊標籤可複製字幕或下載標準 .srt / .vtt 格式</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a id="btn-download-srt" href="#" class="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold transition flex items-center gap-1">
+              <i class="fa-solid fa-download"></i> 下載 SRT
+            </a>
+            <a id="btn-download-vtt" href="#" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold transition flex items-center gap-1">
+              <i class="fa-solid fa-download"></i> 下載 WebVTT
+            </a>
+            <button onclick="copySubtitles()" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition flex items-center gap-1">
+              <i class="fa-regular fa-copy"></i> 複製逐字稿
+            </button>
+          </div>
+        </div>
+
+        <div id="subtitles-list" class="space-y-2 max-h-[500px] overflow-y-auto pr-2">
+          <!-- Dynamically populated subtitle list -->
+        </div>
+      </div>
+
+      <!-- TAB 3: MERMAID INTERACTIVE MINDMAP -->
+      <div id="tab-content-mindmap" class="tab-content hidden bg-white rounded-b-2xl p-6 border-x border-b border-slate-200 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b pb-3">
+          <div>
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+              <i class="fa-solid fa-diagram-project text-teal-600"></i>
+              視覺化核心心智圖 (Interactive Mindmap)
+            </h3>
+            <p class="text-xs text-slate-500">結構化拆解核心摘要、重點精華、延伸研討與合規規範</p>
+          </div>
+          <button onclick="copyMindmapCode()" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1">
+            <i class="fa-regular fa-copy"></i> 複製 Mermaid 代碼
+          </button>
+        </div>
+
+        <!-- Rendered Mermaid Container -->
+        <div class="border border-slate-200 rounded-xl p-6 bg-slate-50/50 flex items-center justify-center min-h-[350px] overflow-x-auto">
+          <div id="mermaid-render-area" class="w-full text-center"></div>
+        </div>
+
+        <!-- Raw Mermaid Syntax Collapsible -->
+        <details class="text-xs text-slate-600">
+          <summary class="cursor-pointer font-bold hover:text-teal-700">檢視 Mermaid 原始語法</summary>
+          <pre id="mermaid-code-pre" class="mt-2 p-3 rounded-lg bg-slate-900 text-slate-200 font-mono text-xs overflow-x-auto"></pre>
+        </details>
+      </div>
+
+      <!-- TAB 4: PPTX PRESENTATION VIEW -->
+      <div id="tab-content-pptx" class="tab-content hidden bg-white rounded-b-2xl p-6 border-x border-b border-slate-200 shadow-sm space-y-5">
+        <div class="flex items-center justify-between border-b pb-3">
+          <div>
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+              <i class="fa-solid fa-file-powerpoint text-orange-600"></i>
+              PowerPoint (.pptx) 簡報大綱與投影片預覽
+            </h3>
+            <p class="text-xs text-slate-500">支援微軟 PowerPoint、Google 簡報、Apple Keynote 原生開啟編輯</p>
+          </div>
+          <a id="btn-download-pptx-tab" href="#" class="px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold transition flex items-center gap-2 shadow-sm">
+            <i class="fa-solid fa-download"></i> 立即下載 .pptx 簡報檔案
+          </a>
+        </div>
+
+        <div id="pptx-slides-preview" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Dynamically populated PPTX slide cards -->
+        </div>
+      </div>
+
+      <!-- TAB 5: CANVA OUTLINE & SCRIPT -->
+      <div id="tab-content-canva" class="tab-content hidden bg-white rounded-b-2xl p-6 border-x border-b border-slate-200 shadow-sm space-y-5">
+        <div class="flex items-center justify-between border-b pb-3">
+          <div>
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+              <i class="fa-solid fa-palette text-sky-500"></i>
+              Canva 簡報結構腳本 (Slide Outline & Visual Prompts)
+            </h3>
+            <p class="text-xs text-slate-500">每頁投影片內建視覺設計提示詞 (Visual Prompt) 與講師備忘錄，可直接貼入 Canva</p>
+          </div>
+          <button onclick="copyAllCanvaScript()" class="px-3.5 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+            <i class="fa-regular fa-copy"></i> 複製全部 Canva 腳本
+          </button>
+        </div>
+
+        <div id="canva-cards-container" class="space-y-4">
+          <!-- Dynamically populated Canva slide blocks -->
+        </div>
+      </div>
+
+      <!-- TAB 6: AI DEEP-DIVE TUTOR (INTERACTIVE CHAT) -->
+      <div id="tab-content-tutor" class="tab-content hidden bg-white rounded-b-2xl p-6 border-x border-b border-slate-200 shadow-sm space-y-4">
+        <div class="border-b pb-3">
+          <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+            <i class="fa-solid fa-chalkboard-user text-purple-600"></i>
+            AI 深度研討導師 (Academic Grounded Q&A)
+          </h3>
+          <p class="text-xs text-slate-500">基於影片逐字稿與教材深度研討，支援追問、觀念思辨與技術細節探討（內建提示詞注入防禦）</p>
+        </div>
+
+        <!-- Chat History Window -->
+        <div id="chat-messages" class="h-96 overflow-y-auto space-y-3 p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm">
+          <div class="flex gap-3">
+            <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
+              導師
+            </div>
+            <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-sm p-4 text-slate-800 shadow-sm max-w-[85%] space-y-1">
+              <p class="font-bold text-xs text-purple-700">AI 深度研討導師</p>
+              <p>您好！我是您的學術研討導師。我已完整理解這部影片的逐字稿與結構化教材。您可以詢問我特定時間軸的論證過程、觀念辨析、延伸技術原理，或是討論課後評量題目！</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Input Form -->
+        <div class="flex gap-2">
+          <input type="text" id="tutor-input" placeholder="請輸入您想深入探討的問題（例：分散式系統中如何權衡一致性與可用性？）..." 
+                 onkeydown="if(event.key==='Enter') sendTutorMessage()"
+                 class="flex-1 px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm">
+          <button onclick="sendTutorMessage()" id="tutor-send-btn" class="px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm transition shadow-md flex items-center gap-2">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>發送提問</span>
+          </button>
+        </div>
+
+        <!-- Recommended questions -->
+        <div class="flex flex-wrap gap-2 text-xs text-slate-500 pt-1">
+          <span>推薦提問：</span>
+          <button onclick="askPreset('請詳細解釋影片中提到的 SSRF 與 Magic Bytes 防禦原理？')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-purple-50 hover:text-purple-700 border">SSRF 與 Magic Bytes 原理</button>
+          <button onclick="askPreset('針對多智慧體架構，Orchestrator 與 Tool 之間的隔離機制如何設計？')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-purple-50 hover:text-purple-700 border">多智慧體 Orchestrator 隔離機制</button>
+          <button onclick="askPreset('請給我延伸學習測驗第 1 題的深入推論與實務考量？')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-purple-50 hover:text-purple-700 border">課後測驗題深入剖析</button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- 5. SECURITY MODAL DIALOG -->
+  <div id="security-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-emerald-600"></i>
+          VideoLearn AI 7 重企業級資安防禦檢核機制
+        </h3>
+        <button onclick="toggleSecurityModal()" class="text-slate-400 hover:text-slate-600 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="space-y-3 text-xs text-slate-700">
+        <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex items-start gap-2.5">
+          <i class="fa-solid fa-check-circle text-emerald-600 mt-0.5"></i>
+          <div>
+            <span class="font-bold text-emerald-950">1. SSRF 伺服端請求偽造防護 (Intranet IP Protection)</span>
+            <p class="text-slate-600 mt-0.5">強制即時解析 URL DNS，阻斷存取 127.0.0.1、10.x、172.16-31.x、192.168.x 及雲端服務 Metadata (169.254.169.254)。</p>
+          </div>
+        </div>
+        <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex items-start gap-2.5">
+          <i class="fa-solid fa-check-circle text-emerald-600 mt-0.5"></i>
+          <div>
+            <span class="font-bold text-emerald-950">2. 二進位檔案 Magic Bytes 特徵碼深度檢驗 (Anti-Malware Scanner)</span>
+            <p class="text-slate-600 mt-0.5">嚴格檢核影音二進位標頭（MP4 ftyp, WebM/MKV, MP3 ID3, WAV RIFF），主動阻斷偽裝成影音的 Windows PE (MZ) 木馬、Linux ELF 病毒與腳本。</p>
+          </div>
+        </div>
+        <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex items-start gap-2.5">
+          <i class="fa-solid fa-check-circle text-emerald-600 mt-0.5"></i>
+          <div>
+            <span class="font-bold text-emerald-950">3. 13 大跨國平台白名單驗證 (Domain Whitelist)</span>
+            <p class="text-slate-600 mt-0.5">嚴格限定 YouTube, TikTok, FB, X, IG, Twitch, Bilibili, Vimeo, SoundCloud, Reddit, LinkedIn, Pinterest 網域，杜絕釣魚網站。</p>
+          </div>
+        </div>
+        <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex items-start gap-2.5">
+          <i class="fa-solid fa-check-circle text-emerald-600 mt-0.5"></i>
+          <div>
+            <span class="font-bold text-emerald-950">4. 指令注入與 Shell 跳脫防禦 (Command Injection Guard)</span>
+            <p class="text-slate-600 mt-0.5">在調用解碼子進程時，過濾 ;, |, &, `, $, 換行符等危險跳脫字元，防止惡意指令注入。</p>
+          </div>
+        </div>
+        <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex items-start gap-2.5">
+          <i class="fa-solid fa-check-circle text-emerald-600 mt-0.5"></i>
+          <div>
+            <span class="font-bold text-emerald-950">5. 提示詞注入與越獄清洗 (Prompt Injection Sanitizer)</span>
+            <p class="text-slate-600 mt-0.5">即時過濾 ignore previous instructions、system prompt leak 等惡意指令，確保 AI 導師安全可控。</p>
+          </div>
+        </div>
+        <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex items-start gap-2.5">
+          <i class="fa-solid fa-check-circle text-emerald-600 mt-0.5"></i>
+          <div>
+            <span class="font-bold text-emerald-950">6. 沙盒進程隔離與無外部特權</span>
+            <p class="text-slate-600 mt-0.5">所有下載與多媒體解碼均運行於非特權沙盒目錄，防止提權逃逸。</p>
+          </div>
+        </div>
+        <div class="p-3 rounded-lg bg-amber-50 border border-amber-200 flex items-start gap-2.5">
+          <i class="fa-solid fa-scale-balanced text-amber-600 mt-0.5"></i>
+          <div>
+            <span class="font-bold text-amber-950">7. 學術倫理與合理使用遵循 (Academic Fair Use Manifest)</span>
+            <p class="text-slate-700 mt-0.5">一切資源作學術研討幫助學習者學習，不提供商業用、或搬運影片用。</p>
+          </div>
+        </div>
+      </div>
+      <div class="text-right">
+        <button onclick="toggleSecurityModal()" class="px-4 py-2 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-slate-800">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. FOOTER -->
+  <footer class="bg-slate-900 text-slate-400 text-xs py-6 mt-12 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+      <p class="text-amber-400 font-bold">⚖️ 學術聲明：本系統一切資源作學術研討幫助學習者學習，不提供商業用、或搬運影片用。</p>
+      <p>VideoLearn AI — Powered by Google ADK & Multi-Agent Architecture • 企業級安全防禦模組已啟動</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    let currentJobId = null;
+    let currentCourseware = null;
+    let chatHistory = [];
+
+    function switchInputMode(mode) {
+      if (mode === 'url') {
+        document.getElementById('url-input-section').classList.remove('hidden');
+        document.getElementById('file-input-section').classList.add('hidden');
+        document.getElementById('mode-url-btn').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-600 text-white shadow-sm';
+        document.getElementById('mode-file-btn').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200';
+      } else {
+        document.getElementById('url-input-section').classList.add('hidden');
+        document.getElementById('file-input-section').classList.remove('hidden');
+        document.getElementById('mode-file-btn').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-600 text-white shadow-sm';
+        document.getElementById('mode-url-btn').className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200';
+      }
+    }
+
+    function toggleSecurityModal() {
+      const modal = document.getElementById('security-modal');
+      modal.classList.toggle('hidden');
+    }
+
+    function loadSample(title, url) {
+      document.getElementById('video-url-input').value = url;
+      startAnalysis(title);
+    }
+
+    async function startAnalysis(customTitle = null) {
+      const url = document.getElementById('video-url-input').value.trim();
+      if (!url) {
+        alert('請先輸入影片網址！');
+        return;
+      }
+
+      showProgress();
+      hideError();
+
+      try {
+        const resp = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: url, custom_title: customTitle })
+        });
+
+        const data = await resp.json();
+        if (!resp.ok) {
+          showError(data.detail || data.error || '解析過程遭資安機制攔截或失敗');
+          hideProgress();
+          return;
+        }
+
+        renderResults(data);
+      } catch (err) {
+        showError('網路連線或系統異常：' + err.message);
+      } finally {
+        hideProgress();
+      }
+    }
+
+    async function startFileUpload() {
+      const fileInput = document.getElementById('media-file-input');
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert('請先選擇影音檔案！');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      showProgress();
+      hideError();
+
+      try {
+        const resp = await fetch('/api/analyze/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await resp.json();
+        if (!resp.ok) {
+          showError(data.detail || data.error || '檔案未通過 Magic Bytes 惡意特徵掃描或轉譯失敗');
+          hideProgress();
+          return;
+        }
+
+        renderResults(data);
+      } catch (err) {
+        showError('檔案上傳或處理異常：' + err.message);
+      } finally {
+        hideProgress();
+      }
+    }
+
+    function showProgress() {
+      const box = document.getElementById('processing-box');
+      box.classList.remove('hidden');
+      document.getElementById('progress-bar').style.width = '30%';
+      document.getElementById('progress-pct').innerText = '30%';
+
+      setTimeout(() => {
+        document.getElementById('progress-bar').style.width = '70%';
+        document.getElementById('progress-pct').innerText = '70%';
+      }, 500);
+    }
+
+    function hideProgress() {
+      document.getElementById('progress-bar').style.width = '100%';
+      document.getElementById('progress-pct').innerText = '100%';
+      setTimeout(() => {
+        document.getElementById('processing-box').classList.add('hidden');
+      }, 400);
+    }
+
+    function showError(msg) {
+      const errBox = document.getElementById('error-alert');
+      document.getElementById('error-message').innerText = msg;
+      errBox.classList.remove('hidden');
+    }
+
+    function hideError() {
+      document.getElementById('error-alert').classList.add('hidden');
+    }
+
+    function renderResults(data) {
+      currentJobId = data.job_id;
+      currentCourseware = data.courseware;
+      chatHistory = [];
+
+      document.getElementById('result-title').innerText = data.title;
+      document.getElementById('result-platform').innerText = data.platform || '串流影音';
+      document.getElementById('result-duration').innerHTML = `<i class="fa-regular fa-clock mr-1"></i>${Math.floor(data.duration/60)} 分鐘`;
+
+      // Download links
+      document.getElementById('btn-download-pptx').href = data.courseware.pptx_download;
+      document.getElementById('btn-download-pptx-tab').href = data.courseware.pptx_download;
+      document.getElementById('btn-download-md').href = data.courseware.markdown_download;
+      document.getElementById('btn-download-srt').href = data.subtitles.srt_download;
+      document.getElementById('btn-download-vtt').href = data.subtitles.vtt_download;
+
+      // 1. Populate Courseware (Markdown tab)
+      const sum = data.courseware.executive_summary;
+      document.getElementById('cw-audience').innerText = sum.target_audience;
+      document.getElementById('cw-prereq').innerText = sum.prerequisites;
+      document.getElementById('cw-overview').innerText = sum.overview;
+
+      const thesesList = document.getElementById('cw-theses');
+      thesesList.innerHTML = '';
+      (sum.core_theses || []).forEach(th => {
+        thesesList.innerHTML += `<li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-teal-600 mt-1 text-xs"></i><span>${th}</span></li>`;
+      });
+
+      const hlList = document.getElementById('cw-highlights-list');
+      hlList.innerHTML = '';
+      (data.courseware.key_highlights || []).forEach(h => {
+        hlList.innerHTML += `
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-teal-300 transition space-y-1.5">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded bg-teal-600 text-white font-mono text-xs font-bold">⏱️ ${h.timestamp}</span>
+              <h5 class="font-bold text-slate-800 text-sm">${h.title}</h5>
+            </div>
+            <p class="text-xs text-slate-700 font-medium">${h.takeaway}</p>
+            <p class="text-xs text-slate-500">${h.details}</p>
+          </div>
+        `;
+      });
+
+      // Populate Discussion & Reading
+      const ext = data.courseware.extended_learning;
+      const discList = document.getElementById('cw-discussion-list');
+      discList.innerHTML = '';
+      (ext.discussion_questions || []).forEach(q => {
+        discList.innerHTML += `<li>${q}</li>`;
+      });
+
+      const readList = document.getElementById('cw-reading-list');
+      readList.innerHTML = '';
+      (ext.recommended_reading || []).forEach(r => {
+        readList.innerHTML += `<li class="flex items-center gap-2"><i class="fa-solid fa-book-bookmark text-teal-600 text-xs"></i><span>${r}</span></li>`;
+      });
+
+      // Populate Quiz
+      const quizList = document.getElementById('cw-quiz-list');
+      quizList.innerHTML = '';
+      (ext.quiz || []).forEach((q, idx) => {
+        let opts = q.options.map(o => `<div class="p-2 rounded bg-white border border-slate-200 text-xs">${o}</div>`).join('');
+        quizList.innerHTML += `
+          <div class="p-4 rounded-xl bg-white border border-teal-200 space-y-2">
+            <h5 class="font-bold text-slate-900 text-xs">第 ${idx+1} 題：${q.question}</h5>
+            <div class="space-y-1">${opts}</div>
+            <div class="p-2.5 rounded bg-teal-50 border border-teal-100 text-xs text-teal-900 mt-2">
+              <span class="font-bold">正確解答：${q.answer}</span>
+              <p class="text-slate-600 mt-0.5">${q.explanation}</p>
+            </div>
+          </div>
+        `;
+      });
+
+      // 2. Populate Subtitles Tab
+      const subList = document.getElementById('subtitles-list');
+      subList.innerHTML = '';
+      (data.subtitles.segments || []).forEach((seg, idx) => {
+        subList.innerHTML += `
+          <div class="p-3 rounded-lg bg-slate-50 border border-slate-200 flex items-start gap-3 hover:bg-teal-50/40 transition text-xs">
+            <span class="font-mono text-slate-400 font-semibold w-8 text-right shrink-0">${idx+1}</span>
+            <span class="px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-mono font-bold shrink-0">${seg.timestamp}</span>
+            <span class="text-slate-800 flex-1 leading-relaxed">${seg.text}</span>
+          </div>
+        `;
+      });
+
+      // 3. Populate Mindmap Tab
+      document.getElementById('mermaid-code-pre').innerText = data.courseware.mindmap_mermaid;
+      renderMermaidMindmap(data.courseware.mindmap_mermaid);
+
+      // 4. Populate PPTX Preview Tab
+      const pptxPreview = document.getElementById('pptx-slides-preview');
+      pptxPreview.innerHTML = `
+        <div class="p-4 rounded-xl bg-slate-900 text-white aspect-video flex flex-col justify-between shadow">
+          <span class="text-[10px] text-teal-400 font-bold uppercase tracking-wider">Slide 1 • 封面投影片</span>
+          <div class="text-center my-auto">
+            <h4 class="font-bold text-base text-white">${data.title}</h4>
+            <p class="text-xs text-teal-300 mt-1">VideoLearn AI 學術研討教材</p>
+          </div>
+          <p class="text-[9px] text-slate-400 text-center">⚖️ 一切資源作學術研討使用</p>
+        </div>
+      `;
+      (data.courseware.key_highlights || []).slice(0, 5).forEach((h, idx) => {
+        pptxPreview.innerHTML += `
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 aspect-video flex flex-col justify-between shadow-sm">
+            <div class="flex items-center justify-between border-b pb-1.5">
+              <span class="text-[10px] text-teal-700 font-bold">Slide ${idx+2} • 重點精華</span>
+              <span class="text-[10px] font-mono text-slate-500">⏱️ ${h.timestamp}</span>
+            </div>
+            <div class="my-auto space-y-1">
+              <h5 class="font-bold text-slate-800 text-xs">${h.title}</h5>
+              <p class="text-[11px] text-slate-600 line-clamp-3">• ${h.takeaway}</p>
+            </div>
+            <p class="text-[9px] text-slate-400">VideoLearn AI • 第 ${idx+2} 頁</p>
+          </div>
+        `;
+      });
+
+      // 5. Populate Canva Tab
+      const canvaContainer = document.getElementById('canva-cards-container');
+      canvaContainer.innerHTML = '';
+      (data.courseware.canva_script || []).forEach((c) => {
+        let bullets = (c.content_bullets || []).map(b => `<li class="text-xs text-slate-700">• ${b}</li>`).join('');
+        canvaContainer.innerHTML += `
+          <div class="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between border-b pb-2">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded bg-sky-600 text-white font-bold text-xs">投影片 ${c.slide_number}</span>
+                <span class="text-xs font-semibold text-slate-600">${c.type}</span>
+              </div>
+              <button onclick="navigator.clipboard.writeText('${escapeQuotes(c.title + '\\n' + c.content_bullets.join('\\n'))}'); alert('已複製第 ${c.slide_number} 頁內容至剪貼簿！');" class="text-xs text-sky-700 hover:text-sky-900 font-semibold flex items-center gap-1">
+                <i class="fa-regular fa-copy"></i> 複製本頁
+              </button>
+            </div>
+            <h4 class="font-bold text-slate-900 text-sm">${c.title}</h4>
+            <ul class="space-y-1 bg-white p-3 rounded-lg border border-slate-200">${bullets}</ul>
+            <div class="p-3 rounded-lg bg-sky-50 border border-sky-100 text-xs text-slate-600">
+              <span class="font-bold text-sky-900"><i class="fa-solid fa-camera mr-1"></i>視覺設計提示詞 (Visual Prompt)：</span>
+              <p class="font-mono text-[11px] text-sky-800 mt-0.5">${c.visual_prompt}</p>
+            </div>
+            <div class="text-xs text-slate-500 italic">
+              <span class="font-semibold text-slate-700">演講備忘錄：</span>${c.presenter_notes}
+            </div>
+          </div>
+        `;
+      });
+
+      // Show Results
+      document.getElementById('results-dashboard').classList.remove('hidden');
+      document.getElementById('results-dashboard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-teal-600', 'text-teal-700');
+        btn.classList.add('border-transparent', 'text-slate-600');
+      });
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+
+      const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+      const activeContent = document.getElementById(`tab-content-${tabName}`);
+
+      if (activeBtn) {
+        activeBtn.classList.remove('border-transparent', 'text-slate-600');
+        activeBtn.classList.add('border-teal-600', 'text-teal-700');
+      }
+      if (activeContent) {
+        activeContent.classList.remove('hidden');
+      }
+
+      if (tabName === 'mindmap' && currentCourseware) {
+        renderMermaidMindmap(currentCourseware.mindmap_mermaid);
+      }
+    }
+
+    async function renderMermaidMindmap(code) {
+      const target = document.getElementById('mermaid-render-area');
+      target.innerHTML = '';
+      try {
+        const id = 'mermaid-' + Math.random().toString(36).substr(2, 9);
+        const { svg } = await mermaid.render(id, code);
+        target.innerHTML = svg;
+      } catch (e) {
+        target.innerHTML = `<p class="text-xs text-slate-500">心智圖渲染中...</p><pre class="text-xs text-left bg-slate-900 text-slate-200 p-4 rounded-xl">${code}</pre>`;
+      }
+    }
+
+    function copySubtitles() {
+      if (!currentCourseware) return;
+      const subs = document.getElementById('subtitles-list').innerText;
+      navigator.clipboard.writeText(subs);
+      alert('已成功複製完整時間軸逐字稿！');
+    }
+
+    function copyMindmapCode() {
+      const code = document.getElementById('mermaid-code-pre').innerText;
+      navigator.clipboard.writeText(code);
+      alert('已複製 Mermaid 心智圖語法！');
+    }
+
+    function copyAllCanvaScript() {
+      if (!currentCourseware) return;
+      let text = JSON.stringify(currentCourseware.canva_script, null, 2);
+      navigator.clipboard.writeText(text);
+      alert('已成功複製全部 Canva 結構腳本 JSON！');
+    }
+
+    function escapeQuotes(str) {
+      return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
+    }
+
+    // TUTOR CHAT LOGIC
+    async function sendTutorMessage() {
+      const input = document.getElementById('tutor-input');
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      appendChatMessage('user', msg);
+      input.value = '';
+
+      chatHistory.push({ role: 'user', content: msg });
+
+      try {
+        const resp = await fetch('/api/tutor/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            job_id: currentJobId || 'default',
+            message: msg,
+            history: chatHistory
+          })
+        });
+
+        const data = await resp.json();
+        appendChatMessage('tutor', data.response, data.citations);
+        chatHistory.push({ role: 'assistant', content: data.response });
+      } catch (err) {
+        appendChatMessage('tutor', '抱歉，系統連線異常，請稍候重試：' + err.message);
+      }
+    }
+
+    function askPreset(q) {
+      document.getElementById('tutor-input').value = q;
+      sendTutorMessage();
+    }
+
+    function appendChatMessage(role, text, citations = []) {
+      const container = document.getElementById('chat-messages');
+      const isUser = role === 'user';
+
+      let citHtml = '';
+      if (citations && citations.length > 0) {
+        citHtml = `<div class="mt-2 pt-2 border-t border-slate-200 text-[11px] text-purple-800">
+          <span class="font-bold"><i class="fa-regular fa-bookmark mr-1"></i>相關時間軸依據：</span>
+          ${citations.map(c => `<span class="inline-block ml-1 bg-purple-100 px-1.5 py-0.5 rounded font-mono">${c.timestamp}</span>`).join('')}
+        </div>`;
+      }
+
+      container.innerHTML += `
+        <div class="flex gap-3 ${isUser ? 'flex-row-reverse' : ''}">
+          <div class="w-8 h-8 rounded-full ${isUser ? 'bg-teal-600' : 'bg-purple-600'} text-white flex items-center justify-center text-xs font-bold shrink-0">
+            ${isUser ? '學員' : '導師'}
+          </div>
+          <div class="bg-white border border-slate-200 rounded-2xl ${isUser ? 'rounded-tr-sm bg-teal-50/50' : 'rounded-tl-sm'} p-4 text-slate-800 shadow-sm max-w-[85%] space-y-1">
+            <p class="font-bold text-xs ${isUser ? 'text-teal-700 text-right' : 'text-purple-700'}">${isUser ? '您' : 'AI 深度研討導師'}</p>
+            <p class="whitespace-pre-line leading-relaxed">${text}</p>
+            ${citHtml}
+          </div>
+        </div>
+      `;
+
+      container.scrollTop = container.scrollHeight;
+    }
+  </script>
+</body>
+</html>

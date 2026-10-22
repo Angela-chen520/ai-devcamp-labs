@@ -17,3 +17,9 @@ ai_devcamp_docs/
 .agents/
 .claude/
 deployment_metadata.json
+deployment_metadata.json.lock
+.bin/
+video_courseware_agent/temp_media/*
+video_courseware_agent/exports/*
+!video_courseware_agent/temp_media/.gitkeep
+!video_courseware_agent/exports/.gitkeep
