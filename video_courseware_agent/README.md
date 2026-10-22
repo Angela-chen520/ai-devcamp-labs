@@ -7,6 +7,19 @@
 
 ---
 
+## 🚀 線上即時展示與體驗 (Live Interactive Demo)
+
+本專案支援兩種零門檻線上體驗方式（無需本機繁複環境配置）：
+
+| 體驗模式 | 支援功能 | 體驗連結 / 啟動方式 |
+|---|---|---|
+| **🌐 GitHub Pages 線上展示模式** | 靜態展示完整雙語介面、3大範例即時解析、心智圖、學習地圖、Canva腳本與 Blob 檔案下載 | [👉 立即開啟 GitHub Pages 線上 Demo](https://angela-chen520.github.io/ai-devcamp-labs/) |
+| **☁️ GitHub Codespaces 完整雲端執行** | 免裝環境直接在雲端啟動完整 FastAPI 後端與真實 AI 代理人工作流 | [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Angela-chen520/ai-devcamp-labs/tree/my-work-2) |
+
+> 💡 **GitHub Pages 設定說明**：本儲存庫根目錄已配置標準 `index.html` 與 `.nojekyll`。前往 GitHub Repo 的 **Settings -> Pages**，將 Build and deployment 的 Source 設為 **Deploy from a branch**，選擇分支 **`my-work-2`** 且目錄選擇 **`/ (root)`** 即可完成發布！
+
+---
+
 ## 🌐 雙語切換支援 (Bilingual Switching Support)
 
 本專案支援**繁體中文 (Traditional Chinese)** 與 **英文 (English)** 雙語環境：

@@ -68,6 +68,24 @@
     </div>
   </header>
 
+  <!-- GITHUB PAGES / OFFLINE DEMO MODE BANNER -->
+  <div id="demo-mode-banner" class="hidden bg-gradient-to-r from-teal-900 via-indigo-950 to-slate-900 text-white text-xs px-6 py-2.5 border-b border-teal-500/30 shadow-inner">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <span class="px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 font-bold border border-teal-400/40 text-[11px] flex items-center gap-1.5 shadow-xs">
+          <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
+          <i class="fa-solid fa-globe"></i>
+          <span data-i18n="demo_mode_badge">GitHub Pages 線上展示模擬模式</span>
+        </span>
+        <span data-i18n="demo_mode_desc" class="text-slate-200">本頁面目前在 GitHub Pages 靜態展示環境中運行。您可以直接點擊下方示範按鈕，體驗完整的 AI 教材解析、雙語切換、投影片大綱、Mermaid 心智圖、學習地圖與跨平台軟體發行中心！</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded bg-white/10 text-teal-200 font-mono text-[10px] border border-white/10">Academic Demo v2.0.4</span>
+      </div>
+    </div>
+  </div>
+
+
   <!-- DUAL TOP-LEVEL INDEX NAVIGATION SWITCHER -->
   <div class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
@@ -1005,6 +1023,10 @@
         nav_btn_downloads: "💻 跨平台軟體客戶端下載專區",
         nav_btn_dl_badge: "Windows / Mac / 安卓 / iOS",
         nav_sys_status: "系統連線就緒 (v2.0.4)",
+        demo_mode_badge: "GitHub Pages 線上展示模擬模式",
+        demo_mode_desc: "本頁面目前在 GitHub Pages 靜態展示環境中運行。您可以直接點選下方【快速示範主題】或輸入任何網址，即可體驗完整的 AI 教材解析、逐字稿時間軸、雙語即時切換、心智圖、學習地圖與跨平台軟體發行中心！若需連線真實 Google Gemini 多智慧體運算，請於本機執行 ./run-videolearn.sh。",
+        demo_offline_notice: "已啟用靜態模擬模式：為您展示即時生成的專業學術教材與學習地圖",
+
 
         platform_grid_title: "已啟動安全轉譯之 13 大跨國影音平台（符合學術合理研討規範）：",
         platform_grid_sub: "自動過濾惡意短網址與釣魚重導向",
@@ -1441,6 +1463,17 @@
       showProgress();
       hideError();
 
+      // Check if running on GitHub Pages or static mode directly
+      if (isGitHubPages) {
+        setTimeout(() => {
+          const mockData = getLocalMockResult(url, customTitle);
+          renderResults(mockData, true);
+          setupBlobDownloads(mockData);
+          hideProgress();
+        }, 800);
+        return;
+      }
+
       try {
         const resp = await fetch('/api/analyze', {
           method: 'POST',
@@ -1448,16 +1481,23 @@
           body: JSON.stringify({ url: url, custom_title: customTitle })
         });
 
-        const data = await resp.json();
         if (!resp.ok) {
+          const data = await resp.json();
           showError(data.detail || data.error || (currentLang === 'zh' ? '解析過程遭資安機制攔截或失敗' : 'Analysis blocked by security filter or failed'));
           hideProgress();
           return;
         }
 
+        const data = await resp.json();
         renderResults(data, true);
       } catch (err) {
-        showError((currentLang === 'zh' ? '網路連線或系統異常：' : 'Network connection or system error: ') + err.message);
+        console.warn('Backend API unavailable, falling back to static offline simulation:', err);
+        // Seamless fallback to demo mode
+        const mockData = getLocalMockResult(url, customTitle);
+        renderResults(mockData, true);
+        setupBlobDownloads(mockData);
+        const banner = document.getElementById('demo-mode-banner');
+        if (banner) banner.classList.remove('hidden');
       } finally {
         hideProgress();
       }
@@ -1941,6 +1981,37 @@
 
       chatHistory.push({ role: 'user', content: msg });
 
+      if (isGitHubPages || !currentJobId || currentJobId.startsWith('demo_')) {
+        setTimeout(() => {
+          let reply = "";
+          let citations = [{ timestamp: "01:15" }];
+          const lower = msg.toLowerCase();
+          if (lower.includes('資安') || lower.includes('security') || lower.includes('防禦')) {
+            reply = currentLang === 'zh' 
+              ? "針對資安防禦，VideoLearn AI 採用嚴格的「七層防線矩陣」：包含 SSRF 阻擋內網穿透、Magic Bytes 二進位特徵防毒掃描、提示詞注入清洗，以及外部副作用動作強制 require_confirmation 人機協同確認。"
+              : "Regarding cybersecurity, VideoLearn AI applies a strict 7-layer defense matrix: blocking intranet SSRF traversal, scanning Magic Bytes against binary malware/executables, sanitizing prompt injections, and requiring confirmation for any external side-effects.";
+            citations = [{ timestamp: "05:40" }];
+          } else if (lower.includes('架構') || lower.includes('agent') || lower.includes('adk')) {
+            reply = currentLang === 'zh'
+              ? "在 Google ADK 架構中，核心原則是分權隔離：Orchestrator（根代理人）只負責決策與狀態會話管理，具體的工作透過 AgentTool 派發給專門的子智慧體（例如 Research Agent 或 Ingestion Agent），避免將 Google Search 等工具混合在單一模型呼叫中。"
+              : "In the Google ADK architecture, the core principle is duty segregation: the Orchestrator manages routing and session state, while specific tasks are delegated via AgentTool to specialized sub-agents, avoiding mixing tools like Google Search in a single model call.";
+            citations = [{ timestamp: "01:15" }];
+          } else if (lower.includes('學習') || lower.includes('roadmap') || lower.includes('地圖') || lower.includes('關鍵字')) {
+            reply = currentLang === 'zh'
+              ? "推薦您依照教材中的「學習地圖」分三階段進修：第一階段掌握基礎 ADK 核心心智模型，第二階段實作資安過濾網，第三階段深入跨平台客戶端封裝與生產部署。此外可參考「未解關鍵字自學指引」探索 A2A 協定與 Model Armor。"
+              : "We recommend following the 3-phase Learning Roadmap: Stage 1 for core ADK mental models, Stage 2 for cyber defense guardrails, and Stage 3 for cross-platform client packaging and production deployment. Also refer to the Unexplored Keywords Guide for A2A protocols and Model Armor.";
+            citations = [{ timestamp: "12:10" }];
+          } else {
+            reply = currentLang === 'zh'
+              ? `這是一個非常具有學術研討價值的提問！根據本影片重點內容，核心關鍵在於結合結構化教學框架與嚴謹的資安防護規範，讓學習者能以最高效率建立系統思維。`
+              : `This is an insightful academic inquiry! Based on the video context, the key takeaway is combining structured pedagogical courseware with rigorous cyber guardrails.`;
+          }
+          appendChatMessage('tutor', reply, citations);
+          chatHistory.push({ role: 'assistant', content: reply });
+        }, 500);
+        return;
+      }
+
       try {
         const resp = await fetch('/api/tutor/chat', {
           method: 'POST',
@@ -1956,7 +2027,12 @@
         appendChatMessage('tutor', data.response, data.citations);
         chatHistory.push({ role: 'assistant', content: data.response });
       } catch (err) {
-        appendChatMessage('tutor', (currentLang === 'zh' ? '抱歉，系統連線異常，請稍候重試：' : 'Sorry, system connection error, please retry later: ') + err.message);
+        console.warn('Tutor API unavailable, switching to local offline response:', err);
+        const reply = currentLang === 'zh'
+          ? "系統目前處於離線展示模式。根據影片逐字稿，這項技術重點在於確保系統的健壯性與人機協同決策。"
+          : "System is in offline showcase mode. Based on video transcripts, this technique emphasizes robustness and human-in-the-loop governance.";
+        appendChatMessage('tutor', reply, [{ timestamp: "01:15" }]);
+        chatHistory.push({ role: 'assistant', content: reply });
       }
     }
 
@@ -2001,6 +2077,348 @@
     window.addEventListener('DOMContentLoaded', () => {
       setLanguage(currentLang);
     });
+  
+    // =========================================================================
+    // GITHUB PAGES / OFFLINE STATIC DEMO SIMULATION ENGINE
+    // =========================================================================
+
+    const isGitHubPages = window.location.hostname.includes('github.io') || 
+                          window.location.protocol === 'file:' || 
+                          window.location.port === '' ||
+                          window.location.hostname === '';
+
+    // Initialize demo banner detection on load
+    window.addEventListener('DOMContentLoaded', () => {
+      if (isGitHubPages) {
+        const banner = document.getElementById('demo-mode-banner');
+        if (banner) banner.classList.remove('hidden');
+        const sysStatus = document.getElementById('nav-sys-status');
+        if (sysStatus) {
+          sysStatus.innerText = currentLang === 'zh' ? '展示模式 (Demo Mode)' : 'Demo Mode (Offline)';
+        }
+      }
+    });
+
+    const DEMO_SAMPLES = {
+      adk: {
+        title: "Google ADK 多智慧體架構與企業級資安防禦實務",
+        platform: "YouTube (GDG DevCamp)",
+        duration: 1248,
+        courseware: {
+          executive_summary: {
+            target_audience: "軟體架構師、AI 工程師、系統資安人員與自學者",
+            prerequisites: "具備 Python 基礎觀念與 RESTful API / 微服務開發概念",
+            overview: "本課程深入探討 Google ADK (Agent Development Kit) 核心設計哲學。透過將多智慧體職責分權、隔離 Google Search 等具副作用之工具，並建立企業級七層資安防禦體系（SSRF 防禦、提示詞注入清洗、沙盒化隔離），建構穩健的高可用 AI 代理人系統。",
+            core_theses: [
+              "單一智慧體不應兼任排程調度與副作用操作，必須透過 Orchestrator 進行 AgentTool 委派分流。",
+              "具副作用之外部執行動作（如社群貼文、資料庫異動）必須配置 require_confirmation 雙重人機驗證。",
+              "七層資安防禦架構是將原型 AI 推進為企業級生產環境的絕對先決條件。"
+            ]
+          },
+          key_highlights: [
+            {
+              timestamp: "01:15",
+              seconds: 75,
+              title: "階段重點 1：Google ADK 架構與角色拆解",
+              summary: "詳解 Root Agent、Specialist Sub-agents 與 AgentTool 之路由機制。",
+              extended_note: "深入理解工作會話 Session State 與 output_key 在跨代理人間之狀態傳遞。",
+              quiz: {
+                question: "在 Google ADK 架構中，為何 Google Search 工具建議獨立於專屬 Sub-agent？",
+                options: ["減少 API 費用", "避免與自訂 Function Tools 在單次模型呼叫中產生架構衝突", "加速轉譯速度", "限制搜尋字數"],
+                answer: "避免與自訂 Function Tools 在單次模型呼叫中產生架構衝突"
+              }
+            },
+            {
+              timestamp: "05:40",
+              seconds: 340,
+              title: "階段重點 2：七層資安防禦縱深",
+              summary: "建構包含 SSRF 防護、Magic Bytes 惡意二進位特徵防毒檢驗、提示詞清洗的防禦體系。",
+              extended_note: "透過 Model Armor 與語意快取機制，保障內部機敏資料不外洩。",
+              quiz: {
+                question: "哪一層資安防線能有效防堵惡意人士上傳偽裝成 mp4 的可執行木馬？",
+                options: ["副檔名比對", "Magic Bytes 二進位特徵掃描", "HTTPS 加密", "CORS 限制"],
+                answer: "Magic Bytes 二進位特徵掃描"
+              }
+            },
+            {
+              timestamp: "12:10",
+              seconds: 730,
+              title: "階段重點 3：跨平台發行與沙盒隔離",
+              summary: "實現 Windows、macOS 桌面啟動器與行動裝置漸進式 Web 應用的無縫發布。",
+              extended_note: "透過本機沙盒環境隔離未受信任的腳本執行，保護使用者終端主機安全。",
+              quiz: {
+                question: "桌面可攜版本提供 SHA-256 數位指紋的主要目的為何？",
+                options: ["加快下載速度", "確保檔案未遭竄改或植入木馬的完整性驗證", "節省磁碟空間", "自動註冊授權"],
+                answer: "確保檔案未遭竄改或植入木馬的完整性驗證"
+              }
+            }
+          ],
+          slides: [
+            { slide_number: 1, type: "封面投影片", title: "Google ADK 企業級多智慧體實務", key_bullets: ["系統架構與路由", "七層資安防線", "跨平台落地交付"] },
+            { slide_number: 2, type: "架構設計", title: "Orchestrator 核心概念", key_bullets: ["Root Agent 負責調度與狀態追蹤", "Specialist 代理人負責特定領域", "避免單一 Agent 承擔過度複雜之職責"] },
+            { slide_number: 3, type: "資安規範", title: "企業級資安防禦矩陣", key_bullets: ["SSRF 內網 IP 阻擋", "Magic Bytes 防毒過濾", "require_confirmation 人機協同審查"] },
+            { slide_number: 4, type: "生產部署", title: "Agent Runtime 容器化", key_bullets: ["Cloud Run 自動彈性擴展", "Secret Manager 憑證安全注入", "BigQuery 審計軌跡稽核"] },
+            { slide_number: 5, type: "總結展望", title: "未來智慧體生態", key_bullets: ["A2A 跨智慧體互通標準", "語意快取節省成本", "全方位持續學習與演進"] }
+          ],
+          canva_script: [
+            { slide_number: 1, type: "開場破題", visual_layout: "畫面中央浮現 Google ADK 與資安盾牌徽章，背景為科技光流動效", narration: "歡迎進入 Google ADK 多智慧體實戰！今天我們將從零解析如何打造企業級 AI Agent，並為它配備七層金鐘罩！", key_bullets: ["多智慧體協同", "七層資安防禦"] },
+            { slide_number: 2, type: "架構解析", visual_layout: "左右分割畫面：左側為 Orchestrator 流程圖，右側為動態資料流傳遞動畫", narration: "在 ADK 中，Orchestrator 是系統的大腦，絕不能讓單一模型承擔所有工具，分權隔離才能確保高可用性。", key_bullets: ["角色職責分權", "Session 狀態隔離"] },
+            { slide_number: 3, type: "實務總結", visual_layout: "展示 Windows 與 macOS 桌面客戶端介面，帶出本機沙盒與學術研討免責聲明", narration: "完成模型訓練與路由後，我們封裝出支援離線沙盒的桌面客戶端，讓學習者安全研討無後顧之憂！", key_bullets: ["安全沙盒", "學術研討合規"] }
+          ],
+          mindmap_mermaid: `mindmap
+  root((Google ADK 實戰))
+    系統架構
+      Orchestrator 調度中樞
+      Specialist 領域代理人
+      Session 狀態隔離
+    資安防護體系
+      SSRF 內網防偽造
+      Magic Bytes 防毒鑑識
+      人機雙重確認機制
+    跨平台發行
+      Windows 桌面客戶端
+      macOS 雙架構原生版
+      Android / iOS PWA
+    教學與評估
+      逐字稿時間戳記
+      學習地圖 Roadmap
+      未解關鍵字自學索引`,
+          learning_roadmap: {
+            phases: [
+              { phase: 1, title: "基礎篇：多智慧體心智模型與 ADK 核心原理", duration: "1 ~ 2 週", description: "掌握 Orchestrator、AgentTool 與狀態管理模式。", key_actions: ["閱讀 Google ADK 官方規範", "實作單一 Root Agent 與簡單 Tool", "觀察 Session State 變化"] },
+              { phase: 2, title: "核心篇：資安防禦縱深與工具隔離實踐", duration: "2 ~ 3 週", description: "建立 7 重資安過濾網，阻止 SSRF 與提示詞惡意注入。", key_actions: ["部署 IP/網域白名單驗證器", "撰寫 Magic Bytes 二進位鑑識邏輯", "為外部寫入動作加入 require_confirmation"] },
+              { phase: 3, title: "企業篇：跨平台發行、效能調優與持續評估", duration: "3 ~ 4 週", description: "封裝可攜桌面版客戶端，建立 BigQuery 稽核軌跡與 Agent 評估機制。", key_actions: ["建立 Windows/Mac 一鍵啟動腳本", "配置 SHA-256 完整性校驗碼", "建立 Eval 基準測試集"] }
+            ]
+          },
+          roadmap_mermaid: `graph TD
+  A["第一階段：ADK 基礎核心 (1-2 週)"] --> B["第二階段：資安縱深防禦 (2-3 週)"]
+  B --> C["第三階段：跨平台客戶端發行 (3-4 週)"]
+  C --> D["第四階段：雲端容器化與評估落地 (持續)"]
+  classDef stage fill:#f0fdfa,stroke:#0d9488,stroke-width:2px,color:#134e4a;
+  class A,B,C,D stage;`,
+          unexplored_keywords: [
+            {
+              keyword: "A2A Protocol (Agent-to-Agent)",
+              context_in_video: "影片在討論多智慧體跨系統協作時提及，但未展開具體協定通訊封包格式。",
+              why_learn: "A2A 是未來不同雲端供應商智慧體相互發現、通訊與授權的核心工業標準。",
+              roadmap_step: "建議於「企業篇：跨系統整合」階段研讀。",
+              self_study_links: ["https://google.github.io/adk-docs/", "https://github.com/google/adk"],
+              practice_suggestions: ["嘗試定義跨 Agent 的 JSON-RPC 訊息結構", "模擬二個獨立代理人的握手與憑證交換"]
+            },
+            {
+              keyword: "Model Armor (Vertex AI)",
+              context_in_video: "影片提到了在提示詞注入防禦中可運用 Model Armor 進行機敏過濾。",
+              why_learn: "能自動過濾使用者輸入中包含的 PII 個資、仇恨言論或惡意越獄指令，降低治理風險。",
+              roadmap_step: "建議於「核心篇：資安防禦縱深」階段實作。",
+              self_study_links: ["https://cloud.google.com/security/products/model-armor", "https://owasp.org/www-project-top-10-for-large-language-model-applications/"],
+              practice_suggestions: ["配置一套敏感詞與正規表示式攔截規則", "編寫越獄提示詞測試防禦強度"]
+            },
+            {
+              keyword: "Semantic Cache (語意快取)",
+              context_in_video: "講者提及透過快取可大幅降低大語言模型推論費用與延遲。",
+              why_learn: "高併發系統中，有 30%~50% 的使用者詢問語意相似，語意快取能省下巨額成本。",
+              roadmap_step: "建議於「企業篇：效能調優」深入探索。",
+              self_study_links: ["https://redis.io/solutions/semantic-caching/", "https://qdrant.tech/articles/semantic-search/"],
+              practice_suggestions: ["利用向量嵌入模型 (Embedding) 比對問題相似度", "設計快取失效與命中閾值"]
+            }
+          ],
+          markdown: `# 📚 Google ADK 多智慧體架構與企業級資安防禦實務 — 專題研討教材 / Specialized Courseware & Research Notes
+
+> ⚖️ **學術研討聲明 / Academic Fair Use Notice**：  
+> 一切資源作學術研討幫助學習者學習，不提供商業用、或搬運影片用  
+> *All resources are provided solely for academic research and educational study to assist learners; commercial use or video piracy/re-uploading is strictly prohibited.*
+
+---
+
+## 📖 壹、核心摘要 / Executive Summary
+
+- 🎯 **目標受眾 / Target Audience**：軟體架構師、AI 工程師、系統資安人員與自學者
+- 🧩 **先備知識 / Prerequisites**：具備 Python 基礎觀念與 RESTful API / 微服務開發概念
+
+### 課程總覽 / Course Overview
+本課程深入探討 Google ADK (Agent Development Kit) 核心設計哲學。透過將多智慧體職責分權、隔離 Google Search 等具副作用之工具，並建立企業級七層資安防禦體系（SSRF 防禦、提示詞注入清洗、沙盒化隔離），建構穩健的高可用 AI 代理人系統。
+
+### 核心觀點清單 / Core Theses & Key Concepts
+- 💡 單一智慧體不應兼任排程調度與副作用操作，必須透過 Orchestrator 進行 AgentTool 委派分流。
+- 💡 具副作用之外部執行動作（如社群貼文、資料庫異動）必須配置 require_confirmation 雙重人機驗證。
+- 💡 七層資安防禦架構是將原型 AI 推進為企業級生產環境的絕對先決條件。
+
+---
+
+## 💡 貳、重點精華與時間戳記 / Key Highlights & Timestamps
+
+### 📍 [01:15] 階段重點 1：Google ADK 架構與角色拆解
+- **內容精要**：詳解 Root Agent、Specialist Sub-agents 與 AgentTool 之路由機制。
+- **延伸思考**：深入理解工作會話 Session State 與 output_key 在跨代理人間之狀態傳遞。
+- **自我測驗 / Checkpoint Quiz**：
+  - *問題*：在 Google ADK 架構中，為何 Google Search 工具建議獨立於專屬 Sub-agent？
+  - *正確解答*：避免與自訂 Function Tools 在單次模型呼叫中產生架構衝突
+
+### 📍 [05:40] 階段重點 2：七層資安防禦縱深
+- **內容精要**：建構包含 SSRF 防護、Magic Bytes 惡意二進位特徵防毒檢驗、提示詞清洗的防禦體系。
+- **延伸思考**：透過 Model Armor 與語意快取機制，保障內部機敏資料不外洩。
+- **自我測驗 / Checkpoint Quiz**：
+  - *問題*：哪一層資安防線能有效防堵惡意人士上傳偽裝成 mp4 的可執行木馬？
+  - *正確解答*：Magic Bytes 二進位特徵掃描
+
+### 📍 [12:10] 階段重點 3：跨平台發行與沙盒隔離
+- **內容精要**：實現 Windows、macOS 桌面啟動器與行動裝置漸進式 Web 應用的無縫發布。
+- **延伸思考**：透過本機沙盒環境隔離未受信任的腳本執行，保護使用者終端主機安全。
+- **自我測驗 / Checkpoint Quiz**：
+  - *問題*：桌面可攜版本提供 SHA-256 數位指紋的主要目的為何？
+  - *正確解答*：確保檔案未遭竄改或植入木馬的完整性驗證
+
+---
+
+## 🗺️ 參、延伸學習與學習地圖 / Learning Roadmap
+
+### 學習階段進程 / Multi-Phase Curriculum
+1. **第一階段：基礎篇：多智慧體心智模型與 ADK 核心原理**（建議時程：1 ~ 2 週）
+   - *階段目標*：掌握 Orchestrator、AgentTool 與狀態管理模式。
+   - *推薦實作*：閱讀 Google ADK 官方規範；實作單一 Root Agent 與簡單 Tool；觀察 Session State 變化。
+2. **第二階段：核心篇：資安防禦縱深與工具隔離實踐**（建議時程：2 ~ 3 週）
+   - *階段目標*：建立 7 重資安過濾網，阻止 SSRF 與提示詞惡意注入。
+   - *推薦實作*：部署 IP/網域白名單驗證器；撰寫 Magic Bytes 二進位鑑識邏輯；為外部寫入動作加入 require_confirmation。
+3. **第三階段：企業篇：跨平台發行、效能調優與持續評估**（建議時程：3 ~ 4 週）
+   - *階段目標*：封裝可攜桌面版客戶端，建立 BigQuery 稽核軌跡與 Agent 評估機制。
+   - *推薦實作*：建立 Windows/Mac 一鍵啟動腳本；配置 SHA-256 完整性校驗碼；建立 Eval 基準測試集。
+
+---
+
+## 🔍 肆、影片提及但未解答之關鍵字自學指引 / Unexplored Keywords Guide
+
+### 1. 🔑 A2A Protocol (Agent-to-Agent)
+- **影片提及情境**：影片在討論多智慧體跨系統協作時提及，但未展開具體協定通訊封包格式。
+- **深入學習價值**：A2A 是未來不同雲端供應商智慧體相互發現、通訊與授權的核心工業標準。
+- **對應學習地圖**：建議於「企業篇：跨系統整合」階段研讀。
+- **推薦研讀資源**：
+  - [Google ADK Official Docs](https://google.github.io/adk-docs/)
+  - [Google ADK Repository](https://github.com/google/adk)
+- **實務演練建議**：嘗試定義跨 Agent 的 JSON-RPC 訊息結構；模擬二個獨立代理人的握手與憑證交換。
+
+### 2. 🔑 Model Armor (Vertex AI)
+- **影片提及情境**：影片提到了在提示詞注入防禦中可運用 Model Armor 進行機敏過濾。
+- **深入學習價值**：能自動過濾使用者輸入中包含的 PII 個資、仇恨言論或惡意越獄指令，降低治理風險。
+- **對應學習地圖**：建議於「核心篇：資安防禦縱深」階段實作。
+- **推薦研讀資源**：
+  - [Google Cloud Model Armor](https://cloud.google.com/security/products/model-armor)
+  - [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
+- **實務演練建議**：配置一套敏感詞與正規表示式攔截規則；編寫越獄提示詞測試防禦強度。
+
+### 3. 🔑 Semantic Cache (語意快取)
+- **影片提及情境**：講者提及透過快取可大幅降低大語言模型推論費用與延遲。
+- **深入學習價值**：高併發系統中，有 30%~50% 的使用者詢問語意相似，語意快取能省下巨額成本。
+- **對應學習地圖**：建議於「企業篇：效能調優」深入探索。
+- **推薦研讀資源**：
+  - [Redis Semantic Caching](https://redis.io/solutions/semantic-caching/)
+  - [Qdrant Semantic Search](https://qdrant.tech/articles/semantic-search/)
+- **實務演練建議**：利用向量嵌入模型 (Embedding) 比對問題相似度；設計快取失效與命中閾值。
+`
+        },
+        subtitles: {
+          segments: [
+            { timestamp: "00:05", start: 5, end: 15, text: "大家好，歡迎收看 Google ADK 智慧體開發實戰教程。" },
+            { timestamp: "01:15", start: 75, end: 95, text: "首先我們來拆解多智慧體的 Orchestrator 與 Specialist 分權架構。" },
+            { timestamp: "05:40", start: 340, end: 360, text: "在開放環境中，我們必須為 AI 智慧體構建包含 SSRF 與 Magic Bytes 掃描的七層資安防禦。" },
+            { timestamp: "12:10", start: 730, end: 750, text: "最後我們將系統打包為跨平台桌面客戶端，讓學習者可以在本機安全沙盒中研討。" },
+            { timestamp: "18:20", start: 1100, end: 1120, text: "所有教材與資源皆遵循學術研討免責宣告，謝謝大家的參與！" }
+          ],
+          full_text: "大家好，歡迎收看 Google ADK 智慧體開發實戰教程。首先我們來拆解多智慧體的 Orchestrator 與 Specialist 分權架構。在開放環境中，我們必須為 AI 智慧體構建包含 SSRF 與 Magic Bytes 掃描的七層資安防禦。最後我們將系統打包為跨平台桌面客戶端，讓學習者可以在本機安全沙盒中研討。所有教材與資源皆遵循學術研討免責宣告，謝謝大家的參與！",
+          srt_content: "1\n00:00:05,000 --> 00:00:15,000\n大家好，歡迎收看 Google ADK 智慧體開發實戰教程。\n\n2\n00:01:15,000 --> 00:01:35,000\n首先我們來拆解多智慧體的 Orchestrator 與 Specialist 分權架構。\n\n3\n00:05:40,000 --> 00:06:00,000\n在開放環境中，我們必須為 AI 智慧體構建包含 SSRF 與 Magic Bytes 掃描的七層資安防禦。\n\n4\n00:12:10,000 --> 00:12:30,000\n最後我們將系統打包為跨平台桌面客戶端，讓學習者可以在本機安全沙盒中研討。\n\n5\n00:18:20,000 --> 00:18:40,000\n所有教材與資源皆遵循學術研討免責宣告，謝謝大家的參與！\n",
+          vtt_content: "WEBVTT\n\n00:00:05.000 --> 00:00:15.000\n大家好，歡迎收看 Google ADK 智慧體開發實戰教程。\n\n00:01:15.000 --> 00:01:35.000\n首先我們來拆解多智慧體的 Orchestrator 與 Specialist 分權架構。\n\n00:05:40.000 --> 00:06:00.000\n在開放環境中，我們必須為 AI 智慧體構建包含 SSRF 與 Magic Bytes 掃描的七層資安防禦。\n\n00:12:10.000 --> 00:12:30.000\n最後我們將系統打包為跨平台桌面客戶端，讓學習者可以在本機安全沙盒中研討。\n\n00:18:20.000 --> 00:18:40.000\n所有教材與資源皆遵循學術研討免責宣告，謝謝大家的參與！\n"
+        }
+      }
+    };
+
+    function getLocalMockResult(url, customTitle) {
+      const u = (url || '').toLowerCase();
+      const title = customTitle || (u.includes('distrib') ? '分散式系統架構演進與高併發非同步設計' :
+                                   (u.includes('transformer') ? '現代機器學習模型：Transformer 與自注意力機制' : 
+                                   'Google ADK 多智慧體架構與企業級資安防禦實務'));
+      
+      const base = JSON.parse(JSON.stringify(DEMO_SAMPLES.adk));
+      base.title = title;
+      base.job_id = 'demo_' + Math.random().toString(36).substring(2, 7);
+      base.source_url = url || 'https://www.youtube.com/watch?v=sample_adk_architecture';
+      return base;
+    }
+
+    function setupBlobDownloads(data) {
+      // 1. Markdown download via Blob
+      const btnMd = document.getElementById('btn-download-md');
+      if (btnMd) {
+        btnMd.onclick = (e) => {
+          e.preventDefault();
+          const blob = new Blob([data.courseware.markdown], { type: 'text/markdown;charset=utf-8' });
+          const dlUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = dlUrl;
+          a.download = `VideoLearn_Notes_${data.job_id || 'academic'}.md`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(dlUrl);
+        };
+      }
+
+      // 2. Subtitles download via Blob
+      const btnSrt = document.getElementById('btn-download-srt');
+      if (btnSrt) {
+        btnSrt.onclick = (e) => {
+          e.preventDefault();
+          const content = data.subtitles.srt_content || "1\n00:00:00,000 --> 00:00:10,000\nVideoLearn AI Subtitles\n";
+          const blob = new Blob([content], { type: 'application/x-subrip;charset=utf-8' });
+          const dlUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = dlUrl;
+          a.download = `VideoLearn_Subtitles_${data.job_id || 'academic'}.srt`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(dlUrl);
+        };
+      }
+
+      const btnVtt = document.getElementById('btn-download-vtt');
+      if (btnVtt) {
+        btnVtt.onclick = (e) => {
+          e.preventDefault();
+          const content = data.subtitles.vtt_content || "WEBVTT\n\n00:00:00.000 --> 00:00:10.000\nVideoLearn AI Subtitles\n";
+          const blob = new Blob([content], { type: 'text/vtt;charset=utf-8' });
+          const dlUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = dlUrl;
+          a.download = `VideoLearn_Subtitles_${data.job_id || 'academic'}.vtt`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(dlUrl);
+        };
+      }
+
+      // 3. PPTX download note via Blob
+      const btnPptx = document.getElementById('btn-download-pptx');
+      const btnPptxTab = document.getElementById('btn-download-pptx-tab');
+      const pptxHandler = (e) => {
+        if (isGitHubPages || !data.courseware.pptx_download) {
+          e.preventDefault();
+          const slidesText = data.courseware.slides.map(s => `[投影片 ${s.slide_number} - ${s.type}]\n標題：${s.title}\n重點：\n${s.key_bullets.map(b => '  • ' + b).join('\n')}\n`).join('\n---\n\n');
+          const blob = new Blob([`# 投影片大綱匯出包 / Presentation Outline\n\n${slidesText}`], { type: 'text/plain;charset=utf-8' });
+          const dlUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = dlUrl;
+          a.download = `VideoLearn_Slides_Outline_${data.job_id || 'demo'}.txt`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(dlUrl);
+          alert(currentLang === 'zh' ? '【展示模式提醒】在 GitHub Pages 靜態環境中已為您匯出投影片大綱文字檔！若需原生二進位 .pptx 簡報檔案，請於本機執行 ./run-videolearn.sh。' : '[Demo Mode] Exported presentation outline text bundle! For native binary .pptx presentation file, run ./run-videolearn.sh locally.');
+        }
+      };
+      if (btnPptx) btnPptx.onclick = pptxHandler;
+      if (btnPptxTab) btnPptxTab.onclick = pptxHandler;
+    }
+
   </script>
 </body>
 </html>

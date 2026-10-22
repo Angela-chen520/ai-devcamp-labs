@@ -57,6 +57,8 @@ class ChatRequest(BaseModel):
 async def read_index():
     """Serves the main application web interface."""
     index_file = os.path.join(STATIC_DIR, "index.html")
+    if not os.path.exists(index_file):
+        index_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "index.html")
     if os.path.exists(index_file):
         with open(index_file, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
