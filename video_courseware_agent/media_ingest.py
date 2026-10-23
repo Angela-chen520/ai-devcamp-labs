@@ -38,13 +38,14 @@ class MediaIngestor:
         3. Performs binary magic byte scans to ensure no disguised malware
         """
         # Step 1: Security Validation
-        is_safe_url, reason = SecurityGuard.validate_url(url)
-        if not is_safe_url:
+        diag = SecurityGuard.diagnose_url(url)
+        if not diag["is_safe"]:
             return {
                 "success": False,
                 "is_safe": False,
-                "error": reason,
-                "security_alert": True
+                "error": diag["formatted_message"],
+                "security_alert": True,
+                "security_diagnostic": diag
             }
 
         file_id = str(uuid.uuid4())[:12]
@@ -79,8 +80,8 @@ class MediaIngestor:
             
             # Step 3: Anti-Malware Binary Inspection
             if os.path.exists(downloaded_file):
-                is_safe_file, file_reason = SecurityGuard.validate_media_file(downloaded_file)
-                if not is_safe_file:
+                file_diag = SecurityGuard.diagnose_media_file(downloaded_file)
+                if not file_diag["is_safe"]:
                     try:
                         os.remove(downloaded_file)
                     except Exception:
@@ -88,8 +89,9 @@ class MediaIngestor:
                     return {
                         "success": False,
                         "is_safe": False,
-                        "error": f"下載檔案觸發資安攔截：{file_reason}",
-                        "security_alert": True
+                        "error": f"下載檔案觸發資安攔截：{file_diag['formatted_message']}",
+                        "security_alert": True,
+                        "security_diagnostic": file_diag
                     }
 
             return {
@@ -117,16 +119,18 @@ class MediaIngestor:
         """
         Validates uploaded media file using magic bytes scanner and saves to temporary storage.
         """
-        is_safe, detected_fmt, message = SecurityGuard.validate_media_binary(file_bytes, filename)
-        if not is_safe:
+        diag = SecurityGuard.diagnose_media_binary(file_bytes, filename)
+        if not diag["is_safe"]:
             return {
                 "success": False,
                 "is_safe": False,
-                "error": message,
-                "security_alert": True
+                "error": diag["formatted_message"],
+                "security_alert": True,
+                "security_diagnostic": diag
             }
 
         file_id = str(uuid.uuid4())[:12]
+        detected_fmt = diag.get("detected_format", "mp4")
         clean_ext = detected_fmt if detected_fmt in ["mp4", "m4a", "mp3", "wav", "webm"] else "mp4"
         dest_path = os.path.join(self.output_dir, f"{file_id}.{clean_ext}")
 
@@ -243,13 +247,14 @@ class MediaIngestor:
         or an extracted audio file (MP3, M4A, WAV), ensuring fair-use compliance.
         """
         # Security pre-check
-        is_safe_url, reason = SecurityGuard.validate_url(url)
-        if not is_safe_url:
+        diag = SecurityGuard.diagnose_url(url)
+        if not diag["is_safe"]:
             return {
                 "success": False,
                 "is_safe": False,
-                "error": reason,
-                "security_alert": True
+                "error": diag["formatted_message"],
+                "security_alert": True,
+                "security_diagnostic": diag
             }
 
         clean_res = resolution.lower() if resolution in ["1080p", "720p", "480p", "360p"] else "720p"
@@ -302,8 +307,8 @@ class MediaIngestor:
                 mime_type = "audio/mpeg" if clean_audio_fmt == "mp3" else ("audio/mp4" if clean_audio_fmt == "m4a" else "audio/wav")
 
             if os.path.exists(downloaded_file):
-                is_safe_file, file_reason = SecurityGuard.validate_media_file(downloaded_file, max_size_mb=300)
-                if not is_safe_file:
+                file_diag = SecurityGuard.diagnose_media_file(downloaded_file, max_size_mb=300)
+                if not file_diag["is_safe"]:
                     try:
                         os.remove(downloaded_file)
                     except Exception:
@@ -311,8 +316,9 @@ class MediaIngestor:
                     return {
                         "success": False,
                         "is_safe": False,
-                        "error": f"下載檔案未通過二進位特徵防毒檢驗：{file_reason}",
-                        "security_alert": True
+                        "error": f"下載檔案未通過二進位特徵防毒檢驗：{file_diag['formatted_message']}",
+                        "security_alert": True,
+                        "security_diagnostic": file_diag
                     }
 
                 return {

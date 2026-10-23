@@ -77,6 +77,70 @@ class TestVideoLearnAgent(unittest.TestCase):
         is_safe, _, _ = self.security.validate_media_binary(genuine_mp4, "lecture.mp4")
         self.assertTrue(is_safe)
 
+    def test_security_detailed_virus_diagnostics_and_impact(self):
+        """
+        Validates detailed diagnostics for blocked media:
+        1. Specific malware type and model identification (PE, ELF, APK, Shell)
+        2. Explicit explanation of how it affects computer files (ransomware, keylogger, etc.)
+        3. Explicit explanation of how it affects mobile phone files (overlay attacks, OTP interception, privacy theft)
+        4. Firm refusal statement: 故系統依據企業級資安防禦規範，嚴格終止解析並拒絕提供下載，以保護您的電腦與手機檔案安全。
+        """
+        # 1. Windows PE Trojan disguised as video
+        fake_pe = b"MZ\x90\x00\x03\x00\x00\x00" + b"\x00" * 50
+        pe_diag = self.security.diagnose_media_binary(fake_pe, "lecture.mp4")
+        self.assertFalse(pe_diag["is_safe"])
+        self.assertEqual(pe_diag["error_code"], "SEC_MALWARE_WIN_PE")
+        self.assertIn("Win32.Trojan.Generic", pe_diag["virus_model"])
+        self.assertIn("PE32", pe_diag["virus_model"])
+        self.assertIn("勒索軟體", pe_diag["pc_impact"])
+        self.assertIn("電腦檔案威脅", pe_diag["pc_impact"])
+        self.assertIn("手機檔案威脅", pe_diag["mobile_impact"])
+        self.assertIn("故系統依據企業級資安防禦規範，嚴格終止解析並拒絕提供下載，以保護您的電腦與手機檔案安全。", pe_diag["action_verdict"])
+
+        # 2. Linux ELF Backdoor Dropper disguised as audio
+        fake_elf = b"\x7fELF\x02\x01\x01\x00" + b"\x00" * 50
+        elf_diag = self.security.diagnose_media_binary(fake_elf, "podcast.mp3")
+        self.assertFalse(elf_diag["is_safe"])
+        self.assertEqual(elf_diag["error_code"], "SEC_MALWARE_LINUX_ELF")
+        self.assertIn("Linux.Backdoor.Dropper", elf_diag["virus_model"])
+        self.assertIn("ELF", elf_diag["virus_model"])
+        self.assertIn("Rootkit", elf_diag["pc_impact"])
+        self.assertIn("Android", elf_diag["mobile_impact"])
+        self.assertIn("沙盒", elf_diag["mobile_impact"])
+        self.assertIn("故系統依據企業級資安防禦規範，嚴格終止解析並拒絕提供下載，以保護您的電腦與手機檔案安全。", elf_diag["action_verdict"])
+
+        # 3. Android APK Banker Trojan disguised as media
+        fake_apk = b"PK\x03\x04\x14\x00\x00\x00" + b"\x00" * 50
+        apk_diag = self.security.diagnose_media_binary(fake_apk, "course.mp4")
+        self.assertFalse(apk_diag["is_safe"])
+        self.assertEqual(apk_diag["error_code"], "SEC_MALWARE_ANDROID_APK")
+        self.assertIn("Android.Trojan.FakeApp", apk_diag["virus_model"])
+        self.assertIn("金融覆蓋攻擊", apk_diag["mobile_impact"])
+        self.assertIn("OTP", apk_diag["mobile_impact"])
+        self.assertIn("故系統依據企業級資安防禦規範，嚴格終止解析並拒絕提供下載，以保護您的電腦與手機檔案安全。", apk_diag["action_verdict"])
+
+        # 4. Command Injection in URL
+        cmd_url = "https://youtube.com/watch?v=sample;rm -rf /"
+        cmd_diag = self.security.diagnose_url(cmd_url)
+        self.assertFalse(cmd_diag["is_safe"])
+        self.assertEqual(cmd_diag["error_code"], "SEC_CMD_INJECTION")
+        self.assertIn("指令注入", cmd_diag["detailed_reason"])
+        self.assertIn("故系統依據企業級資安防禦規範，嚴格終止解析並拒絕提供下載，以保護您的電腦與手機檔案安全。", cmd_diag["action_verdict"])
+
+        # 5. Cloud Metadata SSRF Probe
+        meta_url = "http://169.254.169.254/latest/meta-data/"
+        meta_diag = self.security.diagnose_url(meta_url)
+        self.assertFalse(meta_diag["is_safe"])
+        self.assertEqual(meta_diag["error_code"], "SEC_SSRF_CLOUD_METADATA")
+        self.assertIn("中繼資料", meta_diag["detailed_reason"])
+
+        # 6. Intranet SSRF Probe
+        intra_url = "http://192.168.1.1/admin"
+        intra_diag = self.security.diagnose_url(intra_url)
+        self.assertFalse(intra_diag["is_safe"])
+        self.assertEqual(intra_diag["error_code"], "SEC_SSRF_INTRANET")
+        self.assertIn("SSRF", intra_diag["detailed_reason"])
+
     def test_security_prompt_injection(self):
         """Adversarial prompt injection must be identified and neutralized."""
         injections = [

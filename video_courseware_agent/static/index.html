@@ -186,6 +186,31 @@
             <span data-i18n="sample_btn_3">3. Transformer 自注意力機制</span>
           </button>
         </div>
+
+        <!-- Interactive Security Diagnostic Demonstration Buttons -->
+        <div class="flex flex-wrap items-center gap-2 pt-2 text-xs border-t border-slate-100">
+          <span data-i18n="sec_test_demo_title" class="font-bold text-red-700 flex items-center gap-1">
+            <i class="fa-solid fa-shield-halved text-red-600"></i> 🧪 資安防禦與病毒診斷即時驗證：
+          </span>
+          <button onclick="triggerSecurityDemo('pe')" class="px-2.5 py-1 rounded-md bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold transition flex items-center gap-1">
+            <i class="fa-brands fa-windows text-xs"></i> <span data-i18n="sec_btn_pe">Windows PE 木馬</span>
+          </button>
+          <button onclick="triggerSecurityDemo('elf')" class="px-2.5 py-1 rounded-md bg-orange-50 hover:bg-orange-100 text-orange-700 border border-orange-200 font-semibold transition flex items-center gap-1">
+            <i class="fa-brands fa-linux text-xs"></i> <span data-i18n="sec_btn_elf">Linux ELF 後門</span>
+          </button>
+          <button onclick="triggerSecurityDemo('apk')" class="px-2.5 py-1 rounded-md bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 font-semibold transition flex items-center gap-1">
+            <i class="fa-brands fa-android text-xs"></i> <span data-i18n="sec_btn_apk">Android APK 偽裝包</span>
+          </button>
+          <button onclick="triggerSecurityDemo('ssrf')" class="px-2.5 py-1 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-semibold transition flex items-center gap-1">
+            <i class="fa-solid fa-server text-xs"></i> <span data-i18n="sec_btn_ssrf">SSRF/雲端中繼探測</span>
+          </button>
+          <button onclick="triggerSecurityDemo('injection')" class="px-2.5 py-1 rounded-md bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-semibold transition flex items-center gap-1">
+            <i class="fa-solid fa-terminal text-xs"></i> <span data-i18n="sec_btn_inj">Shell 指令注入</span>
+          </button>
+          <button onclick="triggerSecurityDemo('whitelist')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-semibold transition flex items-center gap-1">
+            <i class="fa-solid fa-ban text-xs"></i> <span data-i18n="sec_btn_domain">非白名單網域</span>
+          </button>
+        </div>
       </div>
 
       <!-- FILE UPLOAD FORM (Hidden by default) -->
@@ -222,12 +247,82 @@
         </div>
       </div>
 
-      <!-- ERROR / BLOCKED ALERT -->
-      <div id="error-alert" class="hidden p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm flex items-start gap-3">
-        <i class="fa-solid fa-triangle-exclamation text-red-500 text-lg mt-0.5"></i>
-        <div>
-          <h4 data-i18n="error_alert_title" class="font-bold">資安防禦或轉譯攔截提醒</h4>
-          <p id="error-message" class="text-xs mt-1">錯誤詳情</p>
+      <!-- ERROR / BLOCKED ALERT & VIRUS DIAGNOSTICS CARD -->
+      <div id="error-alert" class="hidden rounded-2xl bg-gradient-to-br from-red-950/95 via-slate-900 to-rose-950 text-white p-6 border-2 border-red-500/80 shadow-2xl space-y-4 animate-fade-in relative overflow-hidden">
+        <!-- Background danger glow accent -->
+        <div class="absolute -right-12 -top-12 w-48 h-48 bg-red-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Header Bar -->
+        <div class="flex items-start justify-between gap-4 border-b border-red-500/30 pb-3 relative z-10">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/50 flex items-center justify-center text-red-400 text-xl shadow-inner flex-shrink-0">
+              <i class="fa-solid fa-shield-virus animate-pulse"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span id="threat-level-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-red-600 text-white shadow-sm">CRITICAL 危急威脅</span>
+                <span id="error-code-badge" class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-red-950 text-red-300 border border-red-800/80">SEC_MALWARE_BLOCKED</span>
+              </div>
+              <h3 id="error-alert-title" class="text-base font-bold text-red-100 mt-1 flex items-center gap-2">
+                <span data-i18n="sec_card_title">資安威脅防護攔截與診斷報告</span>
+              </h3>
+            </div>
+          </div>
+          <button onclick="hideError()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition text-sm">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Diagnostic Breakdown & Virus Model -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs relative z-10">
+          <div class="bg-black/40 rounded-xl p-3.5 border border-red-500/20 space-y-1.5">
+            <div class="text-slate-400 font-semibold flex items-center gap-1.5">
+              <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+              <span data-i18n="sec_cause_label">攔截原因與特徵描述</span>
+            </div>
+            <p id="error-detailed-reason" class="text-slate-200 leading-relaxed font-medium">檢測到危險二進位特徵碼，疑似夾帶惡意程式碼。</p>
+            <p id="error-message" class="hidden text-xs text-slate-400"></p>
+          </div>
+          <div id="virus-model-card" class="bg-black/40 rounded-xl p-3.5 border border-red-500/20 space-y-1.5">
+            <div class="text-slate-400 font-semibold flex items-center gap-1.5">
+              <i class="fa-solid fa-bug text-rose-400"></i>
+              <span data-i18n="sec_virus_model_label">檢測夾帶之病毒類型型號</span>
+            </div>
+            <p id="error-virus-model" class="text-rose-300 font-mono font-bold leading-relaxed">Win32.Trojan.Generic / PE32 偽裝木馬程式</p>
+          </div>
+        </div>
+
+        <!-- Device Impact Grid: PC vs Mobile -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs relative z-10">
+          <!-- PC Impact -->
+          <div class="bg-gradient-to-br from-red-950/40 to-slate-900/90 rounded-xl p-4 border border-rose-500/30 space-y-2">
+            <div class="flex items-center gap-2 text-rose-300 font-bold">
+              <i class="fa-solid fa-desktop text-sm"></i>
+              <span data-i18n="sec_pc_impact_title">💻 會如何影響您的電腦檔案</span>
+            </div>
+            <p id="error-pc-impact" class="text-slate-300 text-[11.5px] leading-relaxed">
+              若執行將觸發勒索軟體 (Ransomware) 惡意加密硬碟中所有個人文件（.docx, .xlsx, .pdf, .jpg）、相片與專案檔案；植入木馬後門 (RAT) 側錄鍵盤輸入、竊取瀏覽器儲存之密碼、SSH 私鑰及加密貨幣錢包，並將電腦主機淪為殭屍網路節點。
+            </p>
+          </div>
+
+          <!-- Mobile Phone Impact -->
+          <div class="bg-gradient-to-br from-amber-950/40 to-slate-900/90 rounded-xl p-4 border border-amber-500/30 space-y-2">
+            <div class="flex items-center gap-2 text-amber-300 font-bold">
+              <i class="fa-solid fa-mobile-screen-button text-sm"></i>
+              <span data-i18n="sec_mobile_impact_title">📱 會如何影響您的手機檔案</span>
+            </div>
+            <p id="error-mobile-impact" class="text-slate-300 text-[11.5px] leading-relaxed">
+              一旦於手機端下載並安裝，將發動「金融覆蓋攻擊（Overlay Attack）」：彈出偽造登入介面竊取網銀帳號密碼；強制攔截簡訊 SMS 雙因素驗證 OTP 驗證碼進行盜刷；常駐後台私自耗盡數據流量，並非法存取聯絡人與照片相簿。
+            </p>
+          </div>
+        </div>
+
+        <!-- Firm Refusal Notice & Policy Enforcement -->
+        <div class="bg-red-500/15 rounded-xl p-3.5 border border-red-500/40 flex items-center gap-3 relative z-10 text-xs">
+          <i class="fa-solid fa-ban text-red-400 text-lg flex-shrink-0"></i>
+          <p id="error-action-verdict" class="text-red-200 font-semibold leading-relaxed">
+            故系統依據企業級資安防禦規範，嚴格終止解析並拒絕提供下載，以保護您的電腦與手機檔案安全。
+          </p>
         </div>
       </div>
     </div>
@@ -1273,6 +1368,18 @@
         step_stt: "3. 語音時間軸切分",
         step_cw: "4. 多格式教材構建",
         error_alert_title: "資安防禦或轉譯攔截提醒",
+        sec_test_demo_title: "🧪 資安防禦與病毒診斷即時驗證：",
+        sec_btn_pe: "Windows PE 木馬",
+        sec_btn_elf: "Linux ELF 後門",
+        sec_btn_apk: "Android APK 偽裝包",
+        sec_btn_ssrf: "SSRF/雲端中繼探測",
+        sec_btn_inj: "Shell 指令注入",
+        sec_btn_domain: "非白名單網域",
+        sec_card_title: "資安威脅防護攔截與診斷報告",
+        sec_cause_label: "攔截原因與特徵描述",
+        sec_virus_model_label: "檢測夾帶之病毒類型型號",
+        sec_pc_impact_title: "💻 會如何影響您的電腦檔案",
+        sec_mobile_impact_title: "📱 會如何影響您的手機檔案",
 
         result_audit_badge: "資安稽核通過",
         btn_print_pdf: "列印 / 存為 PDF",
@@ -1474,6 +1581,18 @@
         step_stt: "3. Speech Alignment & STT",
         step_cw: "4. Multi-Format Courseware",
         error_alert_title: "Security Interception or Transcription Error",
+        sec_test_demo_title: "🧪 Live Security Defense & Virus Diagnostic Demos:",
+        sec_btn_pe: "Windows PE Trojan",
+        sec_btn_elf: "Linux ELF Backdoor",
+        sec_btn_apk: "Android APK Malware",
+        sec_btn_ssrf: "SSRF / Cloud Metadata",
+        sec_btn_inj: "Shell Command Injection",
+        sec_btn_domain: "Unverified Domain",
+        sec_card_title: "Security Threat Defense & Diagnostic Report",
+        sec_cause_label: "Block Reason & Signature Details",
+        sec_virus_model_label: "Detected Virus Model & Signature",
+        sec_pc_impact_title: "💻 How It Impacts Your Computer Files",
+        sec_mobile_impact_title: "📱 How It Impacts Your Mobile Phone Files",
 
         result_audit_badge: "Security Audit Passed",
         btn_print_pdf: "Print / Save as PDF",
@@ -1689,6 +1808,11 @@
       if (lastRenderData) {
         renderResults(lastRenderData, false);
       }
+
+      // Re-render error card if visible
+      if (lastErrorData && document.getElementById('error-alert') && !document.getElementById('error-alert').classList.contains('hidden')) {
+        renderErrorCard(lastErrorData);
+      }
     }
 
     function toggleLanguage() {
@@ -1719,6 +1843,260 @@
       startAnalysis(title);
     }
 
+    // ==========================================
+    // CYBERSECURITY THREAT & MALWARE CATALOG (DIAGNOSTICS)
+    // ==========================================
+    const SECURITY_CATALOG = {
+      pe: {
+        threat_level: "CRITICAL",
+        error_code: "SEC_MALWARE_WIN_PE",
+        virus_model: "Win32.Trojan.Generic / PE32 偽裝木馬程式",
+        virus_model_en: "Win32.Trojan.Generic / PE32 Disguised Executable Trojan",
+        detailed_reason: "檢測到危險的可執行二進位特徵碼（Windows Portable Executable (EXE/DLL)），偽裝成 .mp4/.mp3 媒體檔案，疑似夾帶木馬病毒攻擊！",
+        detailed_reason_en: "Detected dangerous executable binary signature (Windows Portable Executable (EXE/DLL)) disguised as .mp4/.mp3 media stream!",
+        pc_impact: "【電腦檔案威脅】若執行將觸發勒索軟體 (Ransomware) 惡意加密硬碟中所有個人文件（.docx, .xlsx, .pdf, .jpg）、相片與專案檔案；植入木馬後門 (RAT) 側錄鍵盤輸入、竊取瀏覽器儲存之密碼、SSH 私鑰及加密貨幣錢包，並將主機淪為殭屍網路節點。",
+        pc_impact_en: "[Computer Impact] Execution triggers Ransomware encrypting all personal documents (.docx, .xlsx, .pdf, .jpg), photos, and databases; injects RAT to log keystrokes, steal browser credentials, SSH keys, and crypto wallets, enslaving the PC into a botnet.",
+        mobile_impact: "【手機檔案威脅】若透過跨平台同步（如雲端硬碟、通訊軟體）傳輸至手機，易遭惡意延伸工具提取並感染 Android/Windows 雙系統設備，破壞跨平台同步目錄中的個人工作文檔與媒體庫。",
+        mobile_impact_en: "[Mobile Impact] If synced across devices via cloud drives or chat apps, it acts as a cross-platform malicious seed, risking file viewer crashes and compromising synchronized media folders.",
+        action_verdict: "故系統依據企業級資安防禦規範，嚴格終止解析並拒絕提供下載，以保護您的電腦與手機檔案安全。",
+        action_verdict_en: "Therefore, in strict adherence to enterprise cybersecurity standards, the system has terminated analysis and refused download to safeguard your computer and mobile files."
+      },
+      elf: {
+        threat_level: "CRITICAL",
+        error_code: "SEC_MALWARE_LINUX_ELF",
+        virus_model: "Linux.Backdoor.Dropper / ELF 惡意二進制執行檔",
+        virus_model_en: "Linux.Backdoor.Dropper / ELF Malicious Binary",
+        detailed_reason: "檢測到危險的可執行二進位特徵碼（Linux Executable Binary (ELF)），疑似夾帶 Linux 後門程式或惡意釋放器（Dropper）！",
+        detailed_reason_en: "Detected dangerous executable binary signature (Linux Executable Binary (ELF)), suspected backdoor payload or malicious dropper!",
+        pc_impact: "【電腦檔案威脅】在 Linux / macOS / WSL 終端環境下將獲得原生執行權限，植入持久化 Rootkit 提權木馬，篡改系統設定檔（/etc/passwd, ~/.ssh/authorized_keys），無聲於背景佈署加密貨幣挖礦程式，損毀或外洩伺服器與開發專案核心原始碼。",
+        pc_impact_en: "[Computer Impact] Executes natively on Linux/macOS/WSL to install persistent rootkits, modify critical configs (/etc/passwd, ~/.ssh), deploy covert cryptominers, and exfiltrate proprietary source code files.",
+        mobile_impact: "【手機檔案威脅】Android 底層基於 Linux 核心，此類 ELF 檔案常被設計為 Android 原生惡意模組（Native Payload），可嘗試利用核心漏洞進行提權（Kernel Exploit），突破 Android 應用程式沙盒（Sandbox Escape），任意讀取存儲空間中所有 App 私有資料夾與照片檔案。",
+        mobile_impact_en: "[Mobile Impact] Android is built on the Linux kernel. This ELF payload can exploit kernel vulnerabilities to escape Android App Sandbox, gaining root access to read, overwrite, or exfiltrate private app databases and user photos.",
+        action_verdict: "故系統依據企業級資安防禦規範，嚴格終止解析並拒絕提供下載，以保護您的電腦與手機檔案安全。",
+        action_verdict_en: "Therefore, in strict adherence to enterprise cybersecurity standards, the system has terminated analysis and refused download to safeguard your computer and mobile files."
+      },
+      apk: {
+        threat_level: "HIGH",
+        error_code: "SEC_MALWARE_ANDROID_APK",
+        virus_model: "Android.Trojan.FakeApp / Banker (APK 惡意安裝包 / 偽裝封包)",
+        virus_model_en: "Android.Trojan.FakeApp / Banker (Malicious APK / Disguised Archive)",
+        detailed_reason: "檢測到壓縮封裝標頭（Compressed Archive (ZIP/APK/JAR)），將 Android 應用安裝包偽裝為串流影音副檔名！",
+        detailed_reason_en: "Detected compressed archive signature (ZIP/APK/JAR) disguising an Android application package as a media file!",
+        pc_impact: "【電腦檔案威脅】解開後常內藏惡意 VBS/JS 腳本或巨集文件，誘騙使用者點擊執行，進而下載二階段攻擊載體，感染電腦工作區檔案。",
+        pc_impact_en: "[Computer Impact] May contain bundled malicious scripts or macro-enabled documents that trigger multi-stage dropper attacks infecting local desktop files.",
+        mobile_impact: "【手機檔案威脅】此為 Android 專屬惡意安裝包（APK）。一旦於手機端下載並安裝，將發動「金融覆蓋攻擊（Overlay Attack）」：在使用者開啟網銀或支付 App 時彈出偽造登入介面竊取帳號密碼；強制攔截所有簡訊（SMS）與雙因素驗證 OTP 驗證碼進行盜刷；常駐後台私自撥打付費電話、耗盡行動網路數據流量，並非法存取聯絡人與照片相簿。",
+        mobile_impact_en: "[Mobile Impact] Android package (APK). If installed on mobile, launches banking overlay attacks displaying phishing login windows over genuine banking apps, intercepts incoming SMS OTP authentication codes, dials premium rate numbers in background, drains mobile data, and exfiltrates contacts and photo gallery.",
+        action_verdict: "故系統依據企業級資安防禦規範，嚴格終止解析並拒絕提供下載，以保護您的電腦與手機檔案安全。",
+        action_verdict_en: "Therefore, in strict adherence to enterprise cybersecurity standards, the system has terminated analysis and refused download to safeguard your computer and mobile files."
+      },
+      ssrf: {
+        threat_level: "CRITICAL",
+        error_code: "SEC_SSRF_CLOUD_METADATA",
+        virus_model: "SSRF.CloudExfiltration.Metadata (雲端中繼資料與內網探測攻擊)",
+        virus_model_en: "SSRF.CloudExfiltration.Metadata (Cloud Metadata & Intranet Probe)",
+        detailed_reason: "網址指向 169.254.169.254 (Cloud Metadata) 或私有內部網路位址 (127.0.0.1, 192.168.x.x)。企圖竊取公有雲 IAM 憑證或探測內網資料庫。基於企業級安全防禦（SSRF），禁止請求本地端或內部區域網路位址。",
+        detailed_reason_en: "Target points to 169.254.169.254 (Cloud Metadata) or private intranet address (127.0.0.1, 192.168.x). Strictly blocked by enterprise SSRF prevention.",
+        pc_impact: "【電腦檔案威脅】若雲端 IAM 憑證遭竊，攻擊者可連線至雲端備份儲存桶，篡改或勒索所有遠端專案資料檔；或探測內部 Redis/MySQL，造成資料毀損。",
+        pc_impact_en: "[Computer Impact] Compromised cloud credentials allow attackers to access cloud buckets, destroy remote database backups, and leak sensitive documents.",
+        mobile_impact: "【手機檔案威脅】威脅同一區域網路內連線的手機終端，可能導致區域網路內未加密之行動檔案傳輸被側聽或中斷。",
+        mobile_impact_en: "[Mobile Impact] Threatens local LAN sessions on mobile devices, potentially intercepting unencrypted local file transfers.",
+        action_verdict: "故系統依據企業級資安防禦規範，嚴格終止解析並拒絕提供下載，以保護您的電腦與手機檔案安全。",
+        action_verdict_en: "Therefore, in strict adherence to enterprise cybersecurity standards, the system has terminated analysis and refused download to safeguard your computer and mobile files."
+      },
+      injection: {
+        threat_level: "CRITICAL",
+        error_code: "SEC_CMD_INJECTION",
+        virus_model: "OS.CommandInjection.ShellBreakout (指令注入惡意攻擊)",
+        virus_model_en: "OS.CommandInjection.ShellBreakout (Command Injection Attack)",
+        detailed_reason: "網址中檢測到特殊字元（如 ;、|、&、`），企圖跳脫影音解析程式碼並在作業系統執行任意指令碼（Command Injection / 指令注入攻擊）。",
+        detailed_reason_en: "Disallowed shell metacharacters detected in URL, representing an arbitrary command injection attempt.",
+        pc_impact: "【電腦檔案威脅】指令注入可能使攻擊者在伺服器或電腦端執行刪除檔案、植入未授權後門程式或盜取伺服器配置金鑰之毀滅性操作。",
+        pc_impact_en: "[Computer Impact] Command injection enables arbitrary terminal commands to delete files, deploy backdoors, or steal server credentials.",
+        mobile_impact: "【手機檔案威脅】若行動端轉發惡意指令參數，可能造成手機端終端程序崩潰異常與快取資料破壞。",
+        mobile_impact_en: "[Mobile Impact] May cause terminal crashes or remote execution vulnerabilities if forwarded to mobile components.",
+        action_verdict: "故系統依據企業級資安防禦規範，嚴格終止解析並拒絕提供下載，以保護您的電腦與手機檔案安全。",
+        action_verdict_en: "Therefore, in strict adherence to enterprise cybersecurity standards, the system has terminated analysis and refused download to safeguard your computer and mobile files."
+      },
+      whitelist: {
+        threat_level: "HIGH",
+        error_code: "SEC_DOMAIN_UNVERIFIED",
+        virus_model: "Net.Phishing.UntrustedDomain (未核准之非信任釣魚網域)",
+        virus_model_en: "Net.Phishing.UntrustedDomain (Untrusted Phishing Domain)",
+        detailed_reason: "安全防護攔截：來源網域非核准的影音平台白名單。非受信任網域常充斥釣魚轉址、掛馬下載或偽裝的假影音串流服務。支援平台包括：YouTube, TikTok, Facebook, X/Twitter, Instagram, Bilibili, Vimeo, Twitch, SoundCloud, Reddit 等。",
+        detailed_reason_en: "Security Intercept: Domain is not in the approved whitelist. Untrusted domains carry risks of drive-by downloads, phishing redirects, or fake media streams.",
+        pc_impact: "【電腦檔案威脅】未經驗證的第三方網站可能誘導瀏覽器下載偽裝檔案，觸發惡意腳本執行或勒索病毒感染，破壞電腦工作區檔案。",
+        pc_impact_en: "[Computer Impact] Unverified third-party sites may lure users into downloading spoofed files containing malware or ransomware infecting desktop files.",
+        mobile_impact: "【手機檔案威脅】惡意站點常透過彈出式廣告或偽造更新通知誘騙手機使用者安裝惡意描述檔或監控程式，竊取手機照片、通訊錄與簡訊。",
+        mobile_impact_en: "[Mobile Impact] Malicious sites frequently deploy deceptive pop-ups or fake update prompts to install spyware on phones, stealing photos, contacts, and SMS.",
+        action_verdict: "故系統依據企業級資安防禦規範，嚴格終止解析並拒絕提供下載，以保護您的電腦與手機檔案安全。",
+        action_verdict_en: "Therefore, in strict adherence to enterprise cybersecurity standards, the system has terminated analysis and refused download to safeguard your computer and mobile files."
+      }
+    };
+
+    function validateUrlClientSide(rawUrl) {
+      if (!rawUrl || !rawUrl.trim()) {
+        return { is_safe: false, ...SECURITY_CATALOG.whitelist };
+      }
+      const u = rawUrl.trim();
+
+      // Check command injection
+      const dangerousChars = [';', '|', '&', '`', '$', '\n', '\r', '<', '>', '\\'];
+      for (const ch of dangerousChars) {
+        if (u.includes(ch)) {
+          return { is_safe: false, ...SECURITY_CATALOG.injection };
+        }
+      }
+
+      // Check SSRF & Intranet & Cloud Metadata
+      if (u.includes('169.254.169.254') || u.includes('169.254.169.253')) {
+        return { is_safe: false, ...SECURITY_CATALOG.ssrf };
+      }
+      if (u.includes('127.0.0.1') || u.includes('localhost') || u.includes('192.168.') || u.includes('10.') || u.includes('172.16.')) {
+        return { is_safe: false, ...SECURITY_CATALOG.ssrf };
+      }
+
+      // Check simulated malware extensions or payloads
+      if (u.match(/\.(exe|dll)($|\?)/i) || u.toLowerCase().includes('trojan') || u.toLowerCase().includes('pe32')) {
+        return { is_safe: false, ...SECURITY_CATALOG.pe };
+      }
+      if (u.match(/\.(elf|so|bin)($|\?)/i) || u.toLowerCase().includes('dropper') || u.toLowerCase().includes('backdoor')) {
+        return { is_safe: false, ...SECURITY_CATALOG.elf };
+      }
+      if (u.match(/\.(apk)($|\?)/i) || u.toLowerCase().includes('fakeapp') || u.toLowerCase().includes('banker')) {
+        return { is_safe: false, ...SECURITY_CATALOG.apk };
+      }
+
+      // Check whitelist domain
+      const allowedDomains = [
+        'youtube.com', 'youtu.be', 'tiktok.com', 'facebook.com', 'fb.watch',
+        'twitter.com', 'x.com', 'instagram.com', 'twitch.tv', 'bilibili.com',
+        'b23.tv', 'vimeo.com', 'soundcloud.com', 'reddit.com', 'v.redd.it',
+        'linkedin.com', 'pinterest.com', 'bandcamp.com'
+      ];
+      try {
+        const parsed = new URL(u);
+        const host = parsed.hostname.toLowerCase();
+        const matched = allowedDomains.some(d => host === d || host.endsWith('.' + d));
+        if (!matched) {
+          return { is_safe: false, ...SECURITY_CATALOG.whitelist };
+        }
+      } catch(e) {
+        return { is_safe: false, ...SECURITY_CATALOG.whitelist };
+      }
+
+      return { is_safe: true };
+    }
+
+    let lastErrorData = null;
+
+    function renderErrorCard(errInfo) {
+      const isZh = (currentLang === 'zh');
+      let data = errInfo;
+
+      if (typeof errInfo === 'string') {
+        const str = errInfo;
+        if (str.includes('Windows Portable Executable') || str.includes('PE32') || str.includes('MZ') || str.includes('Win32')) {
+          data = Object.assign({}, SECURITY_CATALOG.pe, { detailed_reason: str, detailed_reason_en: str });
+        } else if (str.includes('Linux Executable Binary') || str.includes('ELF')) {
+          data = Object.assign({}, SECURITY_CATALOG.elf, { detailed_reason: str, detailed_reason_en: str });
+        } else if (str.includes('APK') || str.includes('Android') || str.includes('PK\x03\x04')) {
+          data = Object.assign({}, SECURITY_CATALOG.apk, { detailed_reason: str, detailed_reason_en: str });
+        } else if (str.includes('SSRF') || str.includes('私有') || str.includes('169.254') || str.includes('中繼資料')) {
+          data = Object.assign({}, SECURITY_CATALOG.ssrf, { detailed_reason: str, detailed_reason_en: str });
+        } else if (str.includes('指令注入') || str.includes('Command Injection') || str.includes('注入')) {
+          data = Object.assign({}, SECURITY_CATALOG.injection, { detailed_reason: str, detailed_reason_en: str });
+        } else if (str.includes('白名單') || str.includes('非核准')) {
+          data = Object.assign({}, SECURITY_CATALOG.whitelist, { detailed_reason: str, detailed_reason_en: str });
+        } else {
+          data = {
+            threat_level: 'HIGH',
+            error_code: 'SEC_INTERCEPTED',
+            virus_model: isZh ? 'Security.Policy.Violated (資安規則防禦攔截)' : 'Security.Policy.Violated (Security Policy Intercept)',
+            detailed_reason: str,
+            detailed_reason_en: str,
+            pc_impact: isZh ? '【電腦檔案威脅】來源檔案未通過安全檢核，可能夾帶非預期之二進位載荷或損毀格式，若下載可能威脅本機系統穩定性與檔案安全。' : '[Computer Impact] Source media failed security validation. Downloading may threaten desktop stability and file integrity.',
+            mobile_impact: isZh ? '【手機檔案威脅】若載入行動裝置可能引發媒體服務異常或遭惡意利用，影響手機正常運作。' : '[Mobile Impact] Loading untrusted media on mobile may cause application crashes or security compromise.',
+            action_verdict: isZh ? '故系統依據企業級資安防禦規範，嚴格終止解析並拒絕提供下載，以保護您的電腦與手機檔案安全。' : 'Therefore, in strict adherence to enterprise cybersecurity standards, the system has terminated analysis and refused download to safeguard your computer and mobile files.'
+          };
+        }
+      } else if (errInfo && errInfo.security_diagnostic) {
+        data = errInfo.security_diagnostic;
+      }
+
+      // Populate elements
+      const badgeLevel = document.getElementById('threat-level-badge');
+      if (badgeLevel) {
+        const level = data.threat_level || 'HIGH';
+        badgeLevel.innerText = isZh ? (level === 'CRITICAL' ? 'CRITICAL 危急威脅' : (level === 'HIGH' ? 'HIGH 高度防護' : 'MEDIUM 中度警告'))
+                                    : (level === 'CRITICAL' ? 'CRITICAL THREAT' : (level === 'HIGH' ? 'HIGH PROTECTION' : 'MEDIUM WARNING'));
+        badgeLevel.className = `px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider shadow-sm ${
+          level === 'CRITICAL' ? 'bg-red-600 text-white' : (level === 'HIGH' ? 'bg-orange-600 text-white' : 'bg-amber-600 text-white')
+        }`;
+      }
+
+      const badgeCode = document.getElementById('error-code-badge');
+      if (badgeCode) {
+        badgeCode.innerText = data.error_code || 'SEC_INTERCEPTED';
+      }
+
+      const elReason = document.getElementById('error-detailed-reason');
+      if (elReason) {
+        elReason.innerText = isZh ? (data.detailed_reason || data.formatted_message || '檢測到未符資安規範之來源。')
+                                  : (data.detailed_reason_en || data.detailed_reason || data.formatted_message || 'Detected non-compliant media source.');
+      }
+
+      const elLegacyMsg = document.getElementById('error-message');
+      if (elLegacyMsg) {
+        elLegacyMsg.innerText = data.detailed_reason || data.formatted_message || '';
+      }
+
+      const elModel = document.getElementById('error-virus-model');
+      if (elModel) {
+        elModel.innerText = isZh ? (data.virus_model || 'Security.Policy.Violated (資安規則防禦攔截)')
+                                 : (data.virus_model_en || data.virus_model || 'Security.Policy.Violated');
+      }
+
+      const elPc = document.getElementById('error-pc-impact');
+      if (elPc) {
+        elPc.innerText = isZh ? (data.pc_impact || '【電腦檔案威脅】若執行將觸發勒索軟體 (Ransomware) 惡意加密硬碟中所有個人文件；植入木馬後門 (RAT) 側錄鍵盤輸入、竊取密碼並將主機淪為殭屍網路。')
+                              : (data.pc_impact_en || data.pc_impact || '[Computer Impact] May trigger Ransomware encrypting personal files, inject RAT to log keystrokes and credentials.');
+      }
+
+      const elMobile = document.getElementById('error-mobile-impact');
+      if (elMobile) {
+        elMobile.innerText = isZh ? (data.mobile_impact || '【手機檔案威脅】發動金融覆蓋攻擊竊取網銀帳密、攔截簡訊 OTP 雙重認證碼造成金流盜刷，常駐後台私自耗盡數據流量並洩漏通訊錄與照片。')
+                                  : (data.mobile_impact_en || data.mobile_impact || '[Mobile Impact] May launch banking overlay attacks, intercept SMS OTP codes, exfiltrate contacts and photos.');
+      }
+
+      const elVerdict = document.getElementById('error-action-verdict');
+      if (elVerdict) {
+        elVerdict.innerText = isZh ? (data.action_verdict || '故系統依據企業級資安防禦規範，嚴格終止解析並拒絕提供下載，以保護您的電腦與手機檔案安全。')
+                                   : (data.action_verdict_en || data.action_verdict || 'Therefore, in strict adherence to enterprise cybersecurity standards, the system has terminated analysis and refused download to safeguard your computer and mobile files.');
+      }
+
+      const errBox = document.getElementById('error-alert');
+      if (errBox) {
+        errBox.classList.remove('hidden');
+        errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function showError(errInfo) {
+      lastErrorData = errInfo;
+      renderErrorCard(errInfo);
+    }
+
+    function hideError() {
+      const errBox = document.getElementById('error-alert');
+      if (errBox) errBox.classList.add('hidden');
+    }
+
+    function triggerSecurityDemo(type) {
+      if (SECURITY_CATALOG[type]) {
+        showError(SECURITY_CATALOG[type]);
+      }
+    }
+
     async function startAnalysis(customTitle = null) {
       const url = document.getElementById('video-url-input').value.trim();
       if (!url) {
@@ -1726,8 +2104,16 @@
         return;
       }
 
-      showProgress();
       hideError();
+
+      // Client-Side Security Pre-check (Immediate defense detection)
+      const secCheck = validateUrlClientSide(url);
+      if (!secCheck.is_safe) {
+        showError(secCheck);
+        return;
+      }
+
+      showProgress();
 
       // Check if running on GitHub Pages or static mode directly
       if (isGitHubPages) {
@@ -1749,7 +2135,7 @@
 
         if (!resp.ok) {
           const data = await resp.json();
-          showError(data.detail || data.error || (currentLang === 'zh' ? '解析過程遭資安機制攔截或失敗' : 'Analysis blocked by security filter or failed'));
+          showError(data.security_diagnostic || data.detail || data.error || (currentLang === 'zh' ? '解析過程遭資安機制攔截' : 'Analysis blocked by security filter'));
           hideProgress();
           return;
         }
@@ -1777,11 +2163,31 @@
       }
 
       const file = fileInput.files[0];
+      hideError();
+
+      // Client-side quick file extension check for malware demo/protection
+      const fname = (file.name || '').toLowerCase();
+      if (fname.endsWith('.exe') || fname.endsWith('.dll')) {
+        showError(SECURITY_CATALOG.pe);
+        return;
+      }
+      if (fname.endsWith('.elf') || fname.endsWith('.so') || fname.endsWith('.bin')) {
+        showError(SECURITY_CATALOG.elf);
+        return;
+      }
+      if (fname.endsWith('.apk')) {
+        showError(SECURITY_CATALOG.apk);
+        return;
+      }
+      if (fname.endsWith('.sh') || fname.endsWith('.bat') || fname.endsWith('.vbs')) {
+        showError(SECURITY_CATALOG.injection);
+        return;
+      }
+
       const formData = new FormData();
       formData.append('file', file);
 
       showProgress();
-      hideError();
 
       try {
         const resp = await fetch('/api/analyze/upload', {
@@ -1791,7 +2197,7 @@
 
         const data = await resp.json();
         if (!resp.ok) {
-          showError(data.detail || data.error || (currentLang === 'zh' ? '檔案未通過 Magic Bytes 惡意特徵掃描或轉譯失敗' : 'File failed Magic Bytes malware scan or transcription failed'));
+          showError(data.security_diagnostic || data.detail || data.error || (currentLang === 'zh' ? '檔案未通過 Magic Bytes 惡意特徵掃描' : 'File failed Magic Bytes malware scan'));
           hideProgress();
           return;
         }
@@ -1822,16 +2228,6 @@
       setTimeout(() => {
         document.getElementById('processing-box').classList.add('hidden');
       }, 400);
-    }
-
-    function showError(msg) {
-      const errBox = document.getElementById('error-alert');
-      document.getElementById('error-message').innerText = msg;
-      errBox.classList.remove('hidden');
-    }
-
-    function hideError() {
-      document.getElementById('error-alert').classList.add('hidden');
     }
 
     function renderResults(data, scrollIntoView = true) {

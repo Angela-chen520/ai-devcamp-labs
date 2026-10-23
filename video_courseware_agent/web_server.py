@@ -215,6 +215,16 @@ async def download_media(
     )
 
     if not result.get("success", False):
+        diag = result.get("security_diagnostic")
+        if diag:
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "error": result.get("error", "影音媒體下載遭資安機制攔截。"),
+                    "security_diagnostic": diag,
+                    "detail": diag.get("formatted_message", result.get("error"))
+                }
+            )
         raise HTTPException(
             status_code=403 if result.get("security_alert") else 400,
             detail=result.get("error", "影音媒體下載失敗，請檢查網址或資安限制。")

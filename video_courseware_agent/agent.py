@@ -69,7 +69,8 @@ class VideoLearnOrchestrator:
                 "job_id": job_id,
                 "status": "security_blocked",
                 "error": ingest_result.get("error", "未能通過資安防禦檢核"),
-                "security_report": self.security.get_protection_manifest()
+                "security_report": self.security.get_protection_manifest(),
+                "security_diagnostic": ingest_result.get("security_diagnostic")
             }
 
         # Override title if custom title provided
